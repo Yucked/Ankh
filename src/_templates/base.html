@@ -18,8 +18,15 @@
       background-color: #141414;
     }
 
-    .nav-bg-dark {
+    .bg-pink {
       background-color: #db0c63;
+    }
+
+    footer {
+      position: fixed;
+      height: 100px;
+      bottom: 0;
+      width: 100%;
     }
   </style>
 
@@ -33,7 +40,7 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark nav-bg-dark">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-pink">
     <a class="navbar-brand" href="#">
       <img src="/imgs/logo.svg" width="30" height="30" class="d-inline-block align-top" alt="">
       Ankh
@@ -51,9 +58,15 @@
     </div>
   </nav>
 
-  <div class="container">
+  <div class="container p-3">
     {% block content %}
     {% endblock %}
+  </div>
+
+  <div class="footer fixed-bottom p-3 bg-pink">
+    <div class="container text-center">
+      Available on GitHub https://github.com/Yucked
+    </div>
   </div>
 </body>
 
