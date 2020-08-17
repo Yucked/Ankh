@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}Home{% endblock %}</h1>
+{% endblock %}
+
+{% block head %}
+<style type="text/css">
+    .btn-theme {
+        color: #ced2d6 !important;
+        background-color: #db0c63;
+
+        font-size: 1.1em;
+        width: 200px;
+    }
+</style>
+
+<script>
+    (function () {
+        'use strict';
+        window.addEventListener('load', function () {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="py-5 text-center">
+    <img class="d-block mx-auto mb-4" src="imgs/logo.svg" alt="" width="100" height="100">
+    <h1>Ankh IMVU</h1>
+    <p class="lead">Ankh provides curical information related to an IMVU user.</p>
+</div>
+
+<form action="{{ url_for('search') }}" method="POST" class="needs-validation" novalidate>
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" class="form-control" name="username" id="username" aria-describedby="usernameHelp"
+            placeholder="Enter username / user id" required>
+        <div class="invalid-feedback">
+            Please choose a username. You can also input user id.
+        </div>
+    </div>
+
+    <div class="text-center p-3">
+        <div class="custom-control custom-checkbox custom-control-inline">
+            <input type="checkbox" class="custom-control-input" id="profile" name="profile" checked="checked">
+            <label class="custom-control-label" for="profile">Profile</label>
+        </div>
+        <div class="custom-control custom-checkbox custom-control-inline">
+            <input type="checkbox" class="custom-control-input" id="privateRooms" name="privateRooms">
+            <label class="custom-control-label" for="privateRooms">Private Rooms</label>
+        </div>
+        <div class="custom-control custom-checkbox custom-control-inline">
+            <input type="checkbox" class="custom-control-input" id="roomHistory" name="roomHistory">
+            <label class="custom-control-label" for="roomHistory">Room History</label>
+        </div>
+    </div>
+    <div class="text-center">
+        <button type="submit" class="btn btn-theme p-2">Search User!</button>
+    </div>
+</form>
+{% endblock %}
