@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}User Information{% endblock %}</h1>
+{% endblock %}
+
+{{ user }}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card" style="width: 18rem;">
+        <img class="card-img-top" src="{{ user.avatar }}" alt="Card image cap">
+        <div class="card-body">
+            <h5 class="card-title">{{ user.username }}</h5>
+            <p class="card-text">{{ user.tagline }}</p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
