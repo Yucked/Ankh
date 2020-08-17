@@ -2,7 +2,7 @@ import requests
 import logging
 
 def get_profile(username):
-    cid = get_cid(username)
+    cid = username if username.isnumeric() else get_cid(username)
     response = requests.get(f'http://www.imvu.com/api/avatarcard.php?cid={cid}')
     
     ## Check for status_code
