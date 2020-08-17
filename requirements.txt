@@ -1,0 +1,5 @@
+requests
+flask
+BeautifulSoup4
+redis
+psycopg2
