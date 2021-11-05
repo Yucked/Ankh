@@ -1,10 +1,15 @@
 #nullable enable
 using System.Collections;
 using System.ComponentModel;
+using System.Text;
+using Ankh.Data;
 
 namespace Ankh;
 
 public static class Extensions {
+    private static readonly ReadOnlyMemory<byte> EndSegment
+        = Encoding.UTF8.GetBytes("</int>");
+
     public static T Update<T>(this T before, T after) {
         ArgumentNullException.ThrowIfNull(before, nameof(before));
         ArgumentNullException.ThrowIfNull(after, nameof(after));
@@ -57,5 +62,43 @@ public static class Extensions {
 
     public static int HeadsOrTails(this Random random) {
         return random.Next(0, 500) % 2;
+    }
+
+    public static async Task<UserData> GetUserAsync(this HttpClient httpClient, int id) {
+        using var responseMessage = await httpClient.GetAsync($"http://www.imvu.com/api/avatarcard.php?cid={id}");
+        if (!responseMessage.IsSuccessStatusCode) {
+            throw new Exception(responseMessage.ReasonPhrase);
+        }
+
+        using var content = responseMessage.Content;
+        await using var stream = await content.ReadAsStreamAsync();
+        return await UserData.BuildUserAsync(stream);
+    }
+
+    public static async Task<int> GetIdAsync(this HttpClient httpClient, string username) {
+        using var data = new StringContent(
+            @$"
+        <methodCall>
+        <methodName>gateway.getUserIdForAvatarName</methodName>
+        <params>
+            <param>
+                <value>
+                    <string>{username}</string>
+                </value>
+            </param>
+        </params>s
+        </methodCall>",
+            Encoding.UTF8, "application/xml");
+
+        using var responseMessage =
+            await httpClient.PostAsync("http://secure.imvu.com//catalog/skudb/gateway.php", data);
+        if (!responseMessage.IsSuccessStatusCode) {
+            throw new Exception(responseMessage.ReasonPhrase);
+        }
+
+        using var content = responseMessage.Content;
+        ReadOnlyMemory<byte> byteData = await content.ReadAsByteArrayAsync();
+        var strId = Encoding.UTF8.GetString(byteData[106..byteData.Span.IndexOf(EndSegment.Span)].Span);
+        return int.Parse(strId);
     }
 }

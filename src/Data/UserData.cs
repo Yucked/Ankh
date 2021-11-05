@@ -150,10 +150,11 @@ public readonly record struct UserData : IData {
             return new Misc {
                 IsBuddy = rootElement.GetProperty("is_buddy").GetBoolean(),
                 IsFriend = rootElement.GetProperty("is_friend").GetInt32() == 1,
-                IsCreator = rootElement.GetProperty("is_creator").GetInt32() == 1,
                 IsQualityAssurance = rootElement.GetProperty("is_qa").GetBoolean(),
                 ShowBlock = rootElement.GetProperty("show_block").GetBoolean(),
-                ShowMessage = rootElement.GetProperty("show_message").GetInt32() == 1
+                ShowMessage = rootElement.GetProperty("show_message").GetInt32() == 1,
+                IsCreator = rootElement.TryGetProperty("is_creator", out var isCreator) 
+                            && isCreator.GetInt32() == 1
             };
         }
 
@@ -173,7 +174,6 @@ public readonly record struct UserData : IData {
             RegisteredOn = DateTime.Parse(rootElement.GetProperty("registered").GetString()!),
             LastLogon = DateTime.Parse(rootElement.GetProperty("last_login").GetString()!),
             Gender = rootElement.GetProperty("gender").GetString(),
-            Age = rootElement.GetProperty("age").GetInt32(),
             Tagline = rootElement.GetProperty("tagline").GetString(),
             IsOnline = rootElement.GetProperty("online").GetBoolean(),
             Availability = rootElement.GetProperty("availability").GetString(),
@@ -189,7 +189,10 @@ public readonly record struct UserData : IData {
                 .GetProperty("tag")
                 .GetString(),
             Usernames = new HashSet<string>(),
-            PublicRooms = new List<RoomData>()
+            PublicRooms = new List<RoomData>(),
+            Age = int.TryParse(rootElement.GetProperty("age").GetString(), out var age)
+                ? age
+                : 0
         };
     }
 }

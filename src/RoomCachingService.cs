@@ -117,7 +117,7 @@ public sealed class RoomCachingService : BackgroundService {
         using var content = responseMessage.Content;
         var byteData = await content.ReadAsByteArrayAsync();
         try {
-            var room = Extensions.ToRoom(byteData, url);
+            var room = RoomData.ToRoom(byteData, url);
             await _roomRepository.InsertOrUpdateAsync(room);
         }
         catch (Exception exception) {
