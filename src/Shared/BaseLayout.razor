@@ -1,0 +1,15 @@
+@inherits LayoutComponentBase
+
+
+<div class="columns is-fullheight">
+    <div class="column is-2 is-sidebar-menu is-hidden-mobile">
+        <SideMenu/>
+    </div>
+
+    <div class="column is-main-content content has-text-centered p-5 m-5">
+        <NavBar/>
+        <div class="container p-5">
+            @Body
+        </div>
+    </div>
+</div>

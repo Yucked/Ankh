@@ -1,0 +1,24 @@
+<div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+        <img src="@Image" class="rounded me-2" alt="...">
+        <strong class="me-auto">@Title</strong>
+        <small>@DateTimeOffset.Now</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+        @Message
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string Image { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string Message { get; set; }
+
+}
