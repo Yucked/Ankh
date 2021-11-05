@@ -54,10 +54,6 @@ public record struct Dating(string Status, string Orientation, string LookingFor
 /// 
 /// </summary>
 public readonly record struct UserData : IData {
-    [JsonPropertyName("id")]
-    public string Id
-        => $"{CId}";
-
     [JsonIgnore]
     public int CId { get; private init; }
 
@@ -117,6 +113,10 @@ public readonly record struct UserData : IData {
 
     [JsonPropertyName("usernames")]
     public HashSet<string> Usernames { get; private init; }
+
+    [JsonPropertyName("id")]
+    public string Id
+        => $"{CId}";
 
     public static async ValueTask<UserData> BuildUserAsync(Stream stream) {
         using var document = await JsonDocument.ParseAsync(stream);
@@ -183,6 +183,7 @@ public readonly record struct UserData : IData {
             Moderator = GetModeratorData(),
             Misc = GetMiscUserData(),
             Dating = GetDating(),
+            Badges = BadgesData.GetBadgesData(rootElement),
             Interests = rootElement.GetProperty("interests")
                 .GetProperty("full_text_string")
                 .GetProperty("tag")
