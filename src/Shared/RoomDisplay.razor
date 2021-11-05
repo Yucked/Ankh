@@ -1,0 +1,19 @@
+@using Ankh.Data
+
+<div class="card mb-3">
+    <img src="@Room.Image" class="card-img-top" alt="@Room.Image">
+    <div class="card-body">
+        <h5 class="card-title">@Room.Name</h5>
+        <p class="card-text">@Room.Description</p>
+        <p class="card-text">
+            <small class="text-muted">@Room.Owner</small>
+        </p>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public RoomData Room { get; set; }
+
+}
