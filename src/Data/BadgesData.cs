@@ -1,67 +1,99 @@
-using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace Ankh.Data;
 
-public record struct Badge {
-    [JsonPropertyName("creator_id")]
-    public int CreatorId { get; init; }
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Count"></param>
+/// <param name="Level"></param>
+/// <param name="Layout"></param>
+/// <param name="IsCountVisible"></param>
+/// <param name="Badges"></param>
+public record struct BadgesData(int Count, int Level, string Layout,
+                                bool IsCountVisible, IEnumerable<Badge> Badges) {
+    internal static BadgesData GetBadgesData(JsonElement jsonElement) {
+        return new BadgesData {
+            Count = jsonElement.GetProperty("badge_count").GetInt32(),
+            Level = jsonElement.GetProperty("badge_level").GetInt32(),
+            Layout = jsonElement.GetProperty("badge_area_html").GetString(),
+            IsCountVisible = jsonElement.GetProperty("show_badgecount").GetBoolean(),
+            Badges = GetBadges(jsonElement.GetProperty("badge_layout"))
+        };
+    }
 
-    [JsonPropertyName("creator_badge_index")]
-    public int CreatorIndex { get; init; }
-
-    [JsonPropertyName("name")]
-    public string Name { get; init; }
-
-    [JsonPropertyName("image_mogilekey")]
-    public string ImageMogilekey { get; init; }
-
-    [JsonPropertyName("image_width")]
-    public int Width { get; init; }
-
-    [JsonPropertyName("image_height")]
-    public int Height { get; init; }
-
-    [JsonPropertyName("description")]
-    public string Description { get; init; }
-
-    [JsonPropertyName("allow_autogrant")]
-    public string AllowAutogrant { get; init; }
-
-    [JsonPropertyName("badge_type")]
-    public string BadgeType { get; init; }
-
-    [JsonPropertyName("review_status")]
-    public string ReviewStatus { get; init; }
-
-    [JsonPropertyName("flagger_id")]
-    public string FlaggerId { get; init; }
-
-    [JsonPropertyName("flag_time")]
-    public string FlagTime { get; init; }
-
-    [JsonPropertyName("badgeid")]
-    public string Badgeid { get; init; }
-
-    [JsonPropertyName("image_url")]
-    public string ImageUrl { get; init; }
-
-    [JsonPropertyName("xloc")]
-    public int Xloc { get; init; }
-
-    [JsonPropertyName("yloc")]
-    public int Yloc { get; init; }
+    private static IEnumerable<Badge> GetBadges(JsonElement jsonElement) {
+        return jsonElement.EnumerateObject()
+            .Select(property => property.Value)
+            .Select(badge => new Badge {
+                Id = badge.GetProperty("badgeid").GetString(),
+                Name = badge.GetProperty("name").GetString(),
+                IsAutogranted = badge.GetProperty("allow_autogrant").GetInt32() == 1,
+                Type = badge.GetProperty("badge_type").GetString(),
+                ReviewStatus = badge.GetProperty("review_status").GetString(),
+                Url = badge.GetProperty("image_url").GetString(),
+                Creator = new Creator {
+                    Id = $"{badge.GetProperty("creator_id").GetInt32()}",
+                    Index = badge.GetProperty("creator_badge_index").GetInt32()
+                },
+                Flag = new Flag {
+                    Id = badge.GetProperty("flagger_id").GetString(),
+                    Time = DateTime.Parse(badge.GetProperty("flag_time").GetString()!)
+                },
+                Coordinates = new Coordinates {
+                    X = badge.GetProperty("xloc").GetInt32(),
+                    Y = badge.GetProperty("yloc").GetInt32()
+                },
+                Dimensions = new Dimensions {
+                    Width = badge.GetProperty("image_width").GetInt32(),
+                    Height = badge.GetProperty("image_height").GetInt32(),
+                }
+            });
+    }
 }
 
-public record struct BadgesData {
-    [JsonPropertyName("badge_count")]
-    public int Count { get; private init; }
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Id"></param>
+/// <param name="Name"></param>
+/// <param name="IsAutogranted"></param>
+/// <param name="Type"></param>
+/// <param name="ReviewStatus"></param>
+/// <param name="Url"></param>
+/// <param name="Creator"></param>
+/// <param name="Flag"></param>
+/// <param name="Dimensions"></param>
+/// <param name="Coordinates"></param>
+public record struct Badge(string Id, string Name, bool IsAutogranted,
+                           string Type, string ReviewStatus, string Url,
+                           Creator Creator, Flag Flag,
+                           Dimensions Dimensions, Coordinates Coordinates);
 
-    [JsonPropertyName("badge_level")]
-    public int Level { get; private init; }
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Width"></param>
+/// <param name="Height"></param>
+public record struct Dimensions(int Width, int Height);
 
-    [JsonPropertyName("badge_area_html")]
-    public string HtmlLayout { get; private init; }
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Id"></param>
+/// <param name="Time"></param>
+public record struct Flag(string Id, DateTime Time);
 
-    [JsonPropertyName("show_badgecount")]
-    public bool IsCountVisible { get; private init; }
-}
+/// <summary>
+/// 
+/// </summary>
+/// <param name="X"></param>
+/// <param name="Y"></param>
+public record struct Coordinates(int X, int Y);
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Id"></param>
+/// <param name="Index"></param>
+public record struct Creator(string Id, int Index);
