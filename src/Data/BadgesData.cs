@@ -5,6 +5,52 @@ namespace Ankh.Data;
 /// <summary>
 /// 
 /// </summary>
+/// <param name="Id"></param>
+/// <param name="Name"></param>
+/// <param name="IsAutogranted"></param>
+/// <param name="Type"></param>
+/// <param name="ReviewStatus"></param>
+/// <param name="Url"></param>
+/// <param name="Creator"></param>
+/// <param name="Flag"></param>
+/// <param name="Dimensions"></param>
+/// <param name="Coordinates"></param>
+public record struct Badge(string Id, string Name, bool IsAutogranted,
+                           string Type, string ReviewStatus, string Url,
+                           Creator Creator, Flag Flag,
+                           Dimensions Dimensions, Coordinates Coordinates);
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Width"></param>
+/// <param name="Height"></param>
+public record struct Dimensions(int Width, int Height);
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Id"></param>
+/// <param name="Time"></param>
+public record struct Flag(string Id, DateTime Time);
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="X"></param>
+/// <param name="Y"></param>
+public record struct Coordinates(int X, int Y);
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Id"></param>
+/// <param name="Index"></param>
+public record struct Creator(string Id, int Index);
+
+/// <summary>
+/// 
+/// </summary>
 /// <param name="Count"></param>
 /// <param name="Level"></param>
 /// <param name="Layout"></param>
@@ -51,49 +97,3 @@ public record struct BadgesData(int Count, int Level, string Layout,
             });
     }
 }
-
-/// <summary>
-/// 
-/// </summary>
-/// <param name="Id"></param>
-/// <param name="Name"></param>
-/// <param name="IsAutogranted"></param>
-/// <param name="Type"></param>
-/// <param name="ReviewStatus"></param>
-/// <param name="Url"></param>
-/// <param name="Creator"></param>
-/// <param name="Flag"></param>
-/// <param name="Dimensions"></param>
-/// <param name="Coordinates"></param>
-public record struct Badge(string Id, string Name, bool IsAutogranted,
-                           string Type, string ReviewStatus, string Url,
-                           Creator Creator, Flag Flag,
-                           Dimensions Dimensions, Coordinates Coordinates);
-
-/// <summary>
-/// 
-/// </summary>
-/// <param name="Width"></param>
-/// <param name="Height"></param>
-public record struct Dimensions(int Width, int Height);
-
-/// <summary>
-/// 
-/// </summary>
-/// <param name="Id"></param>
-/// <param name="Time"></param>
-public record struct Flag(string Id, DateTime Time);
-
-/// <summary>
-/// 
-/// </summary>
-/// <param name="X"></param>
-/// <param name="Y"></param>
-public record struct Coordinates(int X, int Y);
-
-/// <summary>
-/// 
-/// </summary>
-/// <param name="Id"></param>
-/// <param name="Index"></param>
-public record struct Creator(string Id, int Index);
