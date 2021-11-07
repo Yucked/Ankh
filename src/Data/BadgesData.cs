@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 
 namespace Ankh.Data;
@@ -31,8 +32,8 @@ public record struct Dimensions(int Width, int Height);
 /// 
 /// </summary>
 /// <param name="Id"></param>
-/// <param name="Time"></param>
-public record struct Flag(string Id, DateTime Time);
+/// <param name="FlaggedOn"></param>
+public record struct Flag(string Id, DateTime FlaggedOn);
 
 /// <summary>
 /// 
@@ -68,32 +69,43 @@ public record struct BadgesData(int Count, int Level, string Layout,
         };
     }
 
-    private static IEnumerable<Badge> GetBadges(JsonElement jsonElement) {
+    private static IReadOnlyList<Badge> GetBadges(JsonElement jsonElement) {
+        static DateTime GetDate(JsonElement jsonElement) {
+            var dateString = jsonElement.GetProperty("flag_time").GetString()!;
+            return dateString
+                .Replace(" ", string.Empty)
+                .Replace(":", string.Empty)
+                .Replace("-", string.Empty)
+                .All(x => x == '0')
+                ? DateTime.MinValue
+                : DateTime.ParseExact(dateString, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+        }
+
         return jsonElement.EnumerateObject()
-            .Select(property => property.Value)
-            .Select(badge => new Badge {
-                Id = badge.GetProperty("badgeid").GetString(),
-                Name = badge.GetProperty("name").GetString(),
-                IsAutogranted = badge.GetProperty("allow_autogrant").GetInt32() == 1,
-                Type = badge.GetProperty("badge_type").GetString(),
-                ReviewStatus = badge.GetProperty("review_status").GetString(),
-                Url = badge.GetProperty("image_url").GetString(),
+            .Select(x => new Badge {
+                Id = x.Value.GetProperty("badgeid").GetString(),
+                Name = x.Value.GetProperty("name").GetString(),
+                IsAutogranted = int.Parse(x.Value.GetProperty("allow_autogrant").GetString()) == 1,
+                Type = x.Value.GetProperty("badge_type").GetString(),
+                ReviewStatus = x.Value.GetProperty("review_status").GetString(),
+                Url = x.Value.GetProperty("image_url").GetString(),
                 Creator = new Creator {
-                    Id = $"{badge.GetProperty("creator_id").GetInt32()}",
-                    Index = badge.GetProperty("creator_badge_index").GetInt32()
+                    Id = $"{x.Value.GetProperty("creator_id").GetInt32()}",
+                    Index = x.Value.GetProperty("creator_badge_index").GetInt32()
                 },
                 Flag = new Flag {
-                    Id = badge.GetProperty("flagger_id").GetString(),
-                    Time = DateTime.Parse(badge.GetProperty("flag_time").GetString()!)
+                    Id = x.Value.GetProperty("flagger_id").GetString(),
+                    FlaggedOn = GetDate(x.Value)
                 },
                 Coordinates = new Coordinates {
-                    X = badge.GetProperty("xloc").GetInt32(),
-                    Y = badge.GetProperty("yloc").GetInt32()
+                    X = x.Value.GetProperty("xloc").GetInt32(),
+                    Y = x.Value.GetProperty("yloc").GetInt32()
                 },
                 Dimensions = new Dimensions {
-                    Width = badge.GetProperty("image_width").GetInt32(),
-                    Height = badge.GetProperty("image_height").GetInt32(),
+                    Width = x.Value.GetProperty("image_width").GetInt32(),
+                    Height = x.Value.GetProperty("image_height").GetInt32(),
                 }
-            });
+            })
+            .ToArray();
     }
 }
