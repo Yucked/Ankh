@@ -23,6 +23,7 @@ public sealed class RoomCachingService : BackgroundService {
         _directoryRepository = directoryRepository;
     }
 
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
         _logger.LogInformation($"{nameof(RoomCachingService)} is starting...");
         stoppingToken.Register(() => _logger.LogDebug("RoomCaching task is stopping..."));
@@ -52,7 +53,7 @@ public sealed class RoomCachingService : BackgroundService {
 
     private async Task GetOrUpdateRoomDirectoryAsync(CancellationToken cancellationToken) {
         using var document = await _browsingContext
-            .OpenAsync("https://www.imvu.com/rooms/", cancellationToken);
+            .OpenAsync(Endpoints.ROOMS, cancellationToken);
 
         var letterList = document.GetElementsByClassName("letter-link notranslate")
             .OfType<IHtmlSpanElement>()
@@ -78,7 +79,7 @@ public sealed class RoomCachingService : BackgroundService {
                 return false;
             }
 
-            nextPage = ((IHtmlAnchorElement) nextElement).Href;
+            nextPage = ((IHtmlAnchorElement)nextElement).Href;
             return true;
         }
 
@@ -110,7 +111,7 @@ public sealed class RoomCachingService : BackgroundService {
     private async Task ParseRoomAsync(string url) {
         using var responseMessage = await _httpClient.GetAsync(url);
         if (!responseMessage.IsSuccessStatusCode) {
-            _logger.LogWarning(responseMessage.ReasonPhrase);
+            _logger.LogWarning("{ReasonPhrase}", responseMessage.ReasonPhrase);
             return;
         }
 
