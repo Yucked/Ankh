@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections;
 using System.ComponentModel;
+using System.Net;
 using System.Text;
 using Ankh.Data;
 
@@ -100,5 +101,9 @@ public static class Extensions {
         ReadOnlyMemory<byte> byteData = await content.ReadAsByteArrayAsync();
         var strId = Encoding.UTF8.GetString(byteData[106..byteData.Span.IndexOf(EndSegment.Span)].Span);
         return int.Parse(strId);
+    }
+
+    public static string Decode(this string str) {
+        return WebUtility.HtmlDecode(WebUtility.UrlDecode(str));
     }
 }

@@ -98,8 +98,8 @@ public record struct RoomData : IData {
         return new RoomData {
             Id = document.GetProperty("roomInstanceId").GetString(),
             Owner = document.GetProperty("owner").GetString(),
-            Name = document.GetProperty("room_name").GetString(),
-            Description = WebUtility.UrlDecode(document.GetProperty("desc").GetString()),
+            Name = document.GetProperty("room_name").GetString()!.Decode(),
+            Description = document.GetProperty("desc").GetString()!.Decode(),
             Capacity = int.Parse(document.GetProperty("max").GetString()!),
             Occupancy = int.Parse(document.GetProperty("count").GetString()!),
             Image = document.GetProperty("img").GetString(),
