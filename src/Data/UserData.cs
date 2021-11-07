@@ -106,7 +106,7 @@ public readonly record struct UserData : IData {
     public Dating Dating { get; private init; }
 
     [JsonPropertyName("badges")]
-    public BadgesData Badges { get; private init; }
+    public BadgesData BadgesData { get; private init; }
 
     [JsonPropertyName("public_rooms")]
     public IReadOnlyCollection<RoomData> PublicRooms { get; private init; }
@@ -183,7 +183,7 @@ public readonly record struct UserData : IData {
             Moderator = GetModeratorData(),
             Misc = GetMiscUserData(),
             Dating = GetDating(),
-            Badges = BadgesData.GetBadgesData(rootElement),
+            BadgesData = BadgesData.GetBadgesData(rootElement),
             Interests = rootElement.GetProperty("interests")
                 .GetProperty("full_text_string")
                 .GetProperty("tag")
