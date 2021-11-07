@@ -1,6 +1,16 @@
-﻿namespace Ankh;
+namespace Ankh;
 
 public readonly record struct Endpoints {
+    /// <summary>
+    /// 
+    /// </summary>
+    public const string BASE_URL = "https://www.imvu.com";
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public const string ROOMS = $"{BASE_URL}/rooms";
+
     /// <summary>
     /// 
     /// </summary>
