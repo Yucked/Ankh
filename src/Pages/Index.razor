@@ -1,10 +1,59 @@
 @page "/"
+@using Ankh.Data
+@using Marten.Linq.LastModified
+
+@inject Repository<UserData> _userRepo
+@inject Repository<RoomData> _roomRepo
+@inject Repository<DirectoryData> _dirRepo
 
 
-<p>
-    <span class="tag is-success">Success</span>
-</p>
-<h1 class="is-1">Título del Artículo en cuestión</h1>
-<p class="subtitle is-4">Esta es la descripción del artículo en cuestión</p>
-<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Commodi ex totam officiis! Quos debitis repellendus modi quidem doloremque quaerat quisquam eos reiciendis, tempora architecto harum cupiditate optio id rerum sequi.</p>
-<p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. A, alias eaque architecto error exercitationem ipsam fugiat voluptatum qui molestiae itaque tempora tenetur numquam laudantium consectetur cumque nihil voluptatem soluta dolores!</p>
+<div class="w-full shadow stats">
+    <div class="stat">
+        <div class="stat-figure text-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+            </svg>
+        </div>
+        <div class="stat-title">Total Rooms</div>
+        <div class="stat-value text-primary">@_dirCount</div>
+        <div class="stat-desc">IMVU room's directory</div>
+    </div>
+    <div class="stat">
+        <div class="stat-figure text-info">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+        </div>
+        <div class="stat-title">Cached Rooms</div>
+        <div class="stat-value text-info">@_roomCount</div>
+        <div class="stat-desc"></div>
+    </div>
+    <div class="stat">
+        <div class="stat-figure text-info">
+            <div class="avatar online">
+                <div class="w-16 h-16 p-1 mask mask-squircle bg-base-100">
+                    <img src="imgs/Ghost.png" alt="Ghost icon" class="mask mask-squircle">
+                </div>
+            </div>
+        </div>
+        <div class="stat-title">Cached Users</div>
+        <div class="stat-value text-info">@_userCount</div>
+        <div class="stat-desc text-info"></div>
+    </div>
+</div>
+
+@code {
+    private int _dirCount;
+    private int _userCount;
+    private int _roomCount;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _userCount = await _userRepo.CountAsync();
+        _roomCount = await _roomRepo.CountAsync();
+
+        var dirList = await _dirRepo.GetAllAsync();
+        _dirCount = dirList.Sum(x => x.Records.Count);
+
+    }
+}
