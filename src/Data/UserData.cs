@@ -40,7 +40,8 @@ public record struct Moderator(bool IsModerator, int WelcomeScore);
 /// <param name="ShowMessage"></param>
 /// <param name="ShowBlock"></param>
 public record struct Misc(bool IsBuddy, bool IsFriend, bool IsCreator,
-                          bool IsQualityAssurance, bool ShowMessage, bool ShowBlock);
+                          bool IsQualityAssurance, bool ShowMessage, bool ShowBlock,
+                          int IMVULevel, int WallpaperId, bool IsAgeVerified);
 
 /// <summary>
 /// 
@@ -119,7 +120,7 @@ public readonly record struct UserData : IData {
         => $"{CId}";
 
     public static async ValueTask<UserData> BuildUserAsync(Stream stream) {
-        using var document = await JsonDocument.ParseAsync(stream);
+        var document = await JsonDocument.ParseAsync(stream);
         var rootElement = document.RootElement;
 
         UserLocation GetLocation() {
@@ -153,8 +154,10 @@ public readonly record struct UserData : IData {
                 IsQualityAssurance = rootElement.GetProperty("is_qa").GetBoolean(),
                 ShowBlock = rootElement.GetProperty("show_block").GetBoolean(),
                 ShowMessage = rootElement.GetProperty("show_message").GetInt32() == 1,
-                IsCreator = rootElement.TryGetProperty("is_creator", out var isCreator) 
-                            && isCreator.GetInt32() == 1
+                IsCreator = rootElement.TryGetProperty("is_creator", out var isCreator)
+                            && isCreator.GetInt32() == 1,
+                //IMVULevel = rootElement.GetProperty("imvu_level").GetInt32(),
+                //WallpaperId = rootElement.GetProperty("wallpaper_id").GetInt32(),
             };
         }
 
@@ -190,7 +193,7 @@ public readonly record struct UserData : IData {
                 .GetString(),
             Usernames = new HashSet<string>(),
             PublicRooms = new List<RoomData>(),
-            Age = int.TryParse(rootElement.GetProperty("age").GetString(), out var age)
+            Age = int.TryParse($"{rootElement.GetProperty("age")}", out var age)
                 ? age
                 : 0
         };
