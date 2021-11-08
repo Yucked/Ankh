@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -6,55 +9,44 @@ using System.Text.Json.Serialization;
 
 namespace Ankh.Data;
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="Location"></param>
-/// <param name="CountryCode"></param>
-/// <param name="State"></param>
-/// <param name="IsFlagIconVisible"></param>
-/// <param name="IsFlagVisible"></param>
-public record struct UserLocation(string Location, int CountryCode, object State,
-                                  bool IsFlagIconVisible, bool IsFlagVisible);
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="Url"></param>
-/// <param name="IsDefault"></param>
-public record struct Avatar(string Url, bool IsDefault);
+public sealed class UserLocation {
+    public string Location { get; init; }
+    public int CountryCode { get; init; }
+    public string State { get; init; }
+    public bool IsFlagIconVisible { get; init; }
+    public bool IsFlagVisible { get; init; }
+}
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="IsModerator"></param>
-/// <param name="WelcomeScore"></param>
-public record struct Moderator(bool IsModerator, int WelcomeScore);
+public sealed class Avatar {
+    public string Url { get; init; }
+    public bool IsDefault { get; init; }
+}
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="IsBuddy"></param>
-/// <param name="IsFriend"></param>
-/// <param name="IsQualityAssurance"></param>
-/// <param name="ShowMessage"></param>
-/// <param name="ShowBlock"></param>
-public record struct Misc(bool IsBuddy, bool IsFriend, bool IsCreator,
-                          bool IsQualityAssurance, bool ShowMessage, bool ShowBlock,
-                          int IMVULevel, int WallpaperId, bool IsAgeVerified);
+public sealed class Moderator {
+    public bool IsModerator { get; init; }
+    public int WelcomeScore { get; init; }
+}
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="Status"></param>
-/// <param name="Orientation"></param>
-/// <param name="LookingFor"></param>
-public record struct Dating(string Status, string Orientation, string LookingFor);
+public sealed class Misc {
+    public bool IsBuddy { get; init; }
+    public bool IsFriend { get; init; }
+    public bool IsCreator { get; init; }
+    public bool IsQualityAssurance { get; init; }
+    public bool ShowMessage { get; init; }
+    public bool ShowBlock { get; init; }
+    public int IMVULevel { get; init; }
+    public int WallpaperId { get; init; }
+    public bool IsAgeVerified { get; init; }
+}
 
-/// <summary>
-/// 
-/// </summary>
-public readonly record struct UserData : IData {
+public sealed class Dating {
+    public string Status { get; init; }
+    public string Orientation { get; init; }
+    public string LookingFor { get; init; }
+}
+
+public sealed class UserData : IData {
     [JsonIgnore]
     public int CId { get; private init; }
 
@@ -115,7 +107,7 @@ public readonly record struct UserData : IData {
     [JsonPropertyName("usernames")]
     public HashSet<string> Usernames { get; private init; }
 
-    [JsonPropertyName("id")]
+    [JsonPropertyName("id"), Key]
     public string Id
         => $"{CId}";
 
@@ -127,7 +119,7 @@ public readonly record struct UserData : IData {
             return new UserLocation {
                 Location = rootElement.GetProperty("location").GetString(),
                 CountryCode = rootElement.GetProperty("country_code").GetInt32(),
-                State = rootElement.GetProperty("location_state"),
+                State = $"{rootElement.GetProperty("location_state")}",
                 IsFlagVisible = rootElement.GetProperty("show_flag_av").GetInt32() == 1,
                 IsFlagIconVisible = rootElement.GetProperty("show_flag_icon").GetInt32() == 1
             };

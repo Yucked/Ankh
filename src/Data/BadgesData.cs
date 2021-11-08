@@ -1,64 +1,55 @@
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Text.Json;
 
 namespace Ankh.Data;
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="Id"></param>
-/// <param name="Name"></param>
-/// <param name="IsAutogranted"></param>
-/// <param name="Type"></param>
-/// <param name="ReviewStatus"></param>
-/// <param name="Url"></param>
-/// <param name="Creator"></param>
-/// <param name="Flag"></param>
-/// <param name="Dimensions"></param>
-/// <param name="Coordinates"></param>
-public record struct Badge(string Id, string Name, bool IsAutogranted,
-                           string Type, string ReviewStatus, string Url,
-                           Creator Creator, Flag Flag,
-                           Dimensions Dimensions, Coordinates Coordinates);
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="Width"></param>
-/// <param name="Height"></param>
-public record struct Dimensions(int Width, int Height);
+public sealed class Badge {
+    [Key]
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public bool IsAutogranted { get; set; }
+    public string Type { get; set; }
+    public string ReviewStatus { get; set; }
+    public string Url { get; set; }
+    public Creator Creator { get; set; }
+    public Flag Flag { get; set; }
+    public Dimensions Dimensions { get; set; }
+    public Coordinates Coordinates { get; set; }
+}
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="Id"></param>
-/// <param name="FlaggedOn"></param>
-public record struct Flag(string Id, DateTime FlaggedOn);
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="X"></param>
-/// <param name="Y"></param>
-public record struct Coordinates(int X, int Y);
+public sealed class Dimensions {
+    public int Width { get; init; }
+    public int Height { get; init; }
+}
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="Id"></param>
-/// <param name="Index"></param>
-public record struct Creator(string Id, int Index);
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="Count"></param>
-/// <param name="Level"></param>
-/// <param name="Layout"></param>
-/// <param name="IsCountVisible"></param>
-/// <param name="Badges"></param>
-public record struct BadgesData(int Count, int Level, string Layout,
-                                bool IsCountVisible, IEnumerable<Badge> Badges) {
+public sealed class Flag {
+    public string Id { get; init; }
+    public DateTime FlaggedOn { get; init; }
+}
+
+public sealed class Coordinates {
+    public int X { get; init; }
+    public int Y { get; init; }
+}
+
+
+public sealed class Creator {
+    public string Id { get; init; }
+    public int Index { get; init; }
+}
+
+public sealed class BadgesData {
+    public int Count { get; set; }
+    public int Level { get; set; }
+    public string Layout { get; set; }
+    public bool IsCountVisible { get; set; }
+    public IEnumerable<Badge> Badges { get; set; }
+
     internal static BadgesData GetBadgesData(JsonElement jsonElement) {
         return new BadgesData {
             Count = jsonElement.GetProperty("badge_count").GetInt32(),

@@ -1,6 +1,6 @@
 namespace Ankh.Data;
 
-public record struct DirectoryData : IData {
+public sealed record DirectoryData : IData {
     /// <summary>
     /// 
     /// </summary>
