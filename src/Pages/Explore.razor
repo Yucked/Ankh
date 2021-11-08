@@ -4,25 +4,58 @@
 @inject Repository<RoomData> _roomRepository
 
 <div class="container">
-    @foreach (var room in Current.Items) {
-        <RoomDisplay Room=@room></RoomDisplay>
-    }
+    @if (Current == default)
+    {
+        <div class="alert alert-warning">
+            <div class="flex-1">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-6 h-6 mx-2 stroke-current">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <label>Loading rooms!</label>
+            </div>
+        </div>
 
-    <div class="container m-5 p-5">
-        <nav class="pagination is-centered" role="navigation" aria-label="pagination">
-            <NavLink @onclick="PrevPageAsync" class="pagination-previous">Previous</NavLink>
-            <NavLink @onclick="NextPageAsync" class="pagination-next">Next page</NavLink>
-            <ul class="pagination-list">
-                @foreach (var (number, _) in NavPages) {
-                    <NavLink @onclick="() => GetPageAsync(number)" class="pagination-link">@number </NavLink>
-                }
-                <li>
-                    <span class="pagination-ellipsis">&hellip;</span>
-                </li>
-                <NavLink @onclick="() => GetPageAsync(Pages.Count - 1)" class="pagination-link">@(Pages.Count - 1)</NavLink>
-            </ul>
-        </nav>
-    </div>
+    }
+    else
+    {
+        @foreach (var room in Current.Items)
+        {
+            <RoomDisplay Room=@room></RoomDisplay>
+        }
+
+        <div class="container m-5 p-5">
+            <div class="btn-group">
+                <button class="btn btn-outline btn-wide">Previous Page</button>
+                <button class="btn btn-outline btn-wide">Next Page</button>
+            </div>
+
+            <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+                <NavLink @onclick="PrevPageAsync" class="pagination-previous">Previous</NavLink>
+                <NavLink @onclick="NextPageAsync" class="pagination-next">Next page</NavLink>
+
+                <div class="btn-group">
+                    <button class="btn">Previous</button>
+                    <button class="btn">1</button>
+                    <button class="btn btn-active">2</button>
+                    <button class="btn">3</button>
+                    <button class="btn">4</button>
+                    <button class="btn">Next</button>
+                </div>
+
+                <ul class="pagination-list">
+                    @foreach (var (number, _) in NavPages)
+                    {
+                        <NavLink @onclick="() => GetPageAsync(number)" class="pagination-link">@number </NavLink>
+                    }
+                    <li>
+                        <span class="pagination-ellipsis">&hellip;</span>
+                    </li>
+                    <NavLink @onclick="() => GetPageAsync(Pages.Count - 1)" class="pagination-link">@(Pages.Count - 1)</NavLink>
+                </ul>
+            </nav>
+        </div>
+
+    }
 </div>
 
 @code {
@@ -33,10 +66,12 @@
     private IList<Page<RoomData>> Pages { get; set; }
     private IEnumerable<Page<RoomData>> NavPages;
 
-    protected override async Task OnInitializedAsync() {
+    protected override async Task OnInitializedAsync()
+    {
         var chunks = (await _roomRepository.GetAllAsync()).Chunk(10).ToList();
         var pages = new List<Page<RoomData>>();
-        for (var i = 1; i < chunks.Count; i++) {
+        for (var i = 1; i < chunks.Count; i++)
+        {
             pages.Add(new Page<RoomData>(i, chunks[i]));
         }
 
@@ -46,17 +81,20 @@
         await base.OnInitializedAsync();
     }
 
-    public async Task NextPageAsync() {
+    public async Task NextPageAsync()
+    {
         Current = Pages[Current.Number + 1];
         await InvokeAsync(StateHasChanged);
     }
 
-    public async Task PrevPageAsync() {
+    public async Task PrevPageAsync()
+    {
         Current = Pages[Current.Number - 1];
         await InvokeAsync(StateHasChanged);
     }
 
-    public async Task GetPageAsync(int pageNumber) {
+    public async Task GetPageAsync(int pageNumber)
+    {
         Current = Pages[pageNumber];
         await InvokeAsync(StateHasChanged);
     }
