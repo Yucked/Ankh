@@ -11,16 +11,19 @@ public sealed class RoomCachingService : BackgroundService {
     private readonly ILogger<RoomCachingService> _logger;
 
     private readonly Repository<RoomData> _roomRepository;
+    private readonly Repository<UserData> _userRepo;
     private readonly Repository<DirectoryData> _directoryRepository;
 
     public RoomCachingService(HttpClient httpClient,
                               IBrowsingContext browsingContext, ILogger<RoomCachingService> logger,
-                              Repository<RoomData> roomRepository, Repository<DirectoryData> directoryRepository) {
+                              Repository<RoomData> roomRepository, Repository<DirectoryData> directoryRepository,
+                              Repository<UserData> userRepo) {
         _httpClient = httpClient;
         _browsingContext = browsingContext;
         _logger = logger;
         _roomRepository = roomRepository;
         _directoryRepository = directoryRepository;
+        _userRepo = userRepo;
     }
 
 
@@ -120,6 +123,12 @@ public sealed class RoomCachingService : BackgroundService {
         try {
             var room = RoomData.ToRoom(byteData, url);
             await _roomRepository.InsertOrUpdateAsync(room);
+
+            await Parallel.ForEachAsync(room.UserHistory.Keys, async (username, _) => {
+                var userId = await _httpClient.GetIdAsync(username);
+                var user = await _httpClient.GetUserAsync(userId);
+                await _userRepo.InsertOrUpdateAsync(user);
+            });
         }
         catch (Exception exception) {
             _logger.LogCritical("{Message} {exception}", exception.Message, exception);
