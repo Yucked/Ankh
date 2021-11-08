@@ -81,6 +81,10 @@ public record struct BadgesData(int Count, int Level, string Layout,
                 : DateTime.ParseExact(dateString, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
         }
 
+        if (jsonElement.ValueKind == JsonValueKind.Array && jsonElement.GetArrayLength() == 0) {
+            return default;
+        }
+
         return jsonElement.EnumerateObject()
             .Select(x => new Badge {
                 Id = x.Value.GetProperty("badgeid").GetString(),
