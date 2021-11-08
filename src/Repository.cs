@@ -4,7 +4,7 @@ using Marten.Linq;
 
 namespace Ankh {
     public sealed class Repository<T>
-        where T : struct, IData {
+        where T : class, IData {
         private readonly IDocumentStore _documentStore;
         private readonly string _tableName;
 

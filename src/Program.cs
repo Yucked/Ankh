@@ -1,36 +1,20 @@
 using AngleSharp;
 using Ankh;
-using Ankh.Data;
-using Marten;
-using Marten.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Colorful;
-using Weasel.Core;
-using Weasel.Postgresql;
 
 var builder = WebApplication.CreateBuilder();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services
     .AddHttpClient()
-    .AddLogging(x => {
-        x.SetMinimumLevel(LogLevel.Information);
+    .AddLogging((Microsoft.Extensions.Logging.ILoggingBuilder x) => {
+        x.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information);
         x.ClearProviders();
         x.AddColorfulConsole();
     })
-    .AddSingleton<Repository<UserData>>()
-    .AddSingleton<Repository<RoomData>>()
-    .AddSingleton<Repository<DirectoryData>>()
-    .AddHostedService<RoomCachingService>()
-    .AddSingleton(BrowsingContext.New(Configuration.Default.WithDefaultLoader()))
-    .AddMarten(x => {
-        x.Connection(builder.Configuration.GetConnectionString("Postgres"));
-        x.AutoCreateSchemaObjects = AutoCreate.All;
-        x.CreateDatabasesForTenants(c => c.ForTenant(nameof(Ankh)));
-        x.Serializer(new SystemTextJsonSerializer {
-            Casing = Casing.SnakeCase,
-            EnumStorage = EnumStorage.AsString
-        });
-    });
+    .AddSingleton<IBrowsingContext>(BrowsingContext.New(Configuration.Default.WithDefaultLoader()))
+    .AddDbContext<IMVUContext>(x => x.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
 
 LoggingExtensions.ChangeConsoleMode();
 var app = builder.Build();
@@ -45,5 +29,7 @@ app.UseHttpsRedirection()
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
+
+await app.EnsureDbCreationAsync();
 
 app.Run();

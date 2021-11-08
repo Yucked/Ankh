@@ -10,10 +10,14 @@
 		<PackageReference Include="AngleSharp" Version="1.0.0-alpha-844" />
 		<PackageReference Include="Marten" Version="4.0.3" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Colorful" Version="1.*" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.0-rtm-ci.20211107T110603" />
 	</ItemGroup>
 
 	<PropertyGroup>
-		<RestoreAdditionalProjectSources>https://www.myget.org/F/yucked/api/v3/index.json</RestoreAdditionalProjectSources>
+		<RestoreAdditionalProjectSources>
+			https://www.myget.org/F/yucked/api/v3/index.json;
+			https://www.myget.org/F/npgsql-unstable/api/v3/index.json
+		</RestoreAdditionalProjectSources>
 	</PropertyGroup>
 
 </Project>

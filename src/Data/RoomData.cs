@@ -5,14 +5,14 @@ using System.Text.Json.Serialization;
 
 namespace Ankh.Data;
 
-public record struct RoomData : IData {
+public sealed record RoomData : IData {
     [JsonIgnore]
     private static readonly ReadOnlyMemory<byte> RoomInfoVar
-        = new byte[] {114, 111, 111, 109, 73, 110, 102, 111, 32, 61};
+        = new byte[] { 114, 111, 111, 109, 73, 110, 102, 111, 32, 61 };
 
     [JsonIgnore]
     private static readonly ReadOnlyMemory<byte> ScriptEnd
-        = new byte[] {60, 47, 115, 99, 114, 105, 112, 116, 62};
+        = new byte[] { 60, 47, 115, 99, 114, 105, 112, 116, 62 };
 
     /// <summary>
     /// 
