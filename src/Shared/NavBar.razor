@@ -1,21 +1,30 @@
-<nav class="navbar is-spaced is-clear" role="navigation" aria-label="main navigation">
-    <div class="container">
-        <div class="navbar-brand">
-            <a class="navbar-item" href="/">
-                <img src="favicon.ico" width="40" height="40">
-            </a>
-
-            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-            </a>
-        </div>
-
-        <div class="navbar-end">
-            <a class="navbar-item" href="#">
-                <i class="fa fa-search" aria-hidden="true"></i>
-            </a>
+<div class="navbar col-span-1 shadow-lg xl:col-span-3 bg-neutral-focus text-neutral-content rounded-box">
+    <div class="flex-none">
+        <button class="btn btn-square btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                </path>
+            </svg>
+        </button>
+    </div>
+    <div class="flex-none px-2 mx-2">
+        <span class="text-lg font-bold">
+            Ankh
+        </span>
+    </div> <div class="flex justify-center flex-1 px-2 mx-2">
+        <div class="items-stretch hidden lg:flex">
+            <NavLink class="btn btn-ghost btn-sm rounded-btn" href="/">Home</NavLink>
+            <NavLink class="btn btn-ghost btn-sm rounded-btn" href="explore">Explore</NavLink>
+            <NavLink class="btn btn-ghost btn-sm rounded-btn" href="/">Profile</NavLink>
+            <NavLink class="btn btn-ghost btn-sm rounded-btn" href="/">Stalk</NavLink>
         </div>
     </div>
-</nav>
+    <div class="flex-none">
+        <button class="btn btn-square btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
+                </path>
+            </svg>
+        </button>
+    </div>
+</div>
