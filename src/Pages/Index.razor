@@ -2,9 +2,7 @@
 @using Ankh.Data
 @using Marten.Linq.LastModified
 
-@inject Repository<UserData> _userRepo
-@inject Repository<RoomData> _roomRepo
-@inject Repository<DirectoryData> _dirRepo
+@inject Database _database
 
 
 <div class="w-full shadow stats">
@@ -49,11 +47,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _userCount = await _userRepo.CountAsync();
-        _roomCount = await _roomRepo.CountAsync();
-
-        var dirList = await _dirRepo.GetAllAsync();
-        _dirCount = dirList.Sum(x => x.Records.Count);
+        _userCount = await _database.CountAsync<UserData>();
+        _roomCount = await _database.CountAsync<RoomData>();
+        _dirCount = await _database.CountAsync<DirectoryData>();
 
     }
 }
