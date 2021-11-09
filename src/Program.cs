@@ -2,6 +2,7 @@ using AngleSharp;
 using Ankh;
 using Microsoft.Extensions.Logging.Colorful;
 using ServiceStack.Redis;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder();
 builder.Services.AddRazorPages();

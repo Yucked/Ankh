@@ -106,10 +106,4 @@ public static class Extensions {
     public static string Decode(this string str) {
         return WebUtility.HtmlDecode(WebUtility.UrlDecode(str));
     }
-
-    public static async Task EnsureDbCreationAsync(this WebApplication app) {
-        await using var scoped = app.Services.CreateAsyncScope();
-        var context = scoped.ServiceProvider.GetRequiredService<IMVUContext>();
-        await context.Database.EnsureCreatedAsync();
-    }
 }
