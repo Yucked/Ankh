@@ -1,8 +1,8 @@
 using AngleSharp;
 using Ankh;
+using Ankh.Caching;
 using Microsoft.Extensions.Logging.Colorful;
 using ServiceStack.Redis;
-using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder();
 builder.Services.AddRazorPages();
@@ -15,7 +15,10 @@ builder.Services
         x.AddColorfulConsole();
     })
     .AddSingleton<Database>()
-    .AddHostedService<RoomCachingService>()
+    .AddSingleton<UserCacher>()
+    .AddSingleton<RoomCacher>()
+    .AddSingleton<DirectoryCacher>()
+    .AddHostedService<CachingService>()
     .AddSingleton(BrowsingContext.New(Configuration.Default.WithDefaultLoader()))
     .AddSingleton<IRedisClientsManagerAsync>(
     new BasicRedisClientManager(builder.Configuration.GetConnectionString("Redis")));
