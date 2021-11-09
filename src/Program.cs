@@ -1,7 +1,7 @@
 using AngleSharp;
 using Ankh;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Colorful;
+using ServiceStack.Redis;
 
 var builder = WebApplication.CreateBuilder();
 builder.Services.AddRazorPages();
@@ -13,8 +13,12 @@ builder.Services
         x.ClearProviders();
         x.AddColorfulConsole();
     })
-    .AddSingleton<IBrowsingContext>(BrowsingContext.New(Configuration.Default.WithDefaultLoader()))
-    .AddDbContext<IMVUContext>(x => x.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
+    .AddSingleton<Database>()
+    .AddHostedService<RoomCachingService>()
+    .AddSingleton(BrowsingContext.New(Configuration.Default.WithDefaultLoader()))
+    .AddSingleton<IRedisClientsManagerAsync>(
+    new BasicRedisClientManager(builder.Configuration.GetConnectionString("Redis")));
+
 
 LoggingExtensions.ChangeConsoleMode();
 var app = builder.Build();
@@ -30,6 +34,4 @@ app.UseHttpsRedirection()
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
-await app.EnsureDbCreationAsync();
-
-app.Run();
+await app.RunAsync();
