@@ -9,21 +9,15 @@ public sealed class RoomCachingService : BackgroundService {
     private readonly HttpClient _httpClient;
     private readonly IBrowsingContext _browsingContext;
     private readonly ILogger<RoomCachingService> _logger;
-
-    private readonly Repository<RoomData> _roomRepository;
-    private readonly Repository<UserData> _userRepo;
-    private readonly Repository<DirectoryData> _directoryRepository;
+    private readonly Database _database;
 
     public RoomCachingService(HttpClient httpClient,
                               IBrowsingContext browsingContext, ILogger<RoomCachingService> logger,
-                              Repository<RoomData> roomRepository, Repository<DirectoryData> directoryRepository,
-                              Repository<UserData> userRepo) {
+                              Database database) {
         _httpClient = httpClient;
         _browsingContext = browsingContext;
         _logger = logger;
-        _roomRepository = roomRepository;
-        _directoryRepository = directoryRepository;
-        _userRepo = userRepo;
+        _database = database;
     }
 
 
@@ -34,7 +28,7 @@ public sealed class RoomCachingService : BackgroundService {
         while (!stoppingToken.IsCancellationRequested) {
             await GetOrUpdateRoomDirectoryAsync(stoppingToken);
 
-            var directoryList = await _directoryRepository.GetAllAsync();
+            var directoryList = await _database.GetAsync<DirectoryData>();
             _logger.LogInformation("Total rooms: {Count}", directoryList.Count);
 
             var roomsDirectory = Random.Shared.HeadsOrTails() == 0
@@ -102,7 +96,7 @@ public sealed class RoomCachingService : BackgroundService {
                 nextPage = await GetRoomUrlsAsync(nextPage);
             }
 
-            await _directoryRepository.InsertOrUpdateAsync(new DirectoryData {
+            await _database.StoreAsync(new DirectoryData {
                 Id = $"{url[^1]}",
                 Records = new HashSet<string>(roomUrls)
             });
@@ -122,12 +116,12 @@ public sealed class RoomCachingService : BackgroundService {
         var byteData = await content.ReadAsByteArrayAsync();
         try {
             var room = RoomData.ToRoom(byteData, url);
-            await _roomRepository.InsertOrUpdateAsync(room);
+            await _database.StoreAsync(room);
 
             await Parallel.ForEachAsync(room.UserHistory.Keys, async (username, _) => {
                 var userId = await _httpClient.GetIdAsync(username);
                 var user = await _httpClient.GetUserAsync(userId);
-                await _userRepo.InsertOrUpdateAsync(user);
+                await _database.StoreAsync(user);
             });
         }
         catch (Exception exception) {
