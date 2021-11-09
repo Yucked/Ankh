@@ -1,15 +1,51 @@
 @using Ankh.Data
 
-<div class="card lg:card-side bordered">
-    <figure>
-        <img src="https://picsum.photos/id/1005/400/250">
-    </figure>
-    <div class="card-body">
-        <h2 class="card-title">Horizontal</h2>
-        <p>Rerum reiciendis beatae tenetur excepturi aut pariatur est eos. Sit sit necessitatibus veritatis sed molestiae voluptates incidunt iure sapiente.</p>
-        <div class="card-actions">
-            <button class="btn btn-primary">Get Started</button>
-            <button class="btn btn-ghost">More info</button>
+<div class="rounded-box shadow-xl overflow-hidden w-full md:flex lg:p-3 lg:m-3 bg-primary-content" style="max-height:270px">
+    <div class="flex w-full md:w-1/2 px-5 pt-8 items-center">
+        <div class="container">
+            <img class="w-10/12 rounded-box" src="@Room.Image">
+        </div>
+
+    </div>
+
+    <div class="flex w-full md:w-1/2 p-10 items-center rounded-box bg-secondary-focus">
+        <div class="w-full">
+            <h3 class="text-lg font-semibold leading-tight text-gray-800">@Room.Name</h3>
+            <h6 class="text-sm leading-tight mb-2">@Room.Owner</h6>
+            <div class="flex w-full items-end mb-6">
+                <span class="block leading-none text-3xl text-gray-800">@Room.Occupancy</span>
+                <span class="block leading-5 text-sm ml-4 text-green-500">@Room.Capacity</span>
+            </div>
+            <div class="flex w-full text-xs">
+                <div class="flex w-5/12">
+                    <div class="flex-1 pr-3 text-left font-semibold">Open</div>
+                    <div class="flex-1 px-3 text-right">0</div>
+                </div>
+                <div class="flex w-7/12">
+                    <div class="flex-1 px-3 text-left font-semibold">Market Cap</div>
+                    <div class="flex-1 pl-3 text-right">0</div>
+                </div>
+            </div>
+            <div class="flex w-full text-xs">
+                <div class="flex w-5/12">
+                    <div class="flex-1 pr-3 text-left font-semibold">High</div>
+                    <div class="px-3 text-right">0</div>
+                </div>
+                <div class="flex w-7/12">
+                    <div class="flex-1 px-3 text-left font-semibold">P/E ratio</div>
+                    <div class="pl-3 text-right">0</div>
+                </div>
+            </div>
+            <div class="flex w-full text-xs">
+                <div class="flex w-5/12">
+                    <div class="flex-1 pr-3 text-left font-semibold">Low</div>
+                    <div class="px-3 text-right">0</div>
+                </div>
+                <div class="flex w-7/12">
+                    <div class="flex-1 px-3 text-left font-semibold">Dividend yield</div>
+                    <div class="pl-3 text-right">0%</div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
