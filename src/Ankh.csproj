@@ -10,7 +10,7 @@
 		<PackageReference Include="AngleSharp" Version="1.0.0-alpha-844" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Colorful" Version="1.*" />
 		<PackageReference Include="StackExchange.Redis" Version="2.2.79" />
-		<PackageReference Include="ServiceStack.Redis" Version="5.13.0" />
+		<PackageReference Include="ServiceStack.Redis" Version="6.0.0" />
 	</ItemGroup>
 
 	<PropertyGroup>
