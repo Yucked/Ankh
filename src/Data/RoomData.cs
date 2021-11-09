@@ -106,7 +106,7 @@ public sealed record RoomData : IData {
             IsVipOnly = string.IsNullOrWhiteSpace(document.GetProperty("vip").GetString()),
             ApNameOnly = document.GetProperty("show_ap_name_only").GetBoolean(),
             Ratings = document.GetProperty("whitelist_rating").GetInt32(),
-            Url = roomUrl,
+            Url = roomUrl.Decode(),
             UserHistory = participants
         };
     }
