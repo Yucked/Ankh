@@ -19,6 +19,16 @@ public readonly record struct Endpoints {
     /// <summary>
     /// 
     /// </summary>
+    public const string GATEWAY_PHP = "http://secure.imvu.com//catalog/skudb/gateway.php";
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public const string AVATAR_CARD = $"{API}/avatarcard.php?cid={{USER_ID}}";
+
+    /// <summary>
+    /// 
+    /// </summary>
     public const string OUTFIT = $"{API}/profile_outfit/profile_outfit-{{USER_ID}}";
 
     /// <summary>
