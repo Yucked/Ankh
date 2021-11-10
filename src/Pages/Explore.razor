@@ -7,28 +7,28 @@
     @if (Current == default)
     {
         <div class="alert alert-warning">
-            <div class="flex-1">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-6 h-6 mx-2 stroke-current">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                </svg>
-                <label>Loading rooms!</label>
+            <div class="flex-1">                
+                <label>⚠️ Loading rooms!</label>
             </div>
         </div>
 
     }
     else
     {
-        @foreach (var room in Current.Items)
-        {
-            <RoomDisplay Room=@room></RoomDisplay>
-        }
+        <div class="">
+            @foreach (var room in Current.Items)
+            {
+                <RoomDisplay Room=@room></RoomDisplay>
+            }
+
+            <div class="rounded-box shadow-xl bg-accent flex items-center space-x-1 p-2">
+                <NavLink @onclick="PrevPageAsync" class="btn btn-outline btn-wide flex items-center">Previous</NavLink>
+                <NavLink @onclick="PrevPageAsync" class="btn btn-outline">1</NavLink>
+                <NavLink @onclick="PrevPageAsync" class="btn btn-outline">1</NavLink>
+                <NavLink @onclick="NextPageAsync" class="btn btn-outline btn-wide">Next page</NavLink>
+            </div>
+        </div>
     }
-    <div class="rounded-box shadow-xl bg-primary-content flex items-center space-x-1">
-        <NavLink @onclick="PrevPageAsync" class="btn btn-outline btn-wide flex items-center">Previous</NavLink>
-        <NavLink @onclick="PrevPageAsync" class="btn btn-outline">1</NavLink>
-        <NavLink @onclick="PrevPageAsync" class="btn btn-outline">1</NavLink>
-        <NavLink @onclick="NextPageAsync" class="btn btn-outline btn-wide">Next page</NavLink>
-    </div>
 </div>
 
 
@@ -57,13 +57,14 @@
 
     public async Task NextPageAsync()
     {
-        Current = Pages[Current.Number + 1];
+        Current = Pages[Current.Number];
         await InvokeAsync(StateHasChanged);
     }
 
     public async Task PrevPageAsync()
     {
-        Current = Pages[Current.Number - 1];
+        var previous = Current.Number - 1;
+        Current = Pages.ElementAt(previous);
         await InvokeAsync(StateHasChanged);
     }
 
@@ -72,5 +73,4 @@
         Current = Pages[pageNumber];
         await InvokeAsync(StateHasChanged);
     }
-
-    }
+}
