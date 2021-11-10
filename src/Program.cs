@@ -18,7 +18,7 @@ builder.Services
     .AddSingleton<UserCacher>()
     .AddSingleton<RoomCacher>()
     .AddSingleton<DirectoryCacher>()
-    .AddHostedService<CachingService>()
+    //.AddHostedService<CachingService>()
     .AddSingleton(BrowsingContext.New(Configuration.Default.WithDefaultLoader()))
     .AddSingleton<IRedisClientsManagerAsync>(
     new BasicRedisClientManager(builder.Configuration.GetConnectionString("Redis")));
