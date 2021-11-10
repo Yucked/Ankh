@@ -1,51 +1,49 @@
 @using Ankh.Data
 
-<div class="rounded-box shadow-xl overflow-hidden w-full md:flex lg:p-3 lg:m-3 bg-primary-content" style="max-height:270px">
-    <div class="flex w-full md:w-1/2 px-5 pt-8 items-center">
-        <div class="container">
-            <img class="w-10/12 rounded-box" src="@Room.Image">
-        </div>
-
+<div class="rounded-box shadow-xl overflow-hidden w-full md:flex p-3 my-5 bg-primary" style="max-height:270px">
+    <div class="flex w-full md:w-1/2 p-10 items-center rounded-box">
+        <figure class="md:flex max-w-2xl p-8 md:p-0 rounded-box">
+            <div class="relative overflow-hidden flex-none w-300 h-200 md:w-300 md:h-auto md:rounded-none md:rounded-l-xl rounded-full mx-auto">
+                <img class="absolute object-cover w-full h-full" src="@Room.Image">
+            </div>
+        </figure>
     </div>
 
-    <div class="flex w-full md:w-1/2 p-10 items-center rounded-box bg-secondary-focus">
+    <div class="flex w-full md:w-1/2 p-10 items-center rounded-box bg-secondary-content">
         <div class="w-full">
-            <h3 class="text-lg font-semibold leading-tight text-gray-800">@Room.Name</h3>
-            <h6 class="text-sm leading-tight mb-2">@Room.Owner</h6>
+            <h3 class="text-4xl font-semibold leading-tight text-gray-800">@Room.Name</h3>
+            <h6 class="text-lg leading-tight mb-2 ml-9">@Room.Owner</h6>
             <div class="flex w-full items-end mb-6">
-                <span class="block leading-none text-3xl text-gray-800">@Room.Occupancy</span>
-                <span class="block leading-5 text-sm ml-4 text-green-500">@Room.Capacity</span>
+                <span class="block leading-tight text-2xl text-gray-800">Occupants:</span>
+                <span class="block leading-5 text-sm ml-4 text-green-500">@Room.Occupancy / @Room.Capacity</span>
             </div>
-            <div class="flex w-full text-xs">
-                <div class="flex w-5/12">
-                    <div class="flex-1 pr-3 text-left font-semibold">Open</div>
-                    <div class="flex-1 px-3 text-right">0</div>
+
+            @if (@Room.UserHistory.Count <= 0)
+            {
+                <div class="flex w-full content-center">
+                    <h3 class="text-lg leading-tight text-gray-800">🙁 No user history!</h3>
                 </div>
-                <div class="flex w-7/12">
-                    <div class="flex-1 px-3 text-left font-semibold">Market Cap</div>
-                    <div class="flex-1 pl-3 text-right">0</div>
+            }
+            else
+            {
+                <div class="flex w-full text-sm">
+                    @for (var i = 0; i < Room.UserHistory.Count; i++)
+                    {
+                        if (i >= 6)
+                        {
+                            break;
+
+                        }
+
+
+                        <div class="flex @(i % 2 == 0 ? "w-5/12" : "w-7/12")">
+                            <div class="flex-1 pr-3 text-left font-semibold">@Room.UserHistory.ElementAt(i).Key</div>
+                            <div class="flex-1 px-3 text-right">@DateOnly.FromDateTime(Room.UserHistory.ElementAt(i).Value.Date)</div>
+                        </div>
+
+                    }
                 </div>
-            </div>
-            <div class="flex w-full text-xs">
-                <div class="flex w-5/12">
-                    <div class="flex-1 pr-3 text-left font-semibold">High</div>
-                    <div class="px-3 text-right">0</div>
-                </div>
-                <div class="flex w-7/12">
-                    <div class="flex-1 px-3 text-left font-semibold">P/E ratio</div>
-                    <div class="pl-3 text-right">0</div>
-                </div>
-            </div>
-            <div class="flex w-full text-xs">
-                <div class="flex w-5/12">
-                    <div class="flex-1 pr-3 text-left font-semibold">Low</div>
-                    <div class="px-3 text-right">0</div>
-                </div>
-                <div class="flex w-7/12">
-                    <div class="flex-1 px-3 text-left font-semibold">Dividend yield</div>
-                    <div class="pl-3 text-right">0%</div>
-                </div>
-            </div>
+            }
         </div>
     </div>
 </div>
