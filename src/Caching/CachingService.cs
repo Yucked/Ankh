@@ -1,12 +1,13 @@
+using System.Collections.Concurrent;
+
 namespace Ankh.Caching;
 
 public sealed class CachingService : BackgroundService {
     private readonly UserCacher _userCacher;
     private readonly RoomCacher _roomCacher;
     private readonly DirectoryCacher _directoryCacher;
-
     private readonly ILogger _logger;
-    private readonly HashSet<string> _urls;
+    private readonly ConcurrentQueue<string> _urls;
 
     public CachingService(UserCacher userCacher,
         RoomCacher roomCacher,
@@ -17,7 +18,7 @@ public sealed class CachingService : BackgroundService {
         _directoryCacher = directoryCacher;
         _logger = logger;
 
-        _urls = new HashSet<string>();
+        _urls = new ConcurrentQueue<string>();
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
@@ -26,50 +27,40 @@ public sealed class CachingService : BackgroundService {
 
         while (!stoppingToken.IsCancellationRequested) {
             await _directoryCacher.CacheDirectoriesAsync(stoppingToken);
-            _logger.LogInformation("Total rooms: {Count}", _directoryCacher.Cache.Sum(x => x.Records.Count));
+            _logger.LogInformation("Total rooms: {Count}",
+                _directoryCacher.Cache.Sum(x => x.Records.Count));
 
-            foreach (var url in _directoryCacher.Cache.SelectMany(x => x.Records)) {
-                if (TryAddToRequestBucket(url)) {
-                    continue;
-                }
+            Parallel.ForEach(
+                _directoryCacher.Cache.SelectMany(x => x.Records),
+                url => _urls.Enqueue($"R::{url}"));
 
-                await ProcessUrlsAsync();
-                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
-            }
+            await ProcessUrlsAsync(stoppingToken);
         }
 
         _logger.LogWarning($"{nameof(CachingService)} has stopped!");
     }
 
-    private bool TryAddToRequestBucket(string url) {
-        if (_urls.Contains(url)) {
-            return true;
-        }
+    private async Task ProcessUrlsAsync(CancellationToken stoppingToken) {
+        while (_urls.TryDequeue(out var url) && !stoppingToken.IsCancellationRequested) {
+            switch (url[0]) {
+                case 'R':
+                    await _roomCacher.CacheRoomAsync(url[3..]);
+                    var lastRoom = _roomCacher.Cache.LastOrDefault();
+                    _logger.LogInformation("Room cached -> {name}", lastRoom.Name);
+                    if (lastRoom.UserHistory.Count == 0) {
+                        continue;
+                    }
 
-        if (_urls.Count > 100) {
-            return false;
-        }
+                    foreach (var user in lastRoom.UserHistory.Keys) {
+                        _urls.Enqueue($"U::{user}");
+                    }
+                    break;
 
-        _urls.Add(url);
-        return true;
-    }
-
-    private async Task ProcessUrlsAsync() {
-        foreach (var url in _urls) {
-            if (url.StartsWith("USER::")) {
-                var userId = await _userCacher.GetIdAsync(url[6..]);
-                await _userCacher.CacheUserAsync(userId);
-            }
-
-
-            await _roomCacher.CacheRoomAsync(url);
-            var lastRoom = _roomCacher.Cache.LastOrDefault();
-            if (lastRoom.UserHistory.Count == 0) {
-                return;
-            }
-
-            foreach (var user in lastRoom.UserHistory.Keys) {
-                _urls.Add($"USER::{user}");
+                case 'U':
+                    var userId = await _userCacher.GetIdAsync(url[3..]);
+                    await _userCacher.CacheUserAsync(userId);
+                    _logger.LogInformation("User cached -> {userId}", userId);
+                    break;
             }
         }
     }
