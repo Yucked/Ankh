@@ -34,8 +34,8 @@ public static class Extensions {
                 continue;
             }
 
-            var collection = ((IEnumerable)beforeProp!).Cast<object>()
-                .Concat(((IEnumerable)afterProp!).Cast<object>())
+            var collection = ((IEnumerable) beforeProp!).Cast<object>()
+                .Concat(((IEnumerable) afterProp!).Cast<object>())
                 .Distinct();
 
             //beforeProps[i].SetValue(before, collection);
