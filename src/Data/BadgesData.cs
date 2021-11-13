@@ -1,46 +1,40 @@
-using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Text.Json;
 
 namespace Ankh.Data;
 
+public record struct Badge(string Id, string Name, bool IsAutogranted,
+                           string Type, string ReviewStatus, string Url,
+                           Creator Creator, Flag Flag,
+                           Dimensions Dimensions, Coordinates Coordinates);
 
-public sealed class Badge {
-    [Key]
-    public string Id { get; set; }
-    public string Name { get; set; }
-    public bool IsAutogranted { get; set; }
-    public string Type { get; set; }
-    public string ReviewStatus { get; set; }
-    public string Url { get; set; }
-    public Creator Creator { get; set; }
-    public Flag Flag { get; set; }
-    public Dimensions Dimensions { get; set; }
-    public Coordinates Coordinates { get; set; }
-}
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Width"></param>
+/// <param name="Height"></param>
+public record struct Dimensions(int Width, int Height);
 
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Id"></param>
+/// <param name="FlaggedOn"></param>
+public record struct Flag(string Id, DateTime FlaggedOn);
 
-public sealed class Dimensions {
-    public int Width { get; init; }
-    public int Height { get; init; }
-}
+/// <summary>
+/// 
+/// </summary>
+/// <param name="X"></param>
+/// <param name="Y"></param>
+public record struct Coordinates(int X, int Y);
 
-
-public sealed class Flag {
-    public string Id { get; init; }
-    public DateTime FlaggedOn { get; init; }
-}
-
-public sealed class Coordinates {
-    public int X { get; init; }
-    public int Y { get; init; }
-}
-
-
-public sealed class Creator {
-    public string Id { get; init; }
-    public int Index { get; init; }
-}
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Id"></param>
+/// <param name="Index"></param>
+public record struct Creator(string Id, int Index);
 
 public sealed class BadgesData {
     public int Count { get; set; }

@@ -4,14 +4,19 @@ using System.Text.Json.Serialization;
 
 namespace Ankh.Data;
 
-public sealed record RoomData : IData {
+public record struct RoomData {
     [JsonIgnore]
     private static readonly ReadOnlyMemory<byte> RoomInfoVar
-        = new byte[] { 114, 111, 111, 109, 73, 110, 102, 111, 32, 61 };
+        = new byte[] {114, 111, 111, 109, 73, 110, 102, 111, 32, 61};
 
     [JsonIgnore]
     private static readonly ReadOnlyMemory<byte> ScriptEnd
-        = new byte[] { 60, 47, 115, 99, 114, 105, 112, 116, 62 };
+        = new byte[] {60, 47, 115, 99, 114, 105, 112, 116, 62};
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public string Id { get; init; }
 
     /// <summary>
     /// 
@@ -72,11 +77,6 @@ public sealed record RoomData : IData {
     /// 
     /// </summary>
     public IDictionary<string, DateTimeOffset> UserHistory { get; init; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public string Id { get; init; }
 
     public static RoomData ToRoom(Span<byte> data, string roomUrl) {
         var slice = data[(data.IndexOf(RoomInfoVar.Span) + RoomInfoVar.Length)..];
