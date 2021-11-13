@@ -2,16 +2,19 @@ using Ankh.Data;
 using System.Text;
 
 namespace Ankh.Caching;
+
 public sealed record UserCacher : AbstractCacher<UserData> {
     private static readonly ReadOnlyMemory<byte> EndSegment = new byte[] {
-        60, 47, 105, 110, 116, 62 };
+        60, 47, 105, 110, 116, 62
+    };
+
     public UserCacher(ILogger<UserData> logger, HttpClient httpClient)
         : base(logger, httpClient) { }
 
     public async Task CacheUserAsync(int id) {
         using var responseMessage = await _httpClient.GetAsync(Endpoints.AVATAR_CARD.Id(id));
         if (!responseMessage.IsSuccessStatusCode) {
-            _logger.LogError("ReasonPhrase", responseMessage.ReasonPhrase);
+            _logger.LogError("{ReasonPhrase}", responseMessage.ReasonPhrase);
             return;
         }
 
@@ -38,7 +41,7 @@ public sealed record UserCacher : AbstractCacher<UserData> {
 
         using var responseMessage = await _httpClient.PostAsync(Endpoints.GATEWAY_PHP, data);
         if (!responseMessage.IsSuccessStatusCode) {
-            _logger.LogError("ReasonPhrase", responseMessage.ReasonPhrase);
+            _logger.LogError("{ReasonPhrase}", responseMessage.ReasonPhrase);
             return default;
         }
 
