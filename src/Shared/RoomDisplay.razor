@@ -1,12 +1,33 @@
 @using Ankh.Data
 
-<div class="flex flex-1 justify-center bg-accent m-5 rounded-box">
-    <div class="flex-none px-2 mx-2">
-        <span class="text-lg font-bold">
-            @Room.Name
-        </span>
+<div class="card lg:card-side bordered rounded-box m-3 shadow-lg flex flex-col w-full lg:flex-row">
+    <div class="grid flex-grow place-items-center h-80 lg:w-1/2">
+        <figure>
+            <img class="object-cover" src="@Room.Image">
+        </figure>
+    </div>
+
+    <div class="grid flex-grow place-items-center">
+        <div class="bg-gray-50 lg:bg-transparent card-body items-center w-full">
+            <h2 class="card-title">@Room.Name</h2>
+            <p>Rerum reiciendis beatae tenetur excepturi aut pariatur est eos. Sit sit necessitatibus veritatis sed molestiae voluptates incidunt iure sapiente.</p>
+            <div class="card-actions">
+                <NavLink class="btn btn-primary btn-wide" href="@Room.Url">Join</NavLink>
+                <label for="@Room.Id" class="btn btn-primary modal-button btn-wide">More Info</label>
+                <input type="checkbox" id="@Room.Id" class="modal-toggle">
+                <div class="modal">
+                    <div class="modal-box">
+                        <p>@Room.Description</p>
+                        <div class="modal-action">
+                            <label for="@Room.Id" class="btn">Close</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
 
 @code {
     [Parameter]
