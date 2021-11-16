@@ -4,7 +4,7 @@
 @inject Database _database
 
 <div class="w-full shadow stats">
-    <div class="stat">
+    <div class="stat  @(_dirCount == 0 ? "animate-pulse" : string.Empty)">
         <div class="stat-figure text-primary">
             <div class="avatar">
                 <div class="w-16 h-16 p-1 mask mask-squircle">
@@ -16,7 +16,7 @@
         <div class="stat-value text-primary">@_dirCount</div>
         <div class="stat-desc">IMVU room's directory</div>
     </div>
-    <div class="stat">
+    <div class="stat  @(_roomCount == 0 ? "animate-pulse" : string.Empty)">
         <div class="stat-figure text-info">
             <div class="avatar">
                 <div class="w-16 h-16 p-1 mask mask-squircle">
@@ -28,7 +28,7 @@
         <div class="stat-value text-info">@_roomCount</div>
         <div class="stat-desc"></div>
     </div>
-    <div class="stat">
+    <div class="stat  @(_userCount == 0 ? "animate-pulse" : string.Empty)">
         <div class="stat-figure text-info">
             <div class="avatar">
                 <div class="w-16 h-16 p-1 mask mask-squircle">
@@ -47,11 +47,13 @@
     private int _userCount;
     private int _roomCount;
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
-        _userCount = await _database.CountAsync<UserData>();
-        _roomCount = await _database.CountAsync<RoomData>();
-        _dirCount = await _database.CountAsync<DirectoryData>();
-
+        return Task.Run(async () =>
+        {
+            _userCount = await _database.CountAsync<UserData>();
+            _roomCount = await _database.CountAsync<RoomData>();
+            _dirCount = await _database.CountAsync<DirectoryData>();
+        });
     }
 }
