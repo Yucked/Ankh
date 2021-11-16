@@ -1,17 +1,11 @@
 namespace Ankh.Caching;
 
-public abstract record AbstractCacher<T> {
-    protected ILogger<T> _logger;
-    protected HttpClient _httpClient;
-    public HashSet<T> Cache { get; }
+public abstract record AbstractCacher<T>(ILogger<T> Logger, HttpClient HttpClient) {
+    protected readonly ILogger<T> Logger = Logger;
+    protected readonly HttpClient HttpClient = HttpClient;
+    public HashSet<T> Cache { get; } = new();
 
-    public AbstractCacher(ILogger<T> logger, HttpClient httpClient) {
-        _logger = logger;
-        _httpClient = httpClient;
-        Cache = new HashSet<T>();
-    }
-
-    public void AddToCache(T item) {
+    protected void AddToCache(T item) {
         Cache.Add(item);
     }
 }

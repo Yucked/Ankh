@@ -12,9 +12,9 @@ public sealed record UserCacher : AbstractCacher<UserData> {
         : base(logger, httpClient) { }
 
     public async Task CacheUserAsync(int id) {
-        using var responseMessage = await _httpClient.GetAsync(Endpoints.AVATAR_CARD.Id(id));
+        using var responseMessage = await HttpClient.GetAsync(Endpoints.AVATAR_CARD.Id(id));
         if (!responseMessage.IsSuccessStatusCode) {
-            _logger.LogError("{ReasonPhrase}", responseMessage.ReasonPhrase);
+            Logger.LogError("{ReasonPhrase}", responseMessage.ReasonPhrase);
             return;
         }
 
@@ -39,9 +39,9 @@ public sealed record UserCacher : AbstractCacher<UserData> {
         </methodCall>",
             Encoding.UTF8, "application/xml");
 
-        using var responseMessage = await _httpClient.PostAsync(Endpoints.GATEWAY_PHP, data);
+        using var responseMessage = await HttpClient.PostAsync(Endpoints.GATEWAY_PHP, data);
         if (!responseMessage.IsSuccessStatusCode) {
-            _logger.LogError("{ReasonPhrase}", responseMessage.ReasonPhrase);
+            Logger.LogError("{ReasonPhrase}", responseMessage.ReasonPhrase);
             return default;
         }
 

@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace Ankh.Data;
 
-public record struct RoomData {
+public sealed record RoomData {
     [JsonIgnore]
     private static readonly ReadOnlyMemory<byte> RoomInfoVar
         = new byte[] {114, 111, 111, 109, 73, 110, 102, 111, 32, 61};
@@ -109,5 +109,14 @@ public record struct RoomData {
             Url = roomUrl.Decode(),
             UserHistory = participants
         };
+    }
+
+    public static RoomData Update(RoomData before, RoomData after) {
+        var updated = before.Update(after);
+        foreach (var (user, time) in after.UserHistory) {
+            updated.UserHistory[user] = time;
+        }
+
+        return updated;
     }
 }

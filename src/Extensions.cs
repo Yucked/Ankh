@@ -1,5 +1,4 @@
 #nullable enable
-using System.Collections;
 using System.ComponentModel;
 using System.Net;
 
@@ -24,21 +23,15 @@ public static class Extensions {
                 continue;
             }
 
-            if (!IsEnumerable(beforeProps[i].PropertyType)) {
-                beforeProps[i].SetValue(before, afterProp);
+            if (IsEnumerable(beforeProps[i].PropertyType)) {
                 continue;
             }
 
-            if (IsNull(beforeProp) && !IsNull(afterProp)) {
-                beforeProps[i].SetValue(before, afterProp);
+            if (!IsNull(beforeProp) || IsNull(afterProp)) {
                 continue;
             }
 
-            var collection = ((IEnumerable) beforeProp!).Cast<object>()
-                .Concat(((IEnumerable) afterProp!).Cast<object>())
-                .Distinct();
-
-            //beforeProps[i].SetValue(before, collection);
+            beforeProps[i].SetValue(before, afterProp);
         }
 
         static bool IsEnumerable(Type type) {

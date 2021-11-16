@@ -6,9 +6,9 @@ public record RoomCacher : AbstractCacher<RoomData> {
         : base(logger, httpClient) { }
 
     public async Task CacheRoomAsync(string url) {
-        using var responseMessage = await _httpClient.GetAsync(url);
+        using var responseMessage = await HttpClient.GetAsync(url);
         if (!responseMessage.IsSuccessStatusCode) {
-            _logger.LogWarning("{ReasonPhrase}", responseMessage.ReasonPhrase);
+            Logger.LogWarning("{ReasonPhrase}", responseMessage.ReasonPhrase);
             return;
         }
 
@@ -19,7 +19,7 @@ public record RoomCacher : AbstractCacher<RoomData> {
             AddToCache(room);
         }
         catch (Exception exception) {
-            _logger.LogCritical("{Message} {exception}", exception.Message, exception);
+            Logger.LogCritical("{Message} {exception}", exception.Message, exception);
         }
     }
 }
