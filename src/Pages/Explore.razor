@@ -4,32 +4,32 @@
 @inject Database _database
 
 
-@if (Current == default)
-{
-    <div class="alert alert-warning">
-        <div class="flex-1">
-            <label>⚠️ Loading rooms!</label>
-        </div>
-    </div>
-}
-else
-{
-    @foreach (var room in Current.Items)
+<div class="container mx-auto">
+    @if (Current == default)
     {
-        <RoomDisplay Room=@room></RoomDisplay>
-    }
-
-    <div class="flex flex-1 justify-center bg-accent p-2 rounded-box">
-        <div class="items-stretch hidden lg:flex gap-x-3">
-            <NavLink @onclick="PrevPageAsync" class="btn btn-outline btn-wide flex items-center">Previous</NavLink>
-            <NavLink @onclick="PrevPageAsync" class="btn btn-outline">1</NavLink>
-            <NavLink @onclick="PrevPageAsync" class="btn btn-outline">1</NavLink>
-            <NavLink @onclick="NextPageAsync" class="btn btn-outline btn-wide">Next page</NavLink>
+        <div class="alert alert-warning">
+            <div class="flex-1">
+                <label>⚠️ Loading rooms!</label>
+            </div>
         </div>
-    </div>
-}
+    }
+    else
+    {
+        @foreach (var room in Current.Items)
+        {
+            <RoomDisplay Room=@room></RoomDisplay>
+        }
 
-
+        <div class="flex flex-1 justify-center bg-accent p-2 rounded-box">
+            <div class="items-stretch flex gap-x-3">
+                <NavLink @onclick="PrevPageAsync" class="btn btn-outline btn-wide">Previous</NavLink>
+                <NavLink @onclick="PrevPageAsync" class="btn btn-outline">1</NavLink>
+                <NavLink @onclick="PrevPageAsync" class="btn btn-outline">1</NavLink>
+                <NavLink @onclick="NextPageAsync" class="btn btn-outline btn-wide">Next page</NavLink>
+            </div>
+        </div>
+    }
+</div>
 
 @code {
 
@@ -41,7 +41,10 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var chunks = (await _database.GetAsync<RoomData>()).Chunk(10).ToList();
+        var chunks = (await _database.GetAsync<RoomData>())
+        .OrderBy(x => x.Name)
+        .Chunk(10)
+        .ToList();
         var pages = new List<Page<RoomData>>();
         for (var i = 1; i < chunks.Count; i++)
         {
