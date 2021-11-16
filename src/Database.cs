@@ -71,7 +71,6 @@ public sealed class Database {
     public async ValueTask UpdateAsync<T>(string id, T update) {
         await using var client = await _clientsManager.GetReadOnlyClientAsync();
         var dataType = client.As<T>();
-        var document = await dataType.GetByIdAsync(id);
-        await dataType.StoreAsync(document.Update(update));
+        await dataType.StoreAsync(update);
     }
 }

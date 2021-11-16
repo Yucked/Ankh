@@ -6,52 +6,43 @@ using System.Text.Json.Serialization;
 
 namespace Ankh.Data;
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="Location"></param>
-/// <param name="CountryCode"></param>
-/// <param name="State"></param>
-/// <param name="IsFlagIconVisible"></param>
-/// <param name="IsFlagVisible"></param>
-public record struct UserLocation(string Location, int CountryCode, object State,
-                                  bool IsFlagIconVisible, bool IsFlagVisible);
+public sealed class UserLocation {
+    public string Location { get; init; }
+    public int CountryCode { get; init; }
+    public string State { get; init; }
+    public bool IsFlagIconVisible { get; init; }
+    public bool IsFlagVisible { get; init; }
+}
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="Url"></param>
-/// <param name="IsDefault"></param>
-public record struct Avatar(string Url, bool IsDefault);
+public sealed class Avatar {
+    public string Url { get; init; }
+    public bool IsDefault { get; init; }
+}
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="IsModerator"></param>
-/// <param name="WelcomeScore"></param>
-public record struct Moderator(bool IsModerator, int WelcomeScore);
+public sealed class Moderator {
+    public bool IsModerator { get; init; }
+    public int WelcomeScore { get; init; }
+}
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="IsBuddy"></param>
-/// <param name="IsFriend"></param>
-/// <param name="IsQualityAssurance"></param>
-/// <param name="ShowMessage"></param>
-/// <param name="ShowBlock"></param>
-public record struct Misc(bool IsBuddy, bool IsFriend, bool IsCreator,
-                          bool IsQualityAssurance, bool ShowMessage, bool ShowBlock,
-                          int ImvuLevel, int WallpaperId, bool IsAgeVerified);
+public sealed class Misc {
+    public bool IsBuddy { get; init; }
+    public bool IsFriend { get; init; }
+    public bool IsCreator { get; init; }
+    public bool IsQualityAssurance { get; init; }
+    public bool ShowMessage { get; init; }
+    public bool ShowBlock { get; init; }
+    public int IMVULevel { get; init; }
+    public int WallpaperId { get; init; }
+    public bool IsAgeVerified { get; init; }
+}
 
-/// <summary>
-/// 
-/// </summary>
-/// <param name="Status"></param>
-/// <param name="Orientation"></param>
-/// <param name="LookingFor"></param>
-public record struct Dating(string Status, string Orientation, string LookingFor);
+public sealed class Dating {
+    public string Status { get; init; }
+    public string Orientation { get; init; }
+    public string LookingFor { get; init; }
+}
 
-public readonly record struct UserData {
+public sealed class UserData {
     [JsonIgnore]
     public int CId { get; private init; }
 
@@ -194,5 +185,18 @@ public readonly record struct UserData {
                 ? age
                 : 0
         };
+    }
+
+    public static UserData Update(UserData before, UserData after) {
+        var updated = before.Update(after);
+        if (!updated.Usernames.Contains(before.Username)) {
+            updated.Usernames.Add(before.Username);
+        }
+
+        if (!updated.Usernames.Contains(after.Username)) {
+            updated.Usernames.Add(after.Username);
+        }
+
+        return updated;
     }
 }
