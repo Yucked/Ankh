@@ -12,14 +12,16 @@
             <h2 class="card-title">@Room.Name</h2>
             <p>Rerum reiciendis beatae tenetur excepturi aut pariatur est eos. Sit sit necessitatibus veritatis sed molestiae voluptates incidunt iure sapiente.</p>
             <div class="card-actions">
-                <NavLink class="btn btn-primary btn-wide" href="@Room.Url">Join</NavLink>
-                <label for="@Room.Id" class="btn btn-primary modal-button btn-wide">More Info</label>
-                <input type="checkbox" id="@Room.Id" class="modal-toggle">
-                <div class="modal">
-                    <div class="modal-box">
-                        <p>@Room.Description</p>
-                        <div class="modal-action">
-                            <label for="@Room.Id" class="btn">Close</label>
+                <div class="flex flex-row gap-2">
+                    <NavLink class="btn btn-primary btn-wide" href="@Room.Url">Join</NavLink>
+                    <label for="@Room.Id" class="btn btn-primary modal-button btn-wide">More Info</label>
+                    <input type="checkbox" id="@Room.Id" class="modal-toggle">
+                    <div class="modal">
+                        <div class="modal-box">
+                            <p>@(string.IsNullOrWhiteSpace(Room.Description) ? "😓 No description provided!" : Room.Description)</p>
+                            <div class="modal-action">
+                                <label for="@Room.Id" class="btn">Close</label>
+                            </div>
                         </div>
                     </div>
                 </div>
