@@ -3,7 +3,7 @@
         "Ankh": {
             "commandName": "Project",
             "dotnetRunMessages": true,
-            "applicationUrl": "https://0.0.0.0:7246;http://0.0.0.0:5248",
+            "applicationUrl": "https://127.0.0.1:7246;http://127.0.0.1:5248",
             "environmentVariables": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
             }
