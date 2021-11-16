@@ -1,62 +1,53 @@
 @inherits LayoutComponentBase
 
-<div class="drawer min-h-screen lg:p-10 rounded-box">
-    <input id="drawer-toggle" type="checkbox" class="drawer-toggle">
-    <div class="drawer-content flex flex-col items-center justify-center overflow-x-hidden">
-        <div class="navbar w-full shadow-lg bg-secondary text-neutral-content rounded-box">
-            <div class="flex-none lg:hidden">
-                <label for="drawer-toggle" class="btn btn-square btn-ghost">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </label>
-            </div>
-
-            <div class="flex-none px-2 mx-2">
-                <span class="text-lg font-bold">
-                    Ankh
-                </span>
-            </div>
-
-            <div class="flex flex-1 justify-center px-2 mx-2">
-                <div class="items-stretch hidden lg:flex">
-                    <NavLink class="btn btn-ghost btn-sm rounded-btn" href="/">Home</NavLink>
-                    <NavLink class="btn btn-ghost btn-sm rounded-btn" href="explore">Explore</NavLink>
-                    <NavLink class="btn btn-ghost btn-sm rounded-btn" href="/">Profile</NavLink>
-                    <NavLink class="btn btn-ghost btn-sm rounded-btn" href="/">Stalk</NavLink>
-                </div>
+<div class="flex flex-col min-h-screen gap-6 p-10 rounded-box">
+    <div class="navbar col-span-1 shadow-lg xl:col-span-3 bg-secondary text-neutral-content rounded-box">
+        <div class="flex-none">
+            <button class="btn btn-square btn-ghost">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                    </path>
+                </svg>
+            </button>
+        </div>
+        <div class="flex-none px-2 mx-2">
+            <span class="text-lg font-bold">
+                Ankh
+            </span>
+        </div> <div class="flex justify-center flex-1 px-2 mx-2">
+            <div class="items-stretch hidden lg:flex">
+                <NavLink class="btn btn-ghost btn-sm rounded-btn" href="/">Home</NavLink>
+                <NavLink class="btn btn-ghost btn-sm rounded-btn" href="explore">Explore</NavLink>
+                <NavLink class="btn btn-ghost btn-sm rounded-btn" href="/">Profile</NavLink>
+                <NavLink class="btn btn-ghost btn-sm rounded-btn" href="/">Stalk</NavLink>
             </div>
         </div>
+        <div class="flex-none">
+            <button class="btn btn-square btn-ghost">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
+                    </path>
+                </svg>
+            </button>
+        </div>
+    </div>
 
-        <main class="flex-grow w-full p-7 m-7">
-            @Body
-        </main>
+    <main class="flex-grow">
+        @Body
+    </main>
 
-        <footer class="footer w-full shadow-lg bg-secondary text-primary-content footer-center rounded-box p-5">
-            <div>
-                <div class="avatar">
-                    <div class="w-20 h-20 mask mask-squircle">
-                        <img src="favicon.png" alt="Ghost icon" class="mask mask-squircle">
-                    </div>
+    <footer class="p-10 footer bg-secondary text-primary-content footer-center rounded-box">
+        <div>
+            <div class="avatar">
+                <div class="w-20 h-20 mask mask-squircle">
+                    <img src="favicon.png" alt="Ghost icon" class="mask mask-squircle">
                 </div>
-                <p class="font-bold">
-                    ANKH - Yucked
-                    <br>Reliable stalking since 2021
-                </p>
-                <p>Copyright © 2021 - All right reserved</p>
             </div>
-        </footer>
-    </div>
-
-    <div class="drawer-side">
-        <label for="drawer-toggle" class="drawer-overlay"></label>
-        <ul class="menu overflow-y-auto p-4 w-80 bg-secondary-focus rounded-lg visible lg:invisible">
-            <li>
-                <a>Item 2</a>
-            </li>
-            <li>
-                <a>Item 2</a>
-            </li>
-        </ul>
-    </div>
+            <p class="font-bold">
+                ANKH - Yucked
+                <br>Reliable stalking since 2021
+            </p>
+            <p>Copyright © 2021 - All right reserved</p>
+        </div>
+    </footer>
 </div>
