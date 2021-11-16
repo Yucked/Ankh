@@ -8,6 +8,10 @@ html, body {
     font-family: 'Neucha', cursive;
 }
 
+.drawer-overlay {
+    background-color: hsla(190 50% 94% / 1) !important;
+}
+
 *::-webkit-scrollbar {
     width: 5px;
 }
@@ -41,7 +45,7 @@ html, body {
     }
 
 .blazor-error-boundary {
-    content: ⚠️;
+    content: "⚠️";
     padding: 1rem 1rem 1rem 3.7rem;
     color: white;
 }
