@@ -65,7 +65,9 @@ public static class Extensions {
         return str.Replace("USER_ID", $"{id}");
     }
 
-    public static string GetConnection(this WebApplicationBuilder builder, string connectionString) {
-        return builder.Configuration.GetConnectionString(connectionString);
+    public static T GetService<T>(this WebApplication application) {
+#pragma warning disable CS8714
+        return application.Services.GetRequiredService<T>();
+#pragma warning restore CS8714
     }
 }
