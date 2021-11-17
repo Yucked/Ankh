@@ -57,37 +57,22 @@ public sealed class Database {
     public async ValueTask<IReadOnlyList<T>> GetAsync<T>() {
         var server = _connectionMultiplexer.GetServer(_connection.EndPoint);
         var db = _connectionMultiplexer.GetDatabase();
-
-        IEnumerable<RedisKey> keys;
-        if (typeof(T).Equals(typeof(UserData))) {
-            keys = server.Keys(_connection.Database, "*userdata*");
-        }
-        else if (typeof(T).Equals(typeof(RoomData))) {
-            keys = server.Keys(_connection.Database, "*roomdata*");
-        }
-        else {
-            keys = server.Keys(_connection.Database, "*directorydata*");
-        }
-
+        var keys = typeof(T).Equals(typeof(UserData))
+            ? server.Keys(_connection.Database, $"*{nameof(UserData)}*")
+            : typeof(T).Equals(typeof(RoomData))
+            ? server.Keys(_connection.Database, $"*{nameof(RoomData)}*")
+            : server.Keys(_connection.Database, $"*{nameof(DirectoryData)}*");
         var values = await Task.WhenAll(keys.Select(x => db.StringGetAsync(x)));
-        var de = values.Select(x => JsonSerializer.Deserialize<T>(x, _serializerOptions));
-        var final = (IReadOnlyList<T>)de;
-        return final;
+        return new List<T>(values.Select(x => JsonSerializer.Deserialize<T>(x, _serializerOptions)));
     }
 
     public ValueTask<int> CountAsync<T>() {
         var server = _connectionMultiplexer.GetServer(_connection.EndPoint);
-        IEnumerable<RedisKey> keys;
-        if (typeof(T).Equals(typeof(UserData))) {
-            keys = server.Keys(_connection.Database, "*userdata*");
-        }
-        else if (typeof(T).Equals(typeof(RoomData))) {
-            keys = server.Keys(_connection.Database, "*roomdata*");
-        }
-        else {
-            keys = server.Keys(_connection.Database, "*directorydata*");
-        }
-
+        var keys = typeof(T).Equals(typeof(UserData))
+            ? server.Keys(_connection.Database, $"*{nameof(UserData)}*")
+            : typeof(T).Equals(typeof(RoomData))
+            ? server.Keys(_connection.Database, $"*{nameof(RoomData)}*")
+            : server.Keys(_connection.Database, $"*{nameof(DirectoryData)}*");
         return ValueTask.FromResult(keys.Count());
     }
 
@@ -99,7 +84,7 @@ public sealed class Database {
     public async ValueTask UpdateAsync<T>(string id, T before, T after)
         where T : class {
         var db = _connectionMultiplexer.GetDatabase();
-        
+
         var update = typeof(T).Equals(typeof(UserData))
             ? UserData.Update(before as UserData, after as UserData) as T
             : typeof(T).Equals(typeof(RoomData))
