@@ -3,6 +3,7 @@ using Ankh;
 using Ankh.Caching;
 using Microsoft.Extensions.Logging.Colorful;
 using StackExchange.Redis;
+using static Ankh.Database;
 
 var builder = WebApplication.CreateBuilder();
 builder.Services.AddRazorPages();
@@ -18,9 +19,12 @@ builder.Services
     .AddSingleton<UserCacher>()
     .AddSingleton<RoomCacher>()
     .AddSingleton<DirectoryCacher>()
-    //.AddHostedService<CachingService>()
+    .AddHostedService<CachingService>()
     .AddSingleton(BrowsingContext.New(Configuration.Default.WithDefaultLoader()))
-    .AddSingleton(ConnectionMultiplexer.Connect(builder.GetConnection("dedis")));
+    .AddSingleton(x => {
+        var connection = builder.Configuration.GetSection("Connection").Get<Connection>();
+        return ConnectionMultiplexer.Connect(connection.ConnectionString);
+    });
 
 
 LoggingExtensions.ChangeConsoleMode();
@@ -37,4 +41,11 @@ app.UseHttpsRedirection()
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
+if (!await app.GetService<Database>().IsConnectAsync()) {
+    app.Logger.LogCritical("Couldn't connect to redis server!");
+    await app.DisposeAsync();
+    return;
+}
+
+app.Logger.LogInformation("Connected to redis server!");
 await app.RunAsync();
