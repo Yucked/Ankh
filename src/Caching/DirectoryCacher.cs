@@ -30,11 +30,13 @@ public record DirectoryCacher : AbstractCacher<DirectoryData> {
                 nextPage = await GetRoomUrlsAsync(nextPage, cancellationToken);
             }
 
-            AddToCache(new DirectoryData {
-                Id = $"{url[^1]}",
-                Records = new HashSet<string>(_roomUrls)
-            });
+            var data = new DirectoryData {
+                Id = $"{nameof(DirectoryData)}:{url[^1]}",
+                Records = new HashSet<string>(_roomUrls),
+                Count = _roomUrls.Count,
+            };
 
+            AddToCache(data.Id, data);
             _roomUrls.Clear();
         }
     }

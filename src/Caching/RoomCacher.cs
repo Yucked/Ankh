@@ -16,7 +16,7 @@ public record RoomCacher : AbstractCacher<RoomData> {
         var byteData = await content.ReadAsByteArrayAsync();
         try {
             var room = RoomData.ToRoom(byteData, url);
-            AddToCache(room);
+            AddToCache(room.Id, room);
         }
         catch (Exception exception) {
             Logger.LogCritical("{Message} {exception}", exception.Message, exception);

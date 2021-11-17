@@ -21,7 +21,7 @@ public sealed record UserCacher : AbstractCacher<UserData> {
         using var content = responseMessage.Content;
         await using var stream = await content.ReadAsStreamAsync();
         var user = await UserData.BuildUserAsync(stream);
-        AddToCache(user);
+        AddToCache(user.Id, user);
     }
 
     public async Task<int> GetIdAsync(string username) {
