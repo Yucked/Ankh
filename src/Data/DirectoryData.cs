@@ -11,8 +11,14 @@ public sealed record DirectoryData {
     /// </summary>
     public HashSet<string> Records { get; init; }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    public int Count { get; internal set; }
+
     public static DirectoryData Update(DirectoryData before, DirectoryData after) {
         before.Records.UnionWith(after.Records);
+        before.Count = before.Records.Count;
         return before;
     }
 }
