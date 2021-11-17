@@ -10,6 +10,7 @@ public sealed class CachingService : BackgroundService {
     private readonly ILogger _logger;
     private readonly ConcurrentQueue<string> _urls;
     private readonly Database _database;
+    private readonly PeriodicTimer _periodicTimer;
 
     public CachingService(UserCacher userCacher,
                           RoomCacher roomCacher,
@@ -23,20 +24,21 @@ public sealed class CachingService : BackgroundService {
         _database = database;
 
         _urls = new ConcurrentQueue<string>();
+        _periodicTimer = new PeriodicTimer(TimeSpan.FromSeconds(15));
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
         _logger.LogInformation($"{nameof(CachingService)} is starting...");
         stoppingToken.Register(() => _logger.LogDebug("RoomCaching task is stopping..."));
-        _ = UpdateDatabaseAsync(stoppingToken);
+        UpdateDatabaseAsync(stoppingToken);
 
         while (!stoppingToken.IsCancellationRequested) {
             await _directoryCacher.CacheDirectoriesAsync(stoppingToken);
             _logger.LogInformation("Total rooms: {Count}",
-                _directoryCacher.Cache.Sum(x => x.Records.Count));
+                _directoryCacher.Cache.Sum(x => x.Value.Records.Count));
 
             Parallel.ForEach(
-                _directoryCacher.Cache.SelectMany(x => x.Records),
+                _directoryCacher.Cache.SelectMany(x => x.Value.Records),
                 url => _urls.Enqueue($"R::{url}"));
 
             await ProcessUrlsAsync(stoppingToken);
@@ -50,7 +52,7 @@ public sealed class CachingService : BackgroundService {
             switch (url[0]) {
                 case 'R':
                     await _roomCacher.CacheRoomAsync(url[3..]);
-                    var lastRoom = _roomCacher.Cache.LastOrDefault();
+                    var (id, lastRoom) = _roomCacher.Cache.LastOrDefault();
                     _logger.LogInformation("Room cached -> {name}", lastRoom.Name);
                     if (lastRoom.UserHistory.Count == 0) {
                         continue;
@@ -72,26 +74,25 @@ public sealed class CachingService : BackgroundService {
     }
 
     private async Task UpdateDatabaseAsync(CancellationToken stoppingToken) {
-        while (!stoppingToken.IsCancellationRequested) {
-            await Parallel.ForEachAsync(_userCacher.Cache, stoppingToken,
-                async (data, _) => {
-                    var oldData = await _database.GetAsync<UserData>(data.Id);
-                    await _database.UpdateAsync(data.Id, UserData.Update(oldData, data));
-                });
+        while (await _periodicTimer.WaitForNextTickAsync(stoppingToken)) {
+            await ParallelProcessAsync(_userCacher);
+            await ParallelProcessAsync(_roomCacher);
+            await ParallelProcessAsync(_directoryCacher);
+        }
 
-            await Parallel.ForEachAsync(_roomCacher.Cache, stoppingToken,
-                async (data, _) => {
-                    var oldData = await _database.GetAsync<RoomData>(data.Id);
-                    await _database.UpdateAsync(data.Id, RoomData.Update(oldData, data));
-                });
-
-            await Parallel.ForEachAsync(_directoryCacher.Cache, stoppingToken,
-                async (data, _) => {
-                    var oldData = await _database.GetAsync<DirectoryData>(data.Id);
-                    await _database.UpdateAsync(data.Id, DirectoryData.Update(oldData, data));
-                });
-
-            await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+        async Task ParallelProcessAsync<T>(AbstractCacher<T> cacher)
+            where T : class {
+            await Parallel.ForEachAsync(cacher.Cache, LoopAsync);
+            async ValueTask LoopAsync(KeyValuePair<string, T> kvp, CancellationToken cancellationToken) {
+                if (!await _database.ExistsAsync<T>(kvp.Key)) {
+                    await _database.StoreAsync(kvp.Key, kvp.Value);
+                    cacher.Cache.TryRemove(kvp.Key, out var _);
+                }
+                else {
+                    var oldData = await _database.GetAsync<T>(kvp.Key);
+                    await _database.UpdateAsync(kvp.Key, oldData, kvp.Value);
+                }
+            }
         }
     }
 }
