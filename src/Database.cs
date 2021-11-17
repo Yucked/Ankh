@@ -1,35 +1,37 @@
 using Ankh.Data;
 using ServiceStack.Redis;
+using StackExchange.Redis;
+using System.Text.Json;
 
 namespace Ankh;
 
 public sealed class Database {
     private readonly IRedisClientsManagerAsync _clientsManager;
+    private readonly ConnectionMultiplexer _connectionMultiplexer;
     private readonly ILogger _logger;
 
-    public Database(IRedisClientsManagerAsync clientsManager,
+    public Database(IRedisClientsManagerAsync clientsManager, ConnectionMultiplexer connectionMultiplexer,
         ILogger<Database> logger) {
+        _connectionMultiplexer = connectionMultiplexer;
         _clientsManager = clientsManager;
         _logger = logger;
     }
 
     public async ValueTask<T> GetAsync<T>(string id) {
-        await using var client = await _clientsManager.GetReadOnlyClientAsync();
-        var dataType = client.As<T>();
-        var document = await dataType.GetByIdAsync(id);
-        return document;
+        var db = _connectionMultiplexer.GetDatabase();
+        var value = await db.StringGetAsync(id);
+        return JsonSerializer.Deserialize<T>(value);
     }
 
     public async ValueTask DeleteAsync<T>(string id) {
-        await using var client = await _clientsManager.GetClientAsync();
-        var dataType = client.As<T>();
-        await dataType.DeleteByIdAsync(id);
+        var db = _connectionMultiplexer.GetDatabase();
+        await db.KeyDeleteAsync(id);
     }
 
-    public async ValueTask StoreAsync<T>(T entity) {
-        await using var client = await _clientsManager.GetClientAsync();
-        var dataType = client.As<T>();
-        await dataType.StoreAsync(entity);
+    public async ValueTask StoreAsync<T>(string id, T entity) {
+        var db = _connectionMultiplexer.GetDatabase();
+        var serialized = JsonSerializer.Serialize(entity);
+        await db.StringSetAsync(id, serialized);
     }
 
     public async ValueTask<IReadOnlyList<T>> GetAsync<T>() {
