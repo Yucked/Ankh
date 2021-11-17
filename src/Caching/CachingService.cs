@@ -84,13 +84,14 @@ public sealed class CachingService : BackgroundService {
             where T : class {
             await Parallel.ForEachAsync(cacher.Cache, LoopAsync);
             async ValueTask LoopAsync(KeyValuePair<string, T> kvp, CancellationToken cancellationToken) {
+                cacher.Cache.TryRemove(kvp.Key, out var value);
+
                 if (!await _database.ExistsAsync<T>(kvp.Key)) {
-                    await _database.StoreAsync(kvp.Key, kvp.Value);
-                    cacher.Cache.TryRemove(kvp.Key, out var _);
+                    await _database.StoreAsync(kvp.Key, value);                    
                 }
                 else {
                     var oldData = await _database.GetAsync<T>(kvp.Key);
-                    await _database.UpdateAsync(kvp.Key, oldData, kvp.Value);
+                    await _database.UpdateAsync(kvp.Key, oldData, value);                    
                 }
             }
         }
