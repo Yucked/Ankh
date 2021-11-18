@@ -5,16 +5,12 @@ using Ankh.Data;
 
 namespace Ankh.Caching;
 
-public record DirectoryCacher : AbstractCacher<DirectoryData> {
-    private readonly IBrowsingContext _browsingContext;
-    private readonly List<string> _roomUrls;
-
-    public DirectoryCacher(ILogger<DirectoryData> logger, HttpClient httpClient,
-        IBrowsingContext browsingContext)
-        : base(logger, httpClient) {
-        _browsingContext = browsingContext;
-        _roomUrls = new List<string>();
-    }
+public record DirectoryCacher(ILogger<DirectoryData> Logger,
+                              HttpClient HttpClient,
+                              IBrowsingContext _browsingContext)
+    : AbstractCacher<DirectoryData>(Logger, HttpClient) {
+    private readonly IBrowsingContext _browsingContext = _browsingContext;
+    private readonly List<string> _roomUrls = new List<string>();
 
     public async Task CacheDirectoriesAsync(CancellationToken cancellationToken) {
         using var document = await _browsingContext
@@ -58,7 +54,7 @@ public record DirectoryCacher : AbstractCacher<DirectoryData> {
             return false;
         }
 
-        nextPage = ((IHtmlAnchorElement)nextElement).Href;
+        nextPage = ((IHtmlAnchorElement) nextElement).Href;
         return true;
     }
 
