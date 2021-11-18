@@ -47,10 +47,8 @@
     private int _userCount;
     private int _roomCount;
 
-    protected override Task OnInitializedAsync()
-    {
-        return Task.Run(async () =>
-        {
+    protected override Task OnInitializedAsync() {
+        return Task.Run(async () => {
             _userCount = await _database.CountAsync<UserData>();
             _roomCount = await _database.CountAsync<RoomData>();
             _dirCount = await _database.CountAsync<DirectoryData>();

@@ -24,7 +24,7 @@ public readonly record struct Endpoints {
     /// <summary>
     /// 
     /// </summary>
-    public const string AVATAR_CARD = $"{API}/avatarcard.php?cid={{USER_ID}}";
+    public const string AVATAR_CARD = $"{BASE_URL}/api/avatarcard.php?cid={{USER_ID}}";
 
     /// <summary>
     /// 
