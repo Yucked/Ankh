@@ -1,6 +1,59 @@
-﻿@page "/Profile"
-<h3>Profile</h3>
+@page "/profile"
+@using Ankh.Data
+@using Ankh.Caching
+
+@inject Database _database
+@inject UserCacher _userCacher
+
+<div class="grid grid-cols-1 gap-6 lg:p-10 xl:grid-cols-3 lg:bg-base-200 rounded-box">
+    <div class="card shadow-lg compact side bg-base-100">
+        <div class="flex-row items-center space-x-4 card-body">
+            <div>
+                <div class="avatar">
+                    <div class="rounded-full w-14 h-14 shadow">
+                        <img src="@_userData.Picture.Url"/>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="card-title">@_userData.Username</h2>
+                <p class="text-base-content text-opacity-40">@_userData.Age</p>"
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
-    
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string Username { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    private UserData _userData;
+
+    protected override async Task OnParametersSetAsync() {
+        if (!string.IsNullOrWhiteSpace(Username)) {
+            var users = await _database.GetAsync<UserData>();
+            _userData = users.FirstOrDefault(x => string.Equals(x.Username, Username,
+                StringComparison.CurrentCultureIgnoreCase));
+        }
+        else if (Id != 0) {
+            _userData = await _database.GetAsync<UserData>($"{Id}");
+        }
+
+        if (_userData == null) {
+            if (!string.IsNullOrWhiteSpace(Username)) {
+                var userId = await _userCacher.GetIdAsync(Username);
+                await _userCacher.CacheUserAsync(userId);
+            }
+        }
+
+        await base.OnParametersSetAsync();
+    }
+
 }
