@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Text.Json;
 using Ankh.Data;
 
 namespace Ankh.Caching;
@@ -38,7 +39,7 @@ public sealed class CachingService : BackgroundService {
                 _directoryCacher.Cache.Sum(x => x.Value.Records.Count));
 
             Parallel.ForEach(
-                _directoryCacher.Cache.SelectMany(x => x.Value.Records),
+                _directoryCacher.Cache.SelectMany(x => x.Value.Records).Distinct(),
                 url => _urls.Enqueue($"R::{url}"));
 
             await ProcessUrlsAsync(stoppingToken);
@@ -49,26 +50,36 @@ public sealed class CachingService : BackgroundService {
 
     private async Task ProcessUrlsAsync(CancellationToken stoppingToken) {
         while (_urls.TryDequeue(out var url) && !stoppingToken.IsCancellationRequested) {
-            switch (url[0]) {
-                case 'R':
-                    await _roomCacher.CacheRoomAsync(url[3..]);
-                    var (id, lastRoom) = _roomCacher.Cache.LastOrDefault();
-                    _logger.LogInformation("Room cached -> {name}", lastRoom.Name);
-                    if (lastRoom.UserHistory.Count == 0) {
-                        continue;
-                    }
+            try {
+                switch (url[0]) {
+                    case 'R':
+                        await _roomCacher.CacheRoomAsync(url[3..]);
+                        var (id, lastRoom) = _roomCacher.Cache.FirstOrDefault(x => x.Value.Url == url[3..]);
+                        if (lastRoom == null) {
+                            continue;
+                        }
 
-                    foreach (var user in lastRoom.UserHistory.Keys) {
-                        _urls.Enqueue($"U::{user}");
-                    }
+                        if (lastRoom.UserHistory.Count == 0) {
+                            continue;
+                        }
 
-                    break;
+                        foreach (var user in lastRoom.UserHistory.Keys) {
+                            _urls.Enqueue($"U::{user}");
+                        }
 
-                case 'U':
-                    var userId = await _userCacher.GetIdAsync(url[3..]);
-                    await _userCacher.CacheUserAsync(userId);
-                    _logger.LogInformation("User cached -> {userId}", userId);
-                    break;
+                        break;
+
+                    case 'U':
+                        var userId = await _userCacher.GetIdAsync(url[3..]);
+                        await _userCacher.CacheUserAsync(userId);
+                        _logger.LogInformation("User cached -> {userId}", userId);
+                        break;
+                }
+            }
+            catch (Exception exception) {
+                _logger.LogError("Error on url: {url}", url);
+                _logger.LogError("{Message}{NewLine}{StackTrace}",
+                    exception.Message, Environment.NewLine, exception.StackTrace);
             }
         }
     }
@@ -79,21 +90,22 @@ public sealed class CachingService : BackgroundService {
             await ParallelProcessAsync(_roomCacher);
             await ParallelProcessAsync(_directoryCacher);
         }
+    }
 
-        async Task ParallelProcessAsync<T>(AbstractCacher<T> cacher)
-            where T : class {
-            await Parallel.ForEachAsync(cacher.Cache, LoopAsync);
-            async ValueTask LoopAsync(KeyValuePair<string, T> kvp, CancellationToken cancellationToken) {
-                cacher.Cache.TryRemove(kvp.Key, out var value);
+    private async Task ParallelProcessAsync<T>(AbstractCacher<T> cacher)
+        where T : class {
+        await Parallel.ForEachAsync(cacher.Cache, LoopAsync);
 
-                if (!await _database.ExistsAsync<T>(kvp.Key)) {
-                    await _database.StoreAsync(kvp.Key, value);                    
-                }
-                else {
-                    var oldData = await _database.GetAsync<T>(kvp.Key);
-                    await _database.UpdateAsync(kvp.Key, oldData, value);                    
-                }
+        async ValueTask LoopAsync(KeyValuePair<string, T> kvp,
+            CancellationToken cancellationToken) {
+            cacher.Cache.TryRemove(kvp.Key, out var value);
+
+            if (!await _database.ExistsAsync(kvp.Key)) {
+                await _database.StoreAsync(kvp.Key, value);
+                return;
             }
+            var oldData = await _database.GetAsync<T>(kvp.Key);
+            await _database.UpdateAsync(kvp.Key, oldData, value);
         }
     }
 }
