@@ -57,14 +57,6 @@ public static class Extensions {
         return WebUtility.HtmlDecode(WebUtility.UrlDecode(str));
     }
 
-    public static string Id(this string str, string id) {
-        return str.Replace("{USER_ID}", id);
-    }
-
-    public static string Id(this string str, int id) {
-        return str.Replace("{USER_ID}", $"{id}");
-    }
-
     public static T GetService<T>(this WebApplication application) {
 #pragma warning disable CS8714
         return application.Services.GetRequiredService<T>();
