@@ -27,7 +27,7 @@ public record DirectoryCacher(ILogger<DirectoryData> Logger,
             }
 
             var data = new DirectoryData {
-                Id = $"{nameof(DirectoryData)}:{url[^1]}",
+                Id = $"{url[^1]}",
                 Records = new HashSet<string>(_roomUrls),
                 Count = _roomUrls.Count,
             };
