@@ -95,7 +95,7 @@ public sealed record RoomData {
         }
 
         return new RoomData {
-            Id = $"{nameof(RoomData)}:{document.GetProperty("roomInstanceId").GetString()}",
+            Id = document.GetProperty("roomInstanceId").GetString(),
             Owner = document.GetProperty("owner").GetString(),
             Name = document.GetProperty("room_name").GetString()!.Decode(),
             Description = document.GetProperty("desc").GetString()!.Decode(),

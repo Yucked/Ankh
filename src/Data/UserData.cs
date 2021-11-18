@@ -117,7 +117,7 @@ public sealed class UserData {
 
     [JsonPropertyName("id")]
     public string Id
-        => $"{nameof(UserData)}:{CId}";
+        => $"{CId}";
 
     public static async ValueTask<UserData> BuildUserAsync(Stream stream) {
         var document = await JsonDocument.ParseAsync(stream);
