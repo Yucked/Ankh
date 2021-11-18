@@ -41,19 +41,19 @@ public sealed class Database {
 
     public async ValueTask<T> GetAsync<T>(string id) {
         var db = _connectionMultiplexer.GetDatabase();
-        var value = await db.StringGetAsync(id);
+        var value = await db.StringGetAsync(Key<T>(id));
         return JsonSerializer.Deserialize<T>(value, _serializerOptions);
     }
 
-    public async ValueTask DeleteAsync(string id) {
+    public async ValueTask DeleteAsync<T>(string id) {
         var db = _connectionMultiplexer.GetDatabase();
-        await db.KeyDeleteAsync(id);
+        await db.KeyDeleteAsync(Key<T>(id));
     }
 
     public async ValueTask StoreAsync<T>(string id, T entity) {
         var db = _connectionMultiplexer.GetDatabase();
         var serialized = JsonSerializer.Serialize(entity, _serializerOptions);
-        await db.StringSetAsync(id, serialized);
+        await db.StringSetAsync(Key<T>(id), serialized);
     }
 
     public async ValueTask<IReadOnlyList<T>> GetAsync<T>() {
@@ -78,9 +78,9 @@ public sealed class Database {
         return ValueTask.FromResult(keys.Count());
     }
 
-    public async ValueTask<bool> ExistsAsync(string id) {
+    public async ValueTask<bool> ExistsAsync<T>(string id) {
         var db = _connectionMultiplexer.GetDatabase();
-        return await db.KeyExistsAsync(id);
+        return await db.KeyExistsAsync(Key<T>(id));
     }
 
     public async ValueTask UpdateAsync<T>(string id, T before, T after)
@@ -93,6 +93,10 @@ public sealed class Database {
                 ? RoomData.Update(before as RoomData, after as RoomData) as T
                 : DirectoryData.Update(before as DirectoryData, after as DirectoryData) as T;
 
-        await db.StringSetAsync(id, JsonSerializer.Serialize(update, _serializerOptions));
+        await db.StringSetAsync(Key<T>(id), JsonSerializer.Serialize(update, _serializerOptions));
+    }
+
+    private static string Key<T>(string id) {
+        return $"{typeof(T).Name}:{id}";
     }
 }
