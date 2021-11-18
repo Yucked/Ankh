@@ -3,17 +3,14 @@ using System.Text;
 
 namespace Ankh.Caching;
 
-public sealed record UserCacher
-    : AbstractCacher<UserData> {
+public sealed record UserCacher(ILogger<UserData> Logger, HttpClient HttpClient)
+    : AbstractCacher<UserData>(Logger, HttpClient) {
     private static readonly ReadOnlyMemory<byte> EndSegment = new byte[] {
         60, 47, 105, 110, 116, 62
     };
 
-    public UserCacher(ILogger<UserData> logger, HttpClient httpClient)
-        : base(logger, httpClient) { }
-
     public async Task CacheUserAsync(int id) {
-        using var responseMessage = await HttpClient.GetAsync(Endpoints.AVATAR_CARD.Id(id));
+        using var responseMessage = await HttpClient.GetAsync(Id(Endpoints.AVATAR_CARD, id));
         if (!responseMessage.IsSuccessStatusCode) {
             Logger.LogError("{ReasonPhrase}", responseMessage.ReasonPhrase);
             return;
@@ -50,5 +47,9 @@ public sealed record UserCacher
         ReadOnlyMemory<byte> byteData = await content.ReadAsByteArrayAsync();
         var slice = byteData[106..byteData.Span.IndexOf(EndSegment.Span)];
         return int.Parse(Encoding.UTF8.GetString(slice.Span));
+    }
+
+    private static string Id(string str, int id) {
+        return str.Replace("{USER_ID}", $"{id}");
     }
 }
