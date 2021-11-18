@@ -1,6 +1,4 @@
 using System.Collections.Concurrent;
-using System.Text.Json;
-using Ankh.Data;
 
 namespace Ankh.Caching;
 
@@ -31,7 +29,7 @@ public sealed class CachingService : BackgroundService {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
         _logger.LogInformation($"{nameof(CachingService)} is starting...");
         stoppingToken.Register(() => _logger.LogDebug("RoomCaching task is stopping..."));
-        UpdateDatabaseAsync(stoppingToken);
+        _ = UpdateDatabaseAsync(stoppingToken);
 
         while (!stoppingToken.IsCancellationRequested) {
             await _directoryCacher.CacheDirectoriesAsync(stoppingToken);
@@ -72,7 +70,6 @@ public sealed class CachingService : BackgroundService {
                     case 'U':
                         var userId = await _userCacher.GetIdAsync(url[3..]);
                         await _userCacher.CacheUserAsync(userId);
-                        _logger.LogInformation("User cached -> {userId}", userId);
                         break;
                 }
             }
@@ -100,10 +97,11 @@ public sealed class CachingService : BackgroundService {
             CancellationToken cancellationToken) {
             cacher.Cache.TryRemove(kvp.Key, out var value);
 
-            if (!await _database.ExistsAsync(kvp.Key)) {
+            if (!await _database.ExistsAsync<T>(kvp.Key)) {
                 await _database.StoreAsync(kvp.Key, value);
                 return;
             }
+
             var oldData = await _database.GetAsync<T>(kvp.Key);
             await _database.UpdateAsync(kvp.Key, oldData, value);
         }
