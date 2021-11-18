@@ -3,6 +3,19 @@ using System.Text.Json;
 
 namespace Ankh.Data;
 
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Id"></param>
+/// <param name="Name"></param>
+/// <param name="IsAutogranted"></param>
+/// <param name="Type"></param>
+/// <param name="ReviewStatus"></param>
+/// <param name="Url"></param>
+/// <param name="Creator"></param>
+/// <param name="Flag"></param>
+/// <param name="Dimensions"></param>
+/// <param name="Coordinates"></param>
 public record struct Badge(string Id, string Name, bool IsAutogranted,
                            string Type, string ReviewStatus, string Url,
                            Creator Creator, Flag Flag,

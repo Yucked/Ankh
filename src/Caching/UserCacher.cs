@@ -3,7 +3,8 @@ using System.Text;
 
 namespace Ankh.Caching;
 
-public sealed record UserCacher : AbstractCacher<UserData> {
+public sealed record UserCacher
+    : AbstractCacher<UserData> {
     private static readonly ReadOnlyMemory<byte> EndSegment = new byte[] {
         60, 47, 105, 110, 116, 62
     };
