@@ -58,11 +58,11 @@ public static class Extensions {
     }
 
     public static string Id(this string str, string id) {
-        return str.Replace("USER_ID", id);
+        return str.Replace("{USER_ID}", id);
     }
 
     public static string Id(this string str, int id) {
-        return str.Replace("USER_ID", $"{id}");
+        return str.Replace("{USER_ID}", $"{id}");
     }
 
     public static T GetService<T>(this WebApplication application) {
