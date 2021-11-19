@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31825.309
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ankh", "src\Ankh.csproj", "{1193B7AA-E44D-47C0-B4B1-BC8631EB99D4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ankh.Redis", "Ankh.Redis\Ankh.Redis.csproj", "{C146F70C-5BDD-4079-B31D-BE5402AC8221}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{1193B7AA-E44D-47C0-B4B1-BC8631EB99D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1193B7AA-E44D-47C0-B4B1-BC8631EB99D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1193B7AA-E44D-47C0-B4B1-BC8631EB99D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C146F70C-5BDD-4079-B31D-BE5402AC8221}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C146F70C-5BDD-4079-B31D-BE5402AC8221}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C146F70C-5BDD-4079-B31D-BE5402AC8221}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C146F70C-5BDD-4079-B31D-BE5402AC8221}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
