@@ -2,8 +2,6 @@ using AngleSharp;
 using Ankh;
 using Ankh.Caching;
 using Microsoft.Extensions.Logging.Colorful;
-using StackExchange.Redis;
-using static Ankh.Database;
 
 var builder = WebApplication.CreateBuilder();
 builder.Services.AddRazorPages();
@@ -20,11 +18,7 @@ builder.Services
     .AddSingleton<RoomCacher>()
     .AddSingleton<DirectoryCacher>()
     .AddHostedService<CachingService>()
-    .AddSingleton(BrowsingContext.New(Configuration.Default.WithDefaultLoader()))
-    .AddSingleton(x => {
-        var connection = builder.Configuration.GetSection("Connection").Get<Connection>();
-        return ConnectionMultiplexer.Connect(connection.ConnectionString);
-    });
+    .AddSingleton(BrowsingContext.New(Configuration.Default.WithDefaultLoader()));
 
 
 LoggingExtensions.ChangeConsoleMode();
