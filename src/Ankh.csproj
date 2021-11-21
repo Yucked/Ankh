@@ -8,11 +8,11 @@
 
 	<ItemGroup>
 		<PackageReference Include="AngleSharp" Version="1.0.0-alpha-844" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Colorful" Version="1.*" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Colorful" Version="1.3" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Ankh.Redis\Ankh.Redis.csproj" />
+		<ProjectReference Include="..\Ankh.Redis\Ankh.Redis.csproj" />
 	</ItemGroup>
 
 	<PropertyGroup>

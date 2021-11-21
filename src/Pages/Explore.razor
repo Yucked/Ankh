@@ -1,7 +1,7 @@
 @page "/explore"
-
+@using Ankh.Redis
 @using Ankh.Data
-@inject Database _database
+@inject RedisClientManager _clientManager
 
 
 <div class="container mx-auto">
@@ -20,8 +20,8 @@
         <div class="flex flex-1 w-full lg:flex-row justify-center bg-accent rounded-box">
             <div class="items-stretch flex py-3 m-3 lg:gap-2">
                 <NavLink @onclick="PrevPageAsync" class="btn btn-outline">⬅️</NavLink>
-                @foreach (var nav in _navPages) {
-                    <NavLink @onclick="() => GetPageAsync(nav.Number)" class="btn btn-outline">@nav.Number</NavLink>
+                @foreach (var (number, _) in _navPages) {
+                    <NavLink @onclick="() => GetPageAsync(number)" class="btn btn-outline">@number</NavLink>
                 }
                 <NavLink @onclick="NextPageAsync" class="btn btn-outline">➡️</NavLink>
             </div>
@@ -38,7 +38,7 @@
     private IEnumerable<Page<RoomData>> _navPages;
 
     protected override async Task OnInitializedAsync() {
-        var chunks = (await _database.GetAsync<RoomData>())
+        var chunks = (await _clientManager.For<RoomData>().GetAllAsync())
             .OrderBy(x => x.Name)
             .Chunk(10)
             .ToList();
