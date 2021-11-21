@@ -1,6 +1,6 @@
 using AngleSharp;
-using Ankh;
 using Ankh.Caching;
+using Ankh.Redis;
 using Microsoft.Extensions.Logging.Colorful;
 
 var builder = WebApplication.CreateBuilder();
@@ -8,18 +8,17 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services
     .AddHttpClient()
-    .AddLogging((Microsoft.Extensions.Logging.ILoggingBuilder x) => {
-        x.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information);
+    .AddLogging(x => {
+        x.SetMinimumLevel(LogLevel.Information);
         x.ClearProviders();
         x.AddColorfulConsole();
     })
-    .AddSingleton<Database>()
     .AddSingleton<UserCacher>()
     .AddSingleton<RoomCacher>()
     .AddSingleton<DirectoryCacher>()
     .AddHostedService<CachingService>()
+    .AddSingleton<RedisClientManager>()
     .AddSingleton(BrowsingContext.New(Configuration.Default.WithDefaultLoader()));
-
 
 LoggingExtensions.ChangeConsoleMode();
 var app = builder.Build();
@@ -35,11 +34,4 @@ app.UseHttpsRedirection()
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
-if (!await app.GetService<Database>().IsConnectAsync()) {
-    app.Logger.LogCritical("Couldn't connect to redis server!");
-    await app.DisposeAsync();
-    return;
-}
-
-app.Logger.LogInformation("Connected to redis server!");
 await app.RunAsync();
