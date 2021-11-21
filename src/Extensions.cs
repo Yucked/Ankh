@@ -32,6 +32,10 @@ public static class Extensions {
                 continue;
             }
 
+            if (IsClassRecordStruct(beforeProps[i].PropertyType)) {
+                Update<T>((T) beforeProp!, (T) afterProp!);
+            }
+
             beforeProps[i].SetValue(before, afterProp);
         }
 
@@ -47,6 +51,10 @@ public static class Extensions {
             return !IsNull(obj) == !IsNull(val) && obj == val;
         }
 
+        static bool IsClassRecordStruct(Type type) {
+            return type.IsClass || type.IsValueType;
+        }
+
         return before;
     }
 
@@ -58,9 +66,46 @@ public static class Extensions {
         return WebUtility.HtmlDecode(WebUtility.UrlDecode(str));
     }
 
-    public static T GetService<T>(this WebApplication application) {
-#pragma warning disable CS8714
+    public static T GetService<T>(this WebApplication application)
+        where T : notnull {
         return application.Services.GetRequiredService<T>();
-#pragma warning restore CS8714
     }
+
+    public static T Get<T>(this JsonElement element, string propertyName,
+                           JsonGetOptions jsonGetOptions = JsonGetOptions.None) {
+        if (!element.TryGetProperty(propertyName, out var data)) {
+            return default!;
+        }
+
+        var typeCode = Type.GetTypeCode(typeof(T));
+        return typeCode switch {
+            TypeCode.String when jsonGetOptions == JsonGetOptions.Decode
+                => (T) (object) WebUtility.HtmlDecode(data.GetString()!),
+            TypeCode.String when jsonGetOptions == JsonGetOptions.IntToString
+                => (T) (object) data.GetInt32().ToString(),
+            TypeCode.String
+                => (T) (object) data.GetString()!,
+            TypeCode.Int32
+                => (T) (object) data.GetInt32(),
+            TypeCode.Boolean when jsonGetOptions == JsonGetOptions.IntToBool
+                => (T) (object) (data.GetInt32() != 0),
+            TypeCode.Boolean
+                => (T) (object) data.GetBoolean(),
+            _ when jsonGetOptions == JsonGetOptions.ParseDate
+                => (T) (object) DateOnly.Parse(data.GetString()!)
+        };
+    }
+
+    public static T Get<T>(this JsonProperty property, string propertyName,
+                           JsonGetOptions jsonGetOptions = JsonGetOptions.None) {
+        return Get<T>(property.Value, propertyName, jsonGetOptions);
+    }
+}
+
+public enum JsonGetOptions {
+    None,
+    Decode,
+    ParseDate,
+    IntToBool,
+    IntToString
 }
