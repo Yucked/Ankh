@@ -1,4 +1,6 @@
 using System.Collections.Concurrent;
+using Ankh.Redis;
+using Ankh.Redis.Interfaces;
 
 namespace Ankh.Caching;
 
@@ -6,21 +8,21 @@ public sealed class CachingService : BackgroundService {
     private readonly UserCacher _userCacher;
     private readonly RoomCacher _roomCacher;
     private readonly DirectoryCacher _directoryCacher;
-    private readonly ILogger _logger;
+    private readonly ILogger<CachingService> _logger;
     private readonly ConcurrentQueue<string> _urls;
-    private readonly Database _database;
+    private readonly RedisClientManager _clientManager;
     private readonly PeriodicTimer _periodicTimer;
 
     public CachingService(UserCacher userCacher,
                           RoomCacher roomCacher,
                           DirectoryCacher directoryCacher,
                           ILogger<CachingService> logger,
-                          Database database) {
+                          RedisClientManager clientManager) {
         _userCacher = userCacher;
         _roomCacher = roomCacher;
         _directoryCacher = directoryCacher;
         _logger = logger;
-        _database = database;
+        _clientManager = clientManager;
 
         _urls = new ConcurrentQueue<string>();
         _periodicTimer = new PeriodicTimer(TimeSpan.FromSeconds(15));
@@ -90,20 +92,23 @@ public sealed class CachingService : BackgroundService {
     }
 
     private async Task ParallelProcessAsync<T>(AbstractCacher<T> cacher)
-        where T : class {
+        where T : IRedisEntity {
         await Parallel.ForEachAsync(cacher.Cache, LoopAsync);
 
         async ValueTask LoopAsync(KeyValuePair<string, T> kvp,
-            CancellationToken cancellationToken) {
+                                  CancellationToken cancellationToken) {
             cacher.Cache.TryRemove(kvp.Key, out var value);
 
-            if (!await _database.ExistsAsync<T>(kvp.Key)) {
-                await _database.StoreAsync(kvp.Key, value);
+            var client = _clientManager.For<T>();
+            if (await client.ExistsAsync(kvp.Key)) { }
+
+            if (!await client.ExistsAsync(kvp.Key)) {
+                await client.AddAsync(value);
                 return;
             }
 
-            var oldData = await _database.GetAsync<T>(kvp.Key);
-            await _database.UpdateAsync(kvp.Key, oldData, value);
+            var oldData = await client.GetAsync(kvp.Key);
+            client.AddAsync(kvp.Key, oldData, value);
         }
     }
 }
