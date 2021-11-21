@@ -1,5 +1,4 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Ankh.Redis.Interfaces;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable NotAccessedPositionalProperty.Global
@@ -9,12 +8,12 @@ namespace Ankh.Data;
 /// <summary>
 /// 
 /// </summary>
-/// <param name="Location"></param>
+/// <param name="Country"></param>
 /// <param name="CountryCode"></param>
 /// <param name="State"></param>
 /// <param name="IsFlagIconVisible"></param>
 /// <param name="IsFlagVisible"></param>
-public record struct UserLocation(string Location, int CountryCode, object State,
+public record struct UserLocation(string Country, int CountryCode, object State,
                                   bool IsFlagIconVisible, bool IsFlagVisible);
 
 /// <summary>
@@ -54,161 +53,43 @@ public record struct Dating(string Status, string Orientation, string LookingFor
 /// <summary>
 /// 
 /// </summary>
-public sealed class UserData {
-    [JsonIgnore]
-    public int CId { get; private init; }
+/// <param name="Count"></param>
+/// <param name="Level"></param>
+/// <param name="Layout"></param>
+/// <param name="IsCountVisible"></param>
+/// <param name="BadgesId"></param>
+public record struct Badges(int Count, int Level, string Layout,
+                            bool IsCountVisible, IEnumerable<string> BadgesId);
 
-    [JsonPropertyName("username")]
-    public string Username { get; private init; }
-
-    [JsonPropertyName("homepage")]
-    public string Homepage { get; private init; }
-
-    [JsonPropertyName("registered_on")]
-    public DateTime RegisteredOn { get; private init; }
-
-    [JsonPropertyName("last_logon")]
-    public DateTime LastLogon { get; private init; }
-
-    [JsonPropertyName("interests")]
-    public string Interests { get; private init; }
-
-    [JsonPropertyName("gender")]
-    public string Gender { get; private init; }
-
-    [JsonPropertyName("age")]
-    public int Age { get; private init; }
-
-    [JsonPropertyName("tagline")]
-    public string Tagline { get; private init; }
-
-    [JsonPropertyName("online")]
-    public bool IsOnline { get; private init; }
-
-    [JsonPropertyName("availability")]
-    public string Availability { get; private init; }
-
-    [JsonPropertyName("visible_albums")]
-    public int VisibleAlbums { get; private init; }
-
-    [JsonPropertyName("location")]
-    public UserLocation Location { get; private init; }
-
-    [JsonPropertyName("avatar")]
-    public Avatar Picture { get; private init; }
-
-    [JsonPropertyName("moderator")]
-    public Moderator Moderator { get; private init; }
-
-    [JsonPropertyName("misc")]
-    public Misc Misc { get; private init; }
-
-    [JsonPropertyName("dating")]
-    public Dating Dating { get; private init; }
-
-    [JsonPropertyName("badges")]
-    public BadgesData BadgesData { get; private init; }
-
-    [JsonPropertyName("public_rooms")]
-    public IReadOnlyCollection<RoomData> PublicRooms { get; private init; }
-
-    [JsonPropertyName("usernames")]
-    public HashSet<string> Usernames { get; private init; }
-
-    [JsonPropertyName("id")]
-    public string Id
-        => $"{CId}";
-
-    public static async ValueTask<UserData> BuildUserAsync(Stream stream) {
-        var document = await JsonDocument.ParseAsync(stream);
-        var rootElement = document.RootElement;
-
-        UserLocation GetLocation() {
-            return new UserLocation {
-                Location = rootElement.GetProperty("location").GetString(),
-                CountryCode = rootElement.GetProperty("country_code").GetInt32(),
-                State = $"{rootElement.GetProperty("location_state")}",
-                IsFlagVisible = rootElement.GetProperty("show_flag_av").GetInt32() == 1,
-                IsFlagIconVisible = rootElement.GetProperty("show_flag_icon").GetInt32() == 1
-            };
-        }
-
-        Avatar GetAvatarPicture() {
-            return new Avatar {
-                Url = rootElement.GetProperty("avpic_url").GetString(),
-                IsDefault = rootElement.GetProperty("avpic_default").GetInt32() == 1
-            };
-        }
-
-        Moderator GetModeratorData() {
-            return new Moderator {
-                WelcomeScore = rootElement.GetProperty("welcome_moderator_score").GetInt32(),
-                IsModerator = rootElement.GetProperty("is_welcome_moderator").GetInt32() == 1
-            };
-        }
-
-        Misc GetMiscUserData() {
-            return new Misc {
-                IsBuddy = rootElement.GetProperty("is_buddy").GetBoolean(),
-                IsFriend = rootElement.GetProperty("is_friend").GetInt32() == 1,
-                IsQualityAssurance = rootElement.GetProperty("is_qa").GetBoolean(),
-                ShowBlock = rootElement.GetProperty("show_block").GetBoolean(),
-                ShowMessage = rootElement.GetProperty("show_message").GetInt32() == 1,
-                IsCreator = rootElement.TryGetProperty("is_creator", out var isCreator)
-                            && isCreator.GetInt32() == 1,
-                //IMVULevel = rootElement.GetProperty("imvu_level").GetInt32(),
-                //WallpaperId = rootElement.GetProperty("wallpaper_id").GetInt32(),
-            };
-        }
-
-        Dating GetDating() {
-            var dating = rootElement.GetProperty("dating");
-            return new Dating {
-                Status = dating.GetProperty("relationship_status").GetString(),
-                Orientation = dating.GetProperty("orientation").GetString(),
-                LookingFor = dating.GetProperty("looking_for").GetString()
-            };
-        }
-
-        return new UserData {
-            CId = rootElement.GetProperty("cid").GetInt32(),
-            Username = rootElement.GetProperty("avname").GetString(),
-            Homepage = rootElement.GetProperty("url").GetString(),
-            RegisteredOn = DateTime.Parse(rootElement.GetProperty("registered").GetString()!),
-            LastLogon = DateTime.Parse(rootElement.GetProperty("last_login").GetString()!),
-            Gender = rootElement.GetProperty("gender").GetString(),
-            Tagline = rootElement.GetProperty("tagline").GetString(),
-            IsOnline = rootElement.GetProperty("online").GetBoolean(),
-            Availability = rootElement.GetProperty("availability").GetString(),
-            VisibleAlbums = rootElement.GetProperty("visible_albums").GetInt32(),
-            Location = GetLocation(),
-            Picture = GetAvatarPicture(),
-            Moderator = GetModeratorData(),
-            Misc = GetMiscUserData(),
-            Dating = GetDating(),
-            BadgesData = BadgesData.GetBadgesData(rootElement),
-            Interests = rootElement.GetProperty("interests")
-                .GetProperty("full_text_string")
-                .GetProperty("tag")
-                .GetString(),
-            Usernames = new HashSet<string>(),
-            PublicRooms = new List<RoomData>(),
-            Age = int.TryParse($"{rootElement.GetProperty("age")}", out var age)
-                ? age
-                : 0
-        };
-    }
-
-    public static UserData Update(UserData before, UserData after) {
-        var updated = before.Update(after);
-        if (!updated.Usernames.Contains(before.Username)) {
-            updated.Usernames.Add(before.Username);
-        }
-
-        if (!updated.Usernames.Contains(after.Username)) {
-            updated.Usernames.Add(after.Username);
-        }
-
-        return updated;
-    }
-}
+/// <summary>
+/// 
+/// </summary>
+/// <param name="Id"></param>
+/// <param name="AddedOn"></param>
+/// <param name="Username"></param>
+/// <param name="Homepage"></param>
+/// <param name="RegisteredOn"></param>
+/// <param name="LastLogon"></param>
+/// <param name="Gender"></param>
+/// <param name="Age"></param>
+/// <param name="Tagline"></param>
+/// <param name="Interests"></param>
+/// <param name="IsOnline"></param>
+/// <param name="Availability"></param>
+/// <param name="VisibleAlbums"></param>
+/// <param name="Location"></param>
+/// <param name="Avatar"></param>
+/// <param name="Moderator"></param>
+/// <param name="Dating"></param>
+/// <param name="Misc"></param>
+/// <param name="Badges"></param>
+/// <param name="PublicRooms"></param>
+/// <param name="Usernames"></param>
+public record struct UserData(string Id, DateOnly AddedOn, string Username,
+                              string Homepage, DateOnly RegisteredOn, DateOnly LastLogon,
+                              string Gender, int Age, string Tagline, string Interests,
+                              bool IsOnline, string Availability, int VisibleAlbums,
+                              UserLocation Location, Avatar Avatar, Moderator Moderator,
+                              Dating Dating, Misc Misc, Badges Badges,
+                              IReadOnlyCollection<string> PublicRooms,
+                              HashSet<string> Usernames) : IRedisEntity;
