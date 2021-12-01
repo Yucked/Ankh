@@ -13,8 +13,6 @@ builder.Services
         x.ClearProviders();
         x.AddColorfulConsole();
     })
-    .AddSingleton<UserCacher>()
-    .AddSingleton<RoomCacher>()
     .AddSingleton<DirectoryCacher>()
     .AddHostedService<CachingService>()
     .AddSingleton<RedisClientManager>()
