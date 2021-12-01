@@ -30,4 +30,4 @@ public record RoomData(string Id, DateOnly AddedOn, string Name,
                        string Owner, string Description, int Capacity,
                        int Occupancy, string Image, int Ratings, string Url,
                        bool ApNameOnly, IDictionary<string, DateTimeOffset> History)
-    : PublicRoomData(Id, AddedOn, Name, IsApOnly, IsApOnly);
+    : PublicRoomData(Id, AddedOn, Name, IsApOnly, IsVipOnly);
