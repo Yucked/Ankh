@@ -5,21 +5,15 @@ using Ankh.Redis.Interfaces;
 namespace Ankh.Caching;
 
 public sealed class CachingService : BackgroundService {
-    private readonly UserCacher _userCacher;
-    private readonly RoomCacher _roomCacher;
     private readonly DirectoryCacher _directoryCacher;
     private readonly ILogger<CachingService> _logger;
     private readonly ConcurrentQueue<string> _urls;
     private readonly RedisClientManager _clientManager;
     private readonly PeriodicTimer _periodicTimer;
 
-    public CachingService(UserCacher userCacher,
-                          RoomCacher roomCacher,
-                          DirectoryCacher directoryCacher,
+    public CachingService(DirectoryCacher directoryCacher,
                           ILogger<CachingService> logger,
                           RedisClientManager clientManager) {
-        _userCacher = userCacher;
-        _roomCacher = roomCacher;
         _directoryCacher = directoryCacher;
         _logger = logger;
         _clientManager = clientManager;
