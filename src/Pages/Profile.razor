@@ -1,10 +1,8 @@
 @page "/profile"
-@using Ankh.Caching
 @using Ankh.Data
 @using Ankh.Redis
 
 @inject RedisClientManager _clientManager
-@inject UserCacher _userCacher
 
 @if (_userData == null) {
     <div class="alert alert-warning">
