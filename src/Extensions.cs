@@ -72,40 +72,47 @@ public static class Extensions {
     }
 
     public static T Get<T>(this JsonElement element, string propertyName,
-                           JsonGetOptions jsonGetOptions = JsonGetOptions.None) {
+                           JsonType jsonType = JsonType.None) {
         if (!element.TryGetProperty(propertyName, out var data)) {
             return default!;
         }
 
         var typeCode = Type.GetTypeCode(typeof(T));
         return typeCode switch {
-            TypeCode.String when jsonGetOptions == JsonGetOptions.Decode
+            TypeCode.String when jsonType == JsonType.Decode
                 => (T) (object) WebUtility.HtmlDecode(data.GetString()!),
-            TypeCode.String when jsonGetOptions == JsonGetOptions.IntToString
+            TypeCode.String when jsonType == JsonType.IntToStr
                 => (T) (object) data.GetInt32().ToString(),
             TypeCode.String
                 => (T) (object) data.GetString()!,
+            TypeCode.Int32 when jsonType == JsonType.StrToInt
+                => (T) (object) (int.TryParse(data.GetString(), out var value) ? value : 0),
             TypeCode.Int32
                 => (T) (object) data.GetInt32(),
-            TypeCode.Boolean when jsonGetOptions == JsonGetOptions.IntToBool
+            TypeCode.Boolean when jsonType == JsonType.IntToBool
                 => (T) (object) (data.GetInt32() != 0),
             TypeCode.Boolean
                 => (T) (object) data.GetBoolean(),
-            _ when jsonGetOptions == JsonGetOptions.ParseDate
+            _ when jsonType == JsonType.ParseDate
                 => (T) (object) DateOnly.Parse(data.GetString()!)
         };
     }
 
     public static T Get<T>(this JsonProperty property, string propertyName,
-                           JsonGetOptions jsonGetOptions = JsonGetOptions.None) {
-        return Get<T>(property.Value, propertyName, jsonGetOptions);
+                           JsonType jsonType = JsonType.None) {
+        return Get<T>(property.Value, propertyName, jsonType);
+    }
+
+    public static DateOnly Today() {
+        return DateOnly.FromDateTime(DateTime.UtcNow);
     }
 }
 
-public enum JsonGetOptions {
+public enum JsonType {
     None,
     Decode,
     ParseDate,
     IntToBool,
-    IntToString
+    IntToStr,
+    StrToInt
 }
