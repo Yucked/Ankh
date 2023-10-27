@@ -1,4 +1,4 @@
-mod config;
+mod configuration;
 mod types;
 
 use surrealdb::{
@@ -8,14 +8,10 @@ use surrealdb::{
 };
 
 #[tokio::main]
-async fn main() {
+async fn main() -> surrealdb::Result<()> {
 
-    connect_to_surreal()
-}
-
-async fn connect_to_surreal() {
     // Connect to the server
-    let db = Surreal::new::<Ws>("").await?;
+    let db = Surreal::new::<Ws>("surreal.srv.lol").await?;
 
     // Signin as a namespace, database, or root user
     db.signin(Root {
@@ -26,4 +22,8 @@ async fn connect_to_surreal() {
 
     // Select a specific namespace / database
     db.use_ns("test").use_db("test").await?;
+
+    Ok(())
 }
+
+async fn connect_to_surreal() {}
