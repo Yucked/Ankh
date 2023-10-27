@@ -1,0 +1,866 @@
+HEADERS
+X-imvu-os		Windows
+X-imvu-version	544.1
+X-imvu-csid		SOME ID
+X-imvu-userid	SOME ID
+X-imvu-auth		some string
+
+
+POST		http://client-dynamic.imvu.com/api/xmlrpc/client.php
+<?xml version='1.0'?>
+<methodCall>
+<methodName>test.logout</methodName>
+<params>
+<param>
+<value><struct>
+<member>
+<name>customer_id</name>
+<value><int>116678358</int></value>
+</member>
+<member>
+<name>clientsession_id</name>
+<value><string>12839904</string></value>
+</member>
+</struct></value>
+</param>
+</params>
+</methodCall>
+
+
+
+GET		https://client-dynamic.imvu.com/api/avatar_actions.php
+GET		https://client-dynamic.imvu.com/api/avatarcard.php?cid={USER_ID}&viewer_cid={USER_ID}
+
+
+POST		http://client-dynamic.imvu.com/api/xmlrpc/client.php
+<?xml version='1.0'?>
+<methodCall>
+<methodName>test.avatarInfoForIds</methodName>
+<params>
+<param>
+<value><array><data>
+<value><int>323607232</int></value>
+<value><int>146707937</int></value>
+<value><int>62418915</int></value>
+<value><int>302322757</int></value>
+<value><int>113623233</int></value>
+<value><int>355245483</int></value>
+<value><int>224846299</int></value>
+</data></array></value>
+</param>
+</params>
+</methodCall>
+
+RESPONSE:
+<?xml version="1.0" encoding="UTF-8"?>
+<methodResponse>
+  <params>
+    <param>
+      <value>
+        <array><data>
+  <value><array><data>
+  <value><string>userId</string></value>
+  <value><string>avatarName</string></value>
+  <value><string>isGuest</string></value>
+  <value><string>picUrl</string></value>
+  <value><string>picUrl_40x55</string></value>
+  <value><string>age</string></value>
+  <value><string>gender</string></value>
+  <value><string>downloadSize</string></value>
+  <value><string>dob</string></value>
+  <value><string>hasVIPPass</string></value>
+  <value><string>hasAccessPass</string></value>
+  <value><string>isMarried</string></value>
+  <value><string>hasTryitPass</string></value>
+</data></array></value>
+  <value><array><data>
+  <value><int>323607232</int></value>
+  <value><string>angel66248</string></value>
+  <value><int>1</int></value>
+  <value><string>http://userimages-akm.imvu.com/catalog/includes/modules/phpbb2/images/avatars/323607232_179235925363832c0c127db.gif</string></value>
+  <value><string>https://webasset-akm.imvu.com/resized_image/duserimages/s40x55/tstretch/i%2Fcatalog%2Fincludes%2Fmodules%2Fphpbb2%2Fimages%2Favatars%2F323607232_179235925363832c0c127db.gif</string></value>
+  <value><int>21</int></value>
+  <value><string>Female</string></value>
+  <value><int>0</int></value>
+  <value><string>2002-03-04 00:00:00</string></value>
+  <value><string>0</string></value>
+  <value><string>0</string></value>
+  <value><string>0</string></value>
+  <value><string>0</string></value>
+</data></array></value>
+  <value><array><data>
+  <value><int>146707937</int></value>
+  <value><string>AwakeWorld</string></value>
+  <value><int>1</int></value>
+  <value><string>http://userimages01-akm.imvu.com/userdata/46/70/79/37/userpics/Snap_SLhQZGVUHu1591377448.jpg</string></value>
+  <value><string>https://webasset-akm.imvu.com/resized_image/duserimages/s40x55/tstretch/i%2Fuserdata%2F46%2F70%2F79%2F37%2Fuserpics%2FSnap_SLhQZGVUHu1591377448.jpg</string></value>
+  <value><int>28</int></value>
+  <value><string>Female</string></value>
+  <value><int>0</int></value>
+  <value><string>1994-07-07 00:00:00</string></value>
+  <value><string>0</string></value>
+  <value><string>1</string></value>
+  <value><string>0</string></value>
+  <value><string>0</string></value>
+</data></array></value>
+  <value><array><data>
+  <value><int>62418915</int></value>
+  <value><string>orb</string></value>
+  <value><int>0</int></value>
+  <value><string>http://userimages-akm.imvu.com/catalog/includes/modules/phpbb2/images/avatars/62418915_1057877930640b19704e452.jpg</string></value>
+  <value><string>https://webasset-akm.imvu.com/resized_image/duserimages/s40x55/tstretch/i%2Fcatalog%2Fincludes%2Fmodules%2Fphpbb2%2Fimages%2Favatars%2F62418915_1057877930640b19704e452.jpg</string></value>
+  <value><int>25</int></value>
+  <value><string>Male</string></value>
+  <value><int>5716782</int></value>
+  <value><string></string></value>
+  <value><string>0</string></value>
+  <value><string>1</string></value>
+  <value><string>0</string></value>
+  <value><string>0</string></value>
+</data></array></value>
+  <value><array><data>
+  <value><int>302322757</int></value>
+  <value><string>physcho1</string></value>
+  <value><int>1</int></value>
+  <value><string>http://userimages05-akm.imvu.com/userdata/02/32/27/57/userpics/Snap_BtCQqd0Eaw509286396.jpg</string></value>
+  <value><string>https://webasset-akm.imvu.com/resized_image/duserimages/s40x55/tstretch/i%2Fuserdata%2F02%2F32%2F27%2F57%2Fuserpics%2FSnap_BtCQqd0Eaw509286396.jpg</string></value>
+  <value><int>22</int></value>
+  <value><string>Female</string></value>
+  <value><int>0</int></value>
+  <value><string>2000-03-27 00:00:00</string></value>
+  <value><string>0</string></value>
+  <value><string>0</string></value>
+  <value><string>0</string></value>
+  <value><string>0</string></value>
+</data></array></value>
+  <value><array><data>
+  <value><int>113623233</int></value>
+  <value><string>Vixere</string></value>
+  <value><int>0</int></value>
+  <value><string>http://userimages01-akm.imvu.com/userdata/13/62/32/33/userpics/Snap_WCcE5s3Xpg636906596.jpg</string></value>
+  <value><string>https://webasset-akm.imvu.com/resized_image/duserimages/s40x55/tstretch/i%2Fuserdata%2F13%2F62%2F32%2F33%2Fuserpics%2FSnap_WCcE5s3Xpg636906596.jpg</string></value>
+  <value><int>24</int></value>
+  <value><string>Female</string></value>
+  <value><int>0</int></value>
+  <value><string>1998-10-20 00:00:00</string></value>
+  <value><string>0</string></value>
+  <value><string>1</string></value>
+  <value><string>0</string></value>
+  <value><string>0</string></value>
+</data></array></value>
+  <value><array><data>
+  <value><int>355245483</int></value>
+  <value><string>glitterpoppin</string></value>
+  <value><int>0</int></value>
+  <value><string>http://userimages01-akm.imvu.com/userdata/55/24/54/83/userpics/Snap_cny1oE3Sj4822021161.jpg</string></value>
+  <value><string>https://webasset-akm.imvu.com/resized_image/duserimages/s40x55/tstretch/i%2Fuserdata%2F55%2F24%2F54%2F83%2Fuserpics%2FSnap_cny1oE3Sj4822021161.jpg</string></value>
+  <value><int>26</int></value>
+  <value><string>Female</string></value>
+  <value><int>0</int></value>
+  <value><string>1996-12-27 00:00:00</string></value>
+  <value><string>1</string></value>
+  <value><string>1</string></value>
+  <value><string>0</string></value>
+  <value><string>0</string></value>
+</data></array></value>
+  <value><array><data>
+  <value><int>224846299</int></value>
+  <value><string>Blke12</string></value>
+  <value><int>0</int></value>
+  <value><string>http://userimages01-akm.imvu.com/userdata/24/84/62/99/userpics/Snap_fSYboYRgaR1875429493.jpg</string></value>
+  <value><string>https://webasset-akm.imvu.com/resized_image/duserimages/s40x55/tstretch/i%2Fuserdata%2F24%2F84%2F62%2F99%2Fuserpics%2FSnap_fSYboYRgaR1875429493.jpg</string></value>
+  <value><int>23</int></value>
+  <value><string>Hidden</string></value>
+  <value><int>3458403</int></value>
+  <value><string></string></value>
+  <value><string>0</string></value>
+  <value><string>1</string></value>
+  <value><string>0</string></value>
+  <value><string>0</string></value>
+</data></array></value>
+</data></array>
+      </value>
+    </param>
+  </params>
+</methodResponse>
+
+
+
+
+
+
+
+
+
+
+
+Room?
+GET		https://client-dynamic.imvu.com/api/find_locations.php?cid=116678358&cids=354463873,94024865,97758770,323607232,62418915,355245483
+{
+  "result": {
+    "62418915": [
+      {
+        "room_instance_id": "62418915-920",
+        "name": "xxx",
+        "is_ap": 0,
+        "is_vip": 0
+      }
+    ],
+    "94024865": [
+      {
+        "room_instance_id": "70812498-645",
+        "name": "2.0&#12644;",
+        "is_ap": 0,
+        "is_vip": 0
+      },
+      {
+        "room_instance_id": "111964767-387",
+        "name": "YE V2",
+        "is_ap": 0,
+        "is_vip": 0
+      },
+      {
+        "room_instance_id": "94024865-381",
+        "name": "222",
+        "is_ap": 0,
+        "is_vip": 0
+      }
+    ],
+    "354463873": [
+      {
+        "room_instance_id": "206574112-30",
+        "name": "Only Creamery 18+",
+        "is_ap": 0,
+        "is_vip": 0
+      }
+    ],
+    "355245483": [
+      {
+        "room_instance_id": "187517419-2449",
+        "name": "The GrtZ Bath House",
+        "is_ap": 1,
+        "is_vip": 0
+      }
+    ]
+  }
+}
+
+
+
+GET		http://client-dynamic.imvu.com/api/rooms/rooms_list_paginated.php?decode=2&search=test&null_upsell=true&cid=116678358
+		http://client-dynamic.imvu.com/api/rooms/rooms_list_paginated.php?decode=2&null_upsell=true&cid=116678358
+
+{
+  "customers_id": [
+    85033386,
+    163566841,
+    81933835,
+    272341111,
+    127605499,
+    336917946,
+    18840909,
+    75959567,
+    60542035,
+    151614617,
+    123148122,
+    278850239,
+    211948571,
+    261097368,
+    112933712,
+    111870924,
+    216312983,
+    316135631,
+    41301998,
+    187561358,
+    198705881,
+    147872698,
+    216313045,
+    216312983
+  ],
+  "customers_name": [
+    "MarkDennis",
+    "DahliaSentari",
+    "aurelieCoquinep",
+    "MrTAYLOResquire",
+    "Poula",
+    "Guest_nstartest0",
+    "LilRikkiRaye",
+    "Hansun",
+    "EngineerBrian",
+    "metalminami",
+    "Odence",
+    "Si1ent",
+    "Brigitte55",
+    "CerenityVexo",
+    "OneFalc017",
+    "VitinhoPrins",
+    "NIVRAM",
+    "RonaMae",
+    "Mika3l",
+    "AZZTHON",
+    "Cynically",
+    "KaitlynAmia",
+    "Maxxxiepie",
+    "NIVRAM"
+  ],
+  "customers_room_id": [
+    "171",
+    "546",
+    "540",
+    "279",
+    "396",
+    "12",
+    "1171",
+    "399",
+    "61",
+    "108",
+    "184",
+    "9",
+    "45",
+    "1040",
+    "112",
+    "56",
+    "25",
+    "48",
+    "39",
+    "14",
+    "78",
+    "1453",
+    "110",
+    "162"
+  ],
+  "name": [
+    "Admin Test",
+    "test 2",
+    "ROOM  EN TEST",
+    "TEST ROOM",
+    "Test Room",
+    "Ambient OFF Test",
+    "Light Test Room",
+    "maricris and hanna's room test",
+    "test two",
+    "Gojou",
+    "test",
+    "TEST",
+    "Test",
+    "test",
+    "Test",
+    "test",
+    "Sheila and Marvin",
+    "TEST",
+    "Test",
+    "GLADIATORS HANDSOME TUNDERSDOMES",
+    "test",
+    "Test",
+    "test",
+    "testjohn"
+  ],
+  "max_users": [
+    10,
+    10,
+    5,
+    3,
+    3,
+    10,
+    10,
+    3,
+    3,
+    10,
+    3,
+    3,
+    10,
+    5,
+    10,
+    10,
+    6,
+    8,
+    3,
+    10,
+    8,
+    3,
+    3,
+    10
+  ],
+  "is_ap": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    0,
+    0,
+    0,
+    1,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0
+  ],
+  "is_vip": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "is_av": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "num_participants": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "participants": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    []
+  ],
+  "image_url": [
+    "",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s300x220/tmaintain_aspect_ratio/i%2Fuserdata%2F63%2F56%2F68%2F41%2Fuserpics%2FSnap_gyH84pjXTU1071246527.png",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s300x220/tmaintain_aspect_ratio/i%2Fuserdata%2F81%2F93%2F38%2F35%2Fuserpics%2FSnap_I0QYNWpmVm1383148215.jpg",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s300x220/tmaintain_aspect_ratio/i%2Fuserdata%2F72%2F34%2F11%2F11%2Fuserpics%2FSnap_LkTJtYqvzQ89685322.jpg",
+    "",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s300x220/tmaintain_aspect_ratio/i%2Frooms%2Fimage%2F336917946-12.png",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s300x220/tmaintain_aspect_ratio/i%2Fuserdata%2F18%2F84%2F09%2F09%2Fuserpics%2FSnap_yRmqWIuKy71615372949.jpg",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s300x220/tmaintain_aspect_ratio/i%2Fuserdata%2F75%2F95%2F95%2F67%2Fuserpics%2FSnap_xVQEVUq2W61349047693.jpg",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s300x220/tmaintain_aspect_ratio/i%2Fuserdata%2F60%2F54%2F20%2F35%2Fuserpics%2FSnap_16923632794f9073f6bf0bf.png",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s300x220/tmaintain_aspect_ratio/i%2Fuserdata%2F51%2F61%2F46%2F17%2Fuserpics%2FSnap_nc1uYsVASP1350146060.jpg",
+    "",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s300x220/tmaintain_aspect_ratio/i%2Fuserdata%2F78%2F85%2F02%2F39%2Fuserpics%2FSnap_Wox7F1fRYA495817990.jpg",
+    "",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s300x220/tmaintain_aspect_ratio/i%2Fuserdata%2F61%2F09%2F73%2F68%2Fuserpics%2FSnap_ZFBOvjS50w834979041.jpg",
+    "",
+    "",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s300x220/tmaintain_aspect_ratio/i%2Fuserdata%2F16%2F31%2F29%2F83%2Fuserpics%2FSnap_5OOz8fZNo6811232209.jpg",
+    "",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s300x220/tmaintain_aspect_ratio/i%2Frooms%2Fimage%2F41301998-39.png",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s300x220/tmaintain_aspect_ratio/i%2Fuserdata%2F87%2F56%2F13%2F58%2Fuserpics%2FSnap_dUPRQLBqeP557430701.jpg",
+    "",
+    "",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s300x220/tmaintain_aspect_ratio/i%2Fuserdata%2F16%2F31%2F30%2F45%2Fuserpics%2FSnap_30g1LLNTkV2059294259.jpg",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s300x220/tmaintain_aspect_ratio/i%2Fuserdata%2F16%2F31%2F29%2F83%2Fuserpics%2FSnap_AT2NMrzU2A866096057.png"
+  ],
+  "description": [
+    "test",
+    "test",
+    "TEST",
+    "***TEST ROOM***",
+    "Test Room",
+    "Test for Ambient light",
+    "Black room for light test",
+    "test",
+    "this is a test room description, please don't approve it for themed rooms :P",
+    "** TEST **\n** TEST **\n** TEST **\n** TEST **\n** TEST **\n** TEST **\n** TEST **\n** TEST **",
+    "",
+    "",
+    "",
+    "",
+    "Under Construction",
+    "",
+    "test",
+    "",
+    "",
+    "TEST",
+    "",
+    "Blah Blah",
+    "ddddd",
+    "test"
+  ],
+  "room_size": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "allow_voice": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "rating": [
+    3.064516129032258,
+    0,
+    0,
+    3.064516129032258,
+    3.064516129032258,
+    0,
+    5,
+    0,
+    3.064516129032258,
+    0,
+    0,
+    0,
+    0,
+    0,
+    3.064516129032258,
+    0,
+    3.125,
+    0,
+    0,
+    3.064516129032258,
+    0,
+    3.064516129032258,
+    0,
+    0
+  ],
+  "language": [
+    "en",
+    0,
+    0,
+    0,
+    0,
+    0,
+    "en",
+    0,
+    "en",
+    "en",
+    0,
+    0,
+    0,
+    "en",
+    "en",
+    0,
+    "en",
+    0,
+    0,
+    0,
+    "en",
+    0,
+    "en",
+    "en"
+  ],
+  "is_favorite": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "resized_image_url": [
+    "",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s332x281/tmaintain_aspect_ratio/i%2Fuserdata%2F63%2F56%2F68%2F41%2Fuserpics%2FSnap_gyH84pjXTU1071246527.png",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s332x281/tmaintain_aspect_ratio/i%2Fuserdata%2F81%2F93%2F38%2F35%2Fuserpics%2FSnap_I0QYNWpmVm1383148215.jpg",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s332x281/tmaintain_aspect_ratio/i%2Fuserdata%2F72%2F34%2F11%2F11%2Fuserpics%2FSnap_LkTJtYqvzQ89685322.jpg",
+    "",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s332x281/tmaintain_aspect_ratio/i%2Frooms%2Fimage%2F336917946-12.png",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s332x281/tmaintain_aspect_ratio/i%2Fuserdata%2F18%2F84%2F09%2F09%2Fuserpics%2FSnap_yRmqWIuKy71615372949.jpg",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s332x281/tmaintain_aspect_ratio/i%2Fuserdata%2F75%2F95%2F95%2F67%2Fuserpics%2FSnap_xVQEVUq2W61349047693.jpg",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s332x281/tmaintain_aspect_ratio/i%2Fuserdata%2F60%2F54%2F20%2F35%2Fuserpics%2FSnap_16923632794f9073f6bf0bf.png",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s332x281/tmaintain_aspect_ratio/i%2Fuserdata%2F51%2F61%2F46%2F17%2Fuserpics%2FSnap_nc1uYsVASP1350146060.jpg",
+    "",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s332x281/tmaintain_aspect_ratio/i%2Fuserdata%2F78%2F85%2F02%2F39%2Fuserpics%2FSnap_Wox7F1fRYA495817990.jpg",
+    "",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s332x281/tmaintain_aspect_ratio/i%2Fuserdata%2F61%2F09%2F73%2F68%2Fuserpics%2FSnap_ZFBOvjS50w834979041.jpg",
+    "",
+    "",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s332x281/tmaintain_aspect_ratio/i%2Fuserdata%2F16%2F31%2F29%2F83%2Fuserpics%2FSnap_5OOz8fZNo6811232209.jpg",
+    "",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s332x281/tmaintain_aspect_ratio/i%2Frooms%2Fimage%2F41301998-39.png",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s332x281/tmaintain_aspect_ratio/i%2Fuserdata%2F87%2F56%2F13%2F58%2Fuserpics%2FSnap_dUPRQLBqeP557430701.jpg",
+    "",
+    "",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s332x281/tmaintain_aspect_ratio/i%2Fuserdata%2F16%2F31%2F30%2F45%2Fuserpics%2FSnap_30g1LLNTkV2059294259.jpg",
+    "http://webasset-akm.imvu.com/resized_image/duserimages/s332x281/tmaintain_aspect_ratio/i%2Fuserdata%2F16%2F31%2F29%2F83%2Fuserpics%2FSnap_AT2NMrzU2A866096057.png"
+  ],
+  "number_of_rooms": 250220,
+  "rooms_per_page": 24,
+  "is_new_enough_for_welcome_rooms": false,
+  "is_welcome_room_moderator": false,
+  "should_hide_welcome_rooms": false,
+  "welcome_room_instance_ids": {
+    "teen": {
+      "room1": "195013796-2"
+    },
+    "adult": {
+      "room1": "195013796-2"
+    }
+  }
+}
+
+
+
+GET		http://client-dynamic.imvu.com/api/rooms/room_info.php?room_id=263636495-130
+{
+  "name": "Lesbian zone🏳️‍🌈",
+  "description": "Lesbians/bisexual women/ women only 🏳️‍🌈💯NO BODY LIGHT💯get freaky😈🏳️‍🌈",
+  "max_users": 10,
+  "permissions": 2,
+  "is_ap": false,
+  "is_vip": false,
+  "image_url": "http://webasset-akm.imvu.com/resized_image/duserimages/s300x220/tmaintain_aspect_ratio/i%2Fuserdata%2F63%2F63%2F64%2F95%2Fuserpics%2FSnap_KkMu6KDyyn1436074399.gif",
+  "url_token": "lesbian-zone-242",
+  "language": "en",
+  "visitor_count": 0,
+  "is_non_guest_only": false,
+  "is_age_verified_only": false,
+  "is_friends_only": false,
+  "is_qa": false,
+  "whitelist_rating": 0,
+  "experiences_id": null,
+  "mogile_key": "/userdata/63/63/64/95/userpics/Snap_KkMu6KDyyn1436074399.gif",
+  "mogile_domain": "userimages",
+  "expired": null,
+  "room_owners": [],
+  "can_join_when_closed": false,
+  "allow_room_shell_change": false,
+  "allow_ap_products": false,
+  "room_shell_owner_id": 263636495,
+  "visitors_count": 196,
+  "boot_count": 7,
+  "auto_innocent_count": 0,
+  "is_grey_area": false,
+  "is_greylisted": false,
+  "last_modified": "2023-03-17 19:33:51",
+  "participants": {
+    "263636495": {
+      "customers_id": 263636495,
+      "avatar_name": "z3lles",
+      "avatar_download_size": 6016053,
+      "country": 223,
+      "age": "NA",
+      "avpic": "http://userimages-akm.imvu.com/catalog/includes/modules/phpbb2/images/avatars/263636495_1965452976640560480997c.gif",
+      "is_friend": false
+    },
+    "267860307": {
+      "customers_id": 267860307,
+      "avatar_name": "Nocnista",
+      "avatar_download_size": 3958817,
+      "country": 223,
+      "age": 23,
+      "avpic": "http://userimages-akm.imvu.com/catalog/includes/modules/phpbb2/images/avatars/267860307_1497314002641328407d09c.jpg",
+      "gender": "f",
+      "is_friend": false
+    },
+    "291462644": {
+      "customers_id": 291462644,
+      "avatar_name": "Evelynlopez23",
+      "avatar_download_size": 0,
+      "country": 223,
+      "age": 23,
+      "avpic": "http://userimages04-akm.imvu.com/userdata/91/46/26/44/userpics/Snap_XWA4ZS9dEd1590076455.jpg",
+      "gender": "f",
+      "is_friend": false
+    },
+    "295784002": {
+      "customers_id": 295784002,
+      "avatar_name": "Guest_establishedin99",
+      "avatar_download_size": 0,
+      "country": 223,
+      "age": "NA",
+      "avpic": "http://userimages-akm.imvu.com/catalog/includes/modules/phpbb2/images/avatars/295784002_6951269886413bc19ae870.gif",
+      "gender": "f",
+      "is_friend": false
+    },
+    "326600302": {
+      "customers_id": 326600302,
+      "avatar_name": "Guest_maze163662",
+      "avatar_download_size": 0,
+      "country": 223,
+      "age": "NA",
+      "avpic": "http://userimages05-akm.imvu.com/userdata/26/60/03/02/userpics/Snap_xZAVBEm3HQ1044973840.jpg",
+      "gender": "f",
+      "is_friend": false
+    },
+    "329557498": {
+      "customers_id": 329557498,
+      "avatar_name": "Guest_Mila672245",
+      "avatar_download_size": 0,
+      "country": 195,
+      "age": "NA",
+      "avpic": "http://userimages03-akm.imvu.com/userdata/29/55/74/98/userpics/Snap_NZXjjbcluf638316990.jpg",
+      "gender": "f",
+      "is_friend": false
+    },
+    "336576361": {
+      "customers_id": 336576361,
+      "avatar_name": "Bokutoslefttoe",
+      "avatar_download_size": 0,
+      "country": 223,
+      "age": "NA",
+      "avpic": "http://userimages04-akm.imvu.com/userdata/36/57/63/61/userpics/Snap_Q5OBqabYFY540209531.jpg",
+      "is_friend": false
+    },
+    "353284204": {
+      "customers_id": 353284204,
+      "avatar_name": "Guest_Yoboiaydenjason",
+      "avatar_download_size": 0,
+      "country": 223,
+      "age": 48,
+      "avpic": "http://userimages-akm.imvu.com/userdata/auto_avpic/image/496c6c35a980617290f812ee28160773.png",
+      "gender": "m",
+      "is_friend": false
+    },
+    "356390926": {
+      "customers_id": 356390926,
+      "avatar_name": "Guest_MaxineEmma",
+      "avatar_download_size": 0,
+      "country": 168,
+      "age": 20,
+      "avpic": "http://userimages-akm.imvu.com/userdata/auto_avpic/image/13177208a84d52a6b34710125d7c9117.png",
+      "gender": "f",
+      "is_friend": false
+    }
+  },
+  "customers_avatar_name": "z3lles",
+  "room_download_size": 0,
+  "rating": 3.064516129032258,
+  "room_instance_id": "263636495-130",
+  "customers_id": 263636495
+}
