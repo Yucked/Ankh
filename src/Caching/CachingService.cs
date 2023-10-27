@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Ankh.Handlers;
 using Ankh.Redis;
 using Ankh.Redis.Interfaces;
 
@@ -6,6 +7,7 @@ namespace Ankh.Caching;
 
 public sealed class CachingService : BackgroundService {
     private readonly DirectoryCacher _directoryCacher;
+    private readonly RoomHandler _roomHandler;
     private readonly ILogger<CachingService> _logger;
     private readonly ConcurrentQueue<string> _urls;
     private readonly RedisClientManager _clientManager;

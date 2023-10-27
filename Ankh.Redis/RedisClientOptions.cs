@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Ankh.Redis;
@@ -6,7 +6,7 @@ namespace Ankh.Redis;
 /// <summary>
 /// 
 /// </summary>
-public readonly record struct RedisClientOptions {
+public sealed record RedisClientOptions {
     /// <summary>
     /// 
     /// </summary>

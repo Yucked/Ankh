@@ -1,4 +1,5 @@
 using AngleSharp;
+using AngleSharp.Html.Parser;
 using Ankh.Caching;
 using Ankh.Redis;
 using Microsoft.Extensions.Logging.Colorful;
@@ -13,9 +14,9 @@ builder.Services
         x.ClearProviders();
         x.AddColorfulConsole();
     })
-    .AddSingleton<DirectoryCacher>()
     .AddHostedService<CachingService>()
     .AddSingleton<RedisClientManager>()
+    .AddSingleton<HtmlParser>()
     .AddSingleton(BrowsingContext.New(Configuration.Default.WithDefaultLoader()));
 
 LoggingExtensions.ChangeConsoleMode();

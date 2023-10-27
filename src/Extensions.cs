@@ -2,6 +2,8 @@
 using System.ComponentModel;
 using System.Net;
 using System.Text.Json;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
 
 namespace Ankh;
 
@@ -105,6 +107,15 @@ public static class Extensions {
 
     public static DateOnly Today() {
         return DateOnly.FromDateTime(DateTime.UtcNow);
+    }
+
+    public static async Task<IHtmlDocument> ParseWebPageAsync(this HttpClient httpClient, string url,
+                                                              HtmlParser htmlParser,
+                                                              CancellationToken cancellationToken) {
+        var responseMessage = await httpClient.GetAsync(url, cancellationToken);
+        using var content = responseMessage.Content;
+        await using var stream = await content.ReadAsStreamAsync(cancellationToken);
+        return await htmlParser.ParseDocumentAsync(stream);
     }
 }
 
