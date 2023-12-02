@@ -1,29 +1,37 @@
 mod configuration;
 mod types;
+mod routes;
+mod imvu;
 
-use surrealdb::{
-    Surreal,
-    engine::remote::ws::Ws,
-    opt::auth::Root,
+
+use std::sync::OnceLock;
+use axum::{Router, routing::get};
+use reqwest::Client;
+use tokio::{
+    main,
+    net::TcpListener,
+};
+use crate::{
+    routes::{ping, get_avatarcard, get_user_id},
+    configuration::{Configuration},
 };
 
-#[tokio::main]
-async fn main() -> surrealdb::Result<()> {
+static REQ_CLIENT: OnceLock<Client> = OnceLock::new();
 
-    // Connect to the server
-    let db = Surreal::new::<Ws>("surreal.srv.lol").await?;
+#[main]
+async fn main() {
+    REQ_CLIENT.get_or_init(|| Client::new());
+    let config: Configuration = configuration::load_config();
+    let app = Router::new()
+        .route("/", get(ping))
+        .route("/v1/json/:user_id", get(get_avatarcard))
+        .route("/v1/xml/:username", get(get_user_id));
 
-    // Signin as a namespace, database, or root user
-    db.signin(Root {
-        username: "",
-        password: "",
-    })
-        .await?;
+    let listener = TcpListener::bind(format!("{}:{}", config.hostname, config.port))
+        .await
+        .unwrap();
 
-    // Select a specific namespace / database
-    db.use_ns("test").use_db("test").await?;
-
-    Ok(())
+    axum::serve(listener, app)
+        .await
+        .unwrap();
 }
-
-async fn connect_to_surreal() {}
