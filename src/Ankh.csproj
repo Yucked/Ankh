@@ -11,10 +11,6 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Colorful" Version="1.3" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\Ankh.Redis\Ankh.Redis.csproj" />
-	</ItemGroup>
-
 	<PropertyGroup>
 		<RestoreAdditionalProjectSources>
 			https://www.myget.org/F/yucked/api/v3/index.json
