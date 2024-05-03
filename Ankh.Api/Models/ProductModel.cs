@@ -1,10 +1,11 @@
 ﻿using System.Text.Json.Serialization;
+using Ankh.Api.Converters;
 
 // ReSharper disable All
 
 namespace Ankh.Api.Models;
 
-public class ProductModel : RestResponse {
+public class ProductModel : IRestModel {
     [JsonPropertyName("product_id")]
     public long ProductId { get; set; }
     
@@ -17,8 +18,7 @@ public class ProductModel : RestResponse {
     [JsonPropertyName("creator_name")]
     public string CreatorName { get; set; }
     
-    // TODO: Use ENUM attribute
-    [JsonPropertyName("rating")]
+    [JsonPropertyName("rating"), JsonConverter(typeof(ProductRatingConverter))]
     public ProductRating Rating { get; set; }
     
     [JsonPropertyName("product_price")]
@@ -42,11 +42,11 @@ public class ProductModel : RestResponse {
     [JsonPropertyName("derivation_profit")]
     public long DerivationProfit { get; set; }
     
-    [JsonPropertyName("allows_derivation")]
-    public long AllowsDerivation { get; set; }
+    [JsonPropertyName("allows_derivation"), JsonConverter(typeof(IntToBoolConverter))]
+    public bool AllowsDerivation { get; set; }
     
-    [JsonPropertyName("allow_third_party_bundle")]
-    public long AllowThirdPartyBundle { get; set; }
+    [JsonPropertyName("allow_third_party_bundle"), JsonConverter(typeof(IntToBoolConverter))]
+    public bool AllowThirdPartyBundle { get; set; }
     
     [JsonPropertyName("product_image")]
     public string Image { get; set; }
@@ -78,8 +78,8 @@ public class ProductModel : RestResponse {
     [JsonPropertyName("gender_restriction")]
     public string GenderRestriction { get; set; }
     
-    [JsonPropertyName("is_bundable")]
-    public long IsBundable { get; set; }
+    [JsonPropertyName("is_bundable"), JsonConverter(typeof(IntToBoolConverter))]
+    public bool IsBundable { get; set; }
     
     [JsonPropertyName("is_visible")]
     public bool IsVisible { get; set; }
@@ -111,8 +111,8 @@ public class ProductModel : RestResponse {
     [JsonPropertyName("preview_image")]
     public Uri PreviewImage { get; set; }
     
-    [JsonPropertyName("allow_derived_nft_minting")]
-    public long AllowDerivedNftMinting { get; set; }
+    [JsonPropertyName("allow_derived_nft_minting"), JsonConverter(typeof(IntToBoolConverter))]
+    public bool AllowDerivedNftMinting { get; set; }
 }
 
 public record CategoryPath(
