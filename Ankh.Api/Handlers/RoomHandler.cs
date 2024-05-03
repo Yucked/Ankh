@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Net.Http.Json;
 using System.Web;
+using Ankh.Api.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Ankh.Api.Handlers;
@@ -30,8 +32,23 @@ public sealed class RoomHandler(
     /// Fetches product information from API
     /// </summary>
     /// <param name="productId"></param>
-    public async ValueTask GetProductByIdAsync(string productId) {
-        ArgumentException.ThrowIfNullOrWhiteSpace(productId);
+    public async ValueTask<ProductModel> GetProductByIdAsync(int productId) {
+        if (productId <= 0) {
+            throw new ArgumentException("Can't be less than or equal to 0.", nameof(productId));
+        }
+        
         var apiUrl = $"https://api.imvu.com/product/product-{productId}";
+        using var responseMessage = await httpClient.GetAsync(apiUrl);
+        if (!responseMessage.IsSuccessStatusCode) {
+            logger.LogError("Failed product fetch {}", productId);
+            throw new Exception("");
+        }
+        
+        var restModel = await responseMessage.Content.ReadFromJsonAsync<RestModel>();
+        if (restModel!.Status != "success") {
+            throw new Exception("");
+        }
+        
+        return (ProductModel)restModel.Data;
     }
 }
