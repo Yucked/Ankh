@@ -32,8 +32,11 @@ public sealed class UserHandler(
                 .Select(x => $"https://api.imvu.com/user/user-{x}")
                 .ToArray();
             
-            using var responseMessage =
-                await httpClient.GetAsync($"https://api.imvu.com/user?id={string.Join(',', userIdUrls)}");
+            using var requestMessage = new HttpRequestMessage(HttpMethod.Get,
+                    $"https://api.imvu.com/user?id={string.Join(',', userIdUrls)}")
+                .AddLoginCookie();
+            
+            var responseMessage = await httpClient.SendAsync(requestMessage);
             if (!responseMessage.IsSuccessStatusCode) {
                 throw new Exception($"Failed to fetch because of {responseMessage.ReasonPhrase}");
             }

@@ -27,4 +27,10 @@ public static class Extensions {
         
         return (T)restModel.Data;
     }
+    
+    public static HttpRequestMessage AddLoginCookie(this HttpRequestMessage requestMessage) {
+        // osCsid is session id - server sided can't spoof.
+        requestMessage.Headers.Add("Cookie", "osCsid=");
+        return requestMessage;
+    }
 }

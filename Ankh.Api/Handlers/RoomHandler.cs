@@ -53,7 +53,10 @@ public class RoomHandler(
         stringBuilder.Append(
             $"filter_text={keywords}&name_filter={avatarName}&partial_avatar_name={avatarName}&keywords={keywords}");
         
-        using var responseMessage = await httpClient.GetAsync($"{stringBuilder}");
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"{stringBuilder}")
+            .AddLoginCookie();
+        
+        var responseMessage = await httpClient.SendAsync(requestMessage);
         if (!responseMessage.IsSuccessStatusCode) {
             throw new Exception($"Failed to fetch because of {responseMessage.ReasonPhrase}");
         }
