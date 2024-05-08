@@ -5,13 +5,11 @@ namespace Ankh.Api.Models;
 
 public interface IRestModel;
 
-public record RestModel {
-    [JsonPropertyName("status")]
-    public string Status { get; init; }
-    
-    [JsonPropertyName("id")]
-    public string Id { get; init; }
-    
-    [JsonPropertyName("denormalized"), JsonConverter(typeof(RestModelConverter))]
-    public IRestModel Data { get; init; }
-}
+public record RestModel(
+    [property: JsonPropertyName("status")]
+    string Status,
+    [property: JsonPropertyName("id")]
+    string Id,
+    [property: JsonPropertyName("denormalized"), JsonConverter(typeof(RestModelConverter))]
+    IRestModel Data
+);
