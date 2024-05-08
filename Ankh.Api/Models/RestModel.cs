@@ -13,7 +13,5 @@ public record RestModel {
     public string Id { get; init; }
     
     [JsonPropertyName("denormalized"), JsonConverter(typeof(RestModelConverter))]
-    public IRestModel Data { get; set; }
-    
-    public IDictionary<string, string> Relations { get; set; }
+    public IRestModel Data { get; init; }
 }
