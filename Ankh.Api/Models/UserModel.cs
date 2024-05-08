@@ -4,133 +4,93 @@ using Ankh.Api.Models.Enums;
 
 namespace Ankh.Api.Models;
 
-public record UserModel : IRestModel {
-    [JsonPropertyName("created")]
-    public DateTimeOffset Created { get; set; }
-    
-    [JsonPropertyName("registered")]
-    public long Registered { get; set; }
-    
-    [JsonPropertyName("gender")]
-    public string Gender { get; set; }
-    
-    [JsonPropertyName("display_name")]
-    public string DisplayName { get; set; }
-    
-    [JsonPropertyName("age"), JsonConverter(typeof(NullIntConverter))]
-    public int Age { get; set; }
-    
-    [JsonPropertyName("country")]
-    public string Country { get; set; }
-    
-    [JsonPropertyName("state")]
-    public object State { get; set; }
-    
-    [JsonPropertyName("avatar_image")]
-    public Uri AvatarImage { get; set; }
-    
-    [JsonPropertyName("avatar_portrait_image")]
-    public Uri AvatarPortraitImage { get; set; }
-    
-    [JsonPropertyName("is_vip")]
-    public bool IsVip { get; set; }
-    
-    [JsonPropertyName("is_ap")]
-    public bool HasAccessPass { get; set; }
-    
-    [JsonPropertyName("is_creator")]
-    public bool IsCreator { get; set; }
-    
-    [JsonPropertyName("is_adult")]
-    public bool IsAdult { get; set; }
-    
-    [JsonPropertyName("is_ageverified")]
-    public bool IsAgeverified { get; set; }
-    
-    [JsonPropertyName("is_staff")]
-    public bool IsStaff { get; set; }
-    
-    [JsonPropertyName("is_greeter")]
-    public bool IsGreeter { get; set; }
-    
-    [JsonPropertyName("greeter_score")]
-    public int GreeterScore { get; set; }
-    
-    [JsonPropertyName("badge_level")]
-    public int BadgeLevel { get; set; }
-    
-    [JsonPropertyName("username")]
-    public string Username { get; set; }
-    
-    [JsonPropertyName("relationship_status"), JsonConverter(typeof(JsonNumberEnumConverter<RelationshipStatus>))]
-    public RelationshipStatus RelationshipStatus { get; set; }
-    
-    [JsonPropertyName("orientation")]
-    public int Orientation { get; set; }
-    
-    [JsonPropertyName("looking_for"), JsonConverter(typeof(JsonNumberEnumConverter<LookingFor>))]
-    public LookingFor LookingFor { get; set; }
-    
-    [JsonPropertyName("interests")]
-    public string Interests { get; set; }
-    
-    [JsonPropertyName("legacy_cid")]
-    public long LegacyCid { get; set; }
-    
-    [JsonPropertyName("persona_type")]
-    public long PersonaType { get; set; }
-    
-    [JsonPropertyName("availability"), JsonConverter(typeof(AvailabilityConverter))]
-    public Availability Availability { get; set; }
-    
-    [JsonPropertyName("is_on_hold")]
-    public bool IsOnHold { get; set; }
-    
-    [JsonPropertyName("is_discussion_moderator")]
-    public bool IsDiscussionModerator { get; set; }
-    
-    [JsonPropertyName("online")]
-    public bool Online { get; set; }
-    
-    [JsonPropertyName("tagline")]
-    public string Tagline { get; set; }
-    
-    [JsonPropertyName("thumbnail_url")]
-    public Uri ThumbnailUrl { get; set; }
-    
-    [JsonPropertyName("is_host"), JsonConverter(typeof(IntToBoolConverter))]
-    public bool IsHost { get; set; }
-    
-    [JsonPropertyName("is_current_user")]
-    public bool IsCurrentUser { get; set; }
-    
-    [JsonPropertyName("ads_category")]
-    public string AdsCategory { get; set; }
-    
-    [JsonPropertyName("ads_category_p")]
-    public bool AdsCategoryP { get; set; }
-    
-    [JsonPropertyName("email")]
-    public string Email { get; set; }
-    
-    [JsonPropertyName("is_email_verified")]
-    public bool IsEmailVerified { get; set; }
-    
-    [JsonPropertyName("last_password_change")]
-    public DateTimeOffset LastPasswordChange { get; set; }
-    
-    [JsonPropertyName("is_2fa_required")]
-    public object Is2FARequired { get; set; }
-    
-    [JsonPropertyName("has_nft")]
-    public bool HasNft { get; set; }
-    
-    [JsonPropertyName("vip_tier")]
-    public int VipTier { get; set; }
-    
-    [JsonPropertyName("vip_platform")]
-    public int VipPlatform { get; set; }
-    
-    [JsonPropertyName("has_legacy_vip")]
-    public bool HasLegacyVip { get; set; }
-}
+public record UserModel(
+    [property: JsonPropertyName("created")]
+    DateTimeOffset Created,
+    [property: JsonPropertyName("registered")]
+    long Registered,
+    [property: JsonPropertyName("gender")]
+    string Gender,
+    [property: JsonPropertyName("display_name")]
+    string DisplayName,
+    [property: JsonPropertyName("age"), JsonConverter(typeof(NullIntConverter))]
+    int Age,
+    [property: JsonPropertyName("country")]
+    string Country,
+    [property: JsonPropertyName("state")]
+    object State,
+    [property: JsonPropertyName("avatar_image")]
+    Uri AvatarImage,
+    [property: JsonPropertyName("avatar_portrait_image")]
+    Uri AvatarPortraitImage,
+    [property: JsonPropertyName("is_vip")]
+    bool IsVip,
+    [property: JsonPropertyName("is_ap")]
+    bool HasAccessPass,
+    [property: JsonPropertyName("is_creator")]
+    bool IsCreator,
+    [property: JsonPropertyName("is_adult")]
+    bool IsAdult,
+    [property: JsonPropertyName("is_ageverified")]
+    bool IsAgeverified,
+    [property: JsonPropertyName("is_staff")]
+    bool IsStaff,
+    [property: JsonPropertyName("is_greeter")]
+    bool IsGreeter,
+    [property: JsonPropertyName("greeter_score")]
+    int GreeterScore,
+    [property: JsonPropertyName("badge_level")]
+    int BadgeLevel,
+    [property: JsonPropertyName("username")]
+    string Username,
+    [property: JsonPropertyName("relationship_status"),
+               JsonConverter(typeof(JsonNumberEnumConverter<RelationshipStatus>))]
+    RelationshipStatus RelationshipStatus,
+    [property: JsonPropertyName("orientation")]
+    int Orientation,
+    [property: JsonPropertyName("looking_for"),
+               JsonConverter(typeof(JsonNumberEnumConverter<LookingFor>))]
+    LookingFor LookingFor,
+    [property: JsonPropertyName("interests")]
+    string Interests,
+    [property: JsonPropertyName("legacy_cid")]
+    long LegacyCid,
+    [property: JsonPropertyName("persona_type")]
+    long PersonaType,
+    [property: JsonPropertyName("availability"), JsonConverter(typeof(AvailabilityConverter))]
+    Availability Availability,
+    [property: JsonPropertyName("is_on_hold")]
+    bool IsOnHold,
+    [property: JsonPropertyName("is_discussion_moderator")]
+    bool IsDiscussionModerator,
+    [property: JsonPropertyName("online")]
+    bool Online,
+    [property: JsonPropertyName("tagline")]
+    string Tagline,
+    [property: JsonPropertyName("thumbnail_url")]
+    Uri ThumbnailUrl,
+    [property: JsonPropertyName("is_host"), JsonConverter(typeof(IntToBoolConverter))]
+    bool IsHost,
+    [property: JsonPropertyName("is_current_user")]
+    bool IsCurrentUser,
+    [property: JsonPropertyName("ads_category")]
+    string AdsCategory,
+    [property: JsonPropertyName("ads_category_p")]
+    bool AdsCategoryP,
+    [property: JsonPropertyName("email")]
+    string Email,
+    [property: JsonPropertyName("is_email_verified")]
+    bool IsEmailVerified,
+    [property: JsonPropertyName("last_password_change")]
+    DateTimeOffset LastPasswordChange,
+    [property: JsonPropertyName("is_2fa_required")]
+    object Is2FARequired,
+    [property: JsonPropertyName("has_nft")]
+    bool HasNft,
+    [property: JsonPropertyName("vip_tier")]
+    int VipTier,
+    [property: JsonPropertyName("vip_platform")]
+    int VipPlatform,
+    [property: JsonPropertyName("has_legacy_vip")]
+    bool HasLegacyVip
+) : IRestModel;

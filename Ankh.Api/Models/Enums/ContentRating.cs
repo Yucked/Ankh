@@ -1,6 +1,6 @@
 ﻿namespace Ankh.Api.Models.Enums;
 
-public enum ProductRating : byte {
+public enum ContentRating : byte {
     /// <summary>
     /// GA
     /// </summary>
