@@ -18,6 +18,7 @@ public class RestModelConverter : JsonConverter<IRestModel> {
         IRestModel result = id switch {
             _ when id.Contains("product/product-") => data.Deserialize<ProductModel>(),
             _ when id.Contains("user/user-")       => data.Deserialize<UserModel>(),
+            _ when id.Contains("room/room-")       => data.Deserialize<RoomModel>(),
         };
         
         return result;
