@@ -1,6 +1,5 @@
-﻿namespace Ankh.Api.Models;
+﻿namespace Ankh.Api.Models.Enums;
 
-// TODO: Add attribute for serializing GA
 public enum ProductRating : byte {
     /// <summary>
     /// GA
