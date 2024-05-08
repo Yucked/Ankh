@@ -4,6 +4,15 @@ using Ankh.Api.Models;
 namespace Ankh.Api;
 
 public static class Extensions {
+    private static readonly long[] StaffUserIds = [
+        120862048, // IMVU_Offers
+        87683724,  // IMVUSocial
+    ];
+    
+    public static long GetRandomUserId() {
+        return StaffUserIds[Random.Shared.Next(StaffUserIds.Length - 1)];
+    }
+    
     public static async ValueTask<T> GetRestModelAsync<T>(this HttpClient httpClient, string requestUrl)
         where T : IRestModel {
         using var responseMessage = await httpClient.GetAsync(requestUrl);
