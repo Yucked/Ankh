@@ -54,21 +54,21 @@ public record UserModel : IRestModel {
     public bool IsGreeter { get; set; }
     
     [JsonPropertyName("greeter_score")]
-    public long GreeterScore { get; set; }
+    public int GreeterScore { get; set; }
     
     [JsonPropertyName("badge_level")]
-    public long BadgeLevel { get; set; }
+    public int BadgeLevel { get; set; }
     
     [JsonPropertyName("username")]
     public string Username { get; set; }
     
-    [JsonPropertyName("relationship_status")]
+    [JsonPropertyName("relationship_status"), JsonConverter(typeof(JsonNumberEnumConverter<RelationshipStatus>))]
     public RelationshipStatus RelationshipStatus { get; set; }
     
     [JsonPropertyName("orientation")]
-    public long Orientation { get; set; }
+    public int Orientation { get; set; }
     
-    [JsonPropertyName("looking_for")]
+    [JsonPropertyName("looking_for"), JsonConverter(typeof(JsonNumberEnumConverter<LookingFor>))]
     public LookingFor LookingFor { get; set; }
     
     [JsonPropertyName("interests")]
@@ -80,7 +80,7 @@ public record UserModel : IRestModel {
     [JsonPropertyName("persona_type")]
     public long PersonaType { get; set; }
     
-    [JsonPropertyName("availability")]
+    [JsonPropertyName("availability"), JsonConverter(typeof(AvailabilityConverter))]
     public Availability Availability { get; set; }
     
     [JsonPropertyName("is_on_hold")]
@@ -126,10 +126,10 @@ public record UserModel : IRestModel {
     public bool HasNft { get; set; }
     
     [JsonPropertyName("vip_tier")]
-    public long VipTier { get; set; }
+    public int VipTier { get; set; }
     
     [JsonPropertyName("vip_platform")]
-    public long VipPlatform { get; set; }
+    public int VipPlatform { get; set; }
     
     [JsonPropertyName("has_legacy_vip")]
     public bool HasLegacyVip { get; set; }
