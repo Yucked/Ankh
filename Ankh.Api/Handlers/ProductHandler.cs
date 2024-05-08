@@ -7,8 +7,8 @@ using Microsoft.Extensions.Logging;
 namespace Ankh.Api.Handlers;
 
 [SuppressMessage("Performance", "CA1822:Mark members as static")]
-public sealed class RoomHandler(
-    ILogger<RoomHandler> logger,
+public sealed class ProductHandler(
+    ILogger<ProductHandler> logger,
     HttpClient httpClient) {
     /// <summary>
     /// Displays all items in scene (room) alongside user's outfits regardless of if they are hidden.
