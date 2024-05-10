@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using Ankh.Api.Converters;
+using Ankh.Api.Models.Interfaces;
 
 namespace Ankh.Api.Models.PHP;
 
@@ -73,7 +74,7 @@ public sealed record PHPUserModel(
                JsonConverter(typeof(IntToBoolConverter))]
     bool IsWelcomeModerator,
     [property: JsonPropertyName("public_rooms")]
-    object[] PublicRooms,
+    VURoomModel[] PublicRooms,
     [property: JsonPropertyName("visible_albums")]
     int VisibleAlbums
 );
