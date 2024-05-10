@@ -1,5 +1,6 @@
-﻿using System.Text.Json;
-using Ankh.Api.Models;
+﻿using System.Text;
+using System.Text.Json;
+using Ankh.Api.Models.Rest;
 using Microsoft.Extensions.Logging;
 
 namespace Ankh.Api.Handlers;
@@ -54,5 +55,39 @@ public sealed class UserHandler(
             logger.LogError(exception, "Something went wrong.");
             throw;
         }
+    }
+    
+    public async Task<long> GetIdFromUsernameAsync(string username) {
+        using var data = new StringContent(
+            $"""
+                         <methodCall>
+                         <methodName>gateway.getUserIdForAvatarName</methodName>
+                         <params>
+                             <param>
+                                 <value>
+                                     <string>{username}</string>
+                                 </value>
+                             </param>
+                         </params>s
+                         </methodCall>
+             """,
+            Encoding.UTF8, "application/xml");
+        
+        using var requestMessage = new HttpRequestMessage {
+            RequestUri = new Uri("https://secure.imvu.com//catalog/skudb/gateway.php"),
+            Content = data,
+            Method = HttpMethod.Post
+        };
+        
+        using var responseMessage = await httpClient.SendAsync(requestMessage);
+        if (!responseMessage.IsSuccessStatusCode) {
+            logger.LogError("{ReasonPhrase}", responseMessage.ReasonPhrase);
+            return default;
+        }
+        
+        var raw = await responseMessage.Content.ReadAsStringAsync();
+        ReadOnlyMemory<byte> byteData = await responseMessage.Content.ReadAsByteArrayAsync();
+        var slice = byteData[106..byteData.Span.IndexOf("</int>"u8)];
+        return int.Parse(Encoding.UTF8.GetString(slice.Span));
     }
 }
