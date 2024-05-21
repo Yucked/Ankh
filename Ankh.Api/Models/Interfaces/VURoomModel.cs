@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Ankh.Api.Attributes;
 
 namespace Ankh.Api.Models.Interfaces;
 
@@ -6,8 +7,9 @@ namespace Ankh.Api.Models.Interfaces;
 /// Can be used for public rooms
 /// </summary>
 public record VURoomModel {
-    [JsonPropertyName("room_instance_id")]
-    public string RoomId { get; init; }
+    // TODO: instance id is used for getting room's information room_instance_id
+    [JsonPropertyNames("room_pid")]
+    public long Id { get; init; }
     
     [JsonPropertyName("name")]
     public string Name { get; init; }
