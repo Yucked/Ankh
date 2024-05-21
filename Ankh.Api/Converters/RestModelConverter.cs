@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using Ankh.Api.Models;
+using Ankh.Api.Models.Rest;
 
 namespace Ankh.Api.Converters;
 

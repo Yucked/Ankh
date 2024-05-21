@@ -2,6 +2,8 @@
 using System.Text.Json;
 using Ankh.Api.Models;
 using Ankh.Api.Models.Enums;
+using Ankh.Api.Models.Interfaces;
+using Ankh.Api.Models.Rest;
 using Microsoft.Extensions.Logging;
 
 namespace Ankh.Api.Handlers;
@@ -72,5 +74,10 @@ public class RoomHandler(
             .EnumerateObject()
             .Select(x => denorm.GetProperty(x.Name).GetProperty("data").Deserialize<RoomModel>())
             .ToArray()!;
+    }
+    
+    public async ValueTask<VURoomModel> GetPublicRoomsForUserAsync(long userId) {
+        // https://client-dynamic.imvu.com/api/find_locations.php?cids={userIds}
+        return default;
     }
 }
