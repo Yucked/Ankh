@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Ankh.Api.Converters;
 
-namespace Ankh.Api.Models;
+namespace Ankh.Api.Models.Rest;
 
 public interface IRestModel;
 
