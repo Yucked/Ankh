@@ -1,5 +1,5 @@
 ﻿using System.Net.Http.Json;
-using Ankh.Api.Models;
+using Ankh.Api.Models.Rest;
 
 namespace Ankh.Api;
 
@@ -7,6 +7,9 @@ public static class Extensions {
     private static readonly long[] StaffUserIds = [
         120862048, // IMVU_Offers
         87683724,  // IMVUSocial
+        191931278, // IMVUMobile
+        312470110, // Nola_AP
+        11417, //IMVU Badger
     ];
     
     public static long GetRandomUserId() {
