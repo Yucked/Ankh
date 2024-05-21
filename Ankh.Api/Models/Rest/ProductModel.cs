@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Ankh.Api.Converters;
 using Ankh.Api.Models.Enums;
+using Ankh.Api.Models.Rest;
 
 // ReSharper disable All
 

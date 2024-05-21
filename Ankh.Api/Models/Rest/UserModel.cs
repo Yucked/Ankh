@@ -2,7 +2,7 @@
 using Ankh.Api.Converters;
 using Ankh.Api.Models.Enums;
 
-namespace Ankh.Api.Models;
+namespace Ankh.Api.Models.Rest;
 
 public record UserModel(
     [property: JsonPropertyName("created")]
@@ -13,12 +13,13 @@ public record UserModel(
     string Gender,
     [property: JsonPropertyName("display_name")]
     string DisplayName,
-    [property: JsonPropertyName("age"), JsonConverter(typeof(NullIntConverter))]
+    [property: JsonPropertyName("age"),
+               JsonConverter(typeof(NullIntConverter))]
     int Age,
     [property: JsonPropertyName("country")]
     string Country,
     [property: JsonPropertyName("state")]
-    object State,
+    string State,
     [property: JsonPropertyName("avatar_image")]
     Uri AvatarImage,
     [property: JsonPropertyName("avatar_portrait_image")]
@@ -54,10 +55,11 @@ public record UserModel(
     [property: JsonPropertyName("interests")]
     string Interests,
     [property: JsonPropertyName("legacy_cid")]
-    long LegacyCid,
+    long LegacyUserId,
     [property: JsonPropertyName("persona_type")]
     long PersonaType,
-    [property: JsonPropertyName("availability"), JsonConverter(typeof(AvailabilityConverter))]
+    [property: JsonPropertyName("availability"),
+               JsonConverter(typeof(AvailabilityConverter))]
     Availability Availability,
     [property: JsonPropertyName("is_on_hold")]
     bool IsOnHold,
@@ -69,7 +71,8 @@ public record UserModel(
     string Tagline,
     [property: JsonPropertyName("thumbnail_url")]
     Uri ThumbnailUrl,
-    [property: JsonPropertyName("is_host"), JsonConverter(typeof(IntToBoolConverter))]
+    [property: JsonPropertyName("is_host"),
+               JsonConverter(typeof(IntToBoolConverter))]
     bool IsHost,
     [property: JsonPropertyName("is_current_user")]
     bool IsCurrentUser,

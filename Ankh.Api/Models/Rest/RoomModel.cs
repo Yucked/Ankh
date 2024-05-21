@@ -2,7 +2,7 @@
 using Ankh.Api.Converters;
 using Ankh.Api.Models.Enums;
 
-namespace Ankh.Api.Models;
+namespace Ankh.Api.Models.Rest;
 
 public record RoomModel(
     [property: JsonPropertyName("name")]
