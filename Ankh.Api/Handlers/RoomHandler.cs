@@ -1,6 +1,5 @@
-﻿using System.Text;
-using System.Text.Json;
-using Ankh.Api.Models;
+﻿using System.Text.Json;
+using System.Web;
 using Ankh.Api.Models.Enums;
 using Ankh.Api.Models.Interfaces;
 using Ankh.Api.Models.Rest;
@@ -11,6 +10,34 @@ namespace Ankh.Api.Handlers;
 public class RoomHandler(
     ILogger<RoomHandler> logger,
     HttpClient httpClient) {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="Keywords"></param>
+    /// <param name="Language"></param>
+    /// <param name="AvatarName"></param>
+    /// <param name="MinOccpuants"></param>
+    /// <param name="MaxOccupants"></param>
+    /// <param name="HasPlusProducts"></param>
+    /// <param name="RequiresAccessPass"></param>
+    /// <param name="Rating"></param>
+    public record struct SearchQuery(
+        string Keywords,
+        string Language = "en",
+        string AvatarName = "",
+        int MinOccpuants = 1,
+        int MaxOccupants = 10,
+        bool HasPlusProducts = false,
+        bool RequiresAccessPass = false,
+        ContentRating Rating = ContentRating.GeneralAudience);
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="roomId"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
     public ValueTask<RoomModel> GetRoomByIdAsync(long userId, int roomId) {
         if (userId <= 0 || roomId <= 0) {
             throw new ArgumentException("Can't be less than or equal to 0.", nameof(userId));
@@ -25,38 +52,49 @@ public class RoomHandler(
         }
     }
     
-    // TODO: Requires cookies
-    public async ValueTask<IReadOnlyList<RoomModel>> SearchRoomsAsync(string keywords,
-                                                                      string language = "en",
-                                                                      string avatarName = "",
-                                                                      int minOccpuants = 1,
-                                                                      int maxOccupants = 10,
-                                                                      bool hasPlusProducts = false,
-                                                                      bool requiresAccessPass = false,
-                                                                      ContentRating rating =
-                                                                          ContentRating.GeneralAudience) {
-        // TODO: RandomUserId doesn't work for this API call. Requires logged in user's cookie.
-        var stringBuilder =
-            new StringBuilder($"https://api.imvu.com/user/user-{Extensions.GetRandomUserId()}filtered_rooms?");
-        stringBuilder.Append($"language={language}&");
-        stringBuilder.Append($"low={minOccpuants}&");
-        stringBuilder.Append($"high={maxOccupants}&");
-        stringBuilder.Append("supports_audience=0&");
-        stringBuilder.Append($"plus_filter={hasPlusProducts}&");
-        switch (requiresAccessPass) {
-            case true when rating is ContentRating.AccessPass:
-                stringBuilder.Append("ap=1&rating=ap&has_access_pass=1");
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sauce"></param>
+    /// <param name="searchQuery"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public async ValueTask<IReadOnlyList<RoomModel>> SearchRoomsAsync(string sauce, Action<SearchQuery> searchQuery) {
+        if (string.IsNullOrWhiteSpace(sauce)) {
+            throw new Exception($"Please use {nameof(UserHandler.LoginAsync)} before calling this method.");
+        }
+        
+        var query = new SearchQuery();
+        searchQuery.Invoke(query);
+        
+        var queryBuilder = HttpUtility.ParseQueryString(string.Empty);
+        queryBuilder.Add("language", query.Language);
+        queryBuilder.Add("low", $"{query.MinOccpuants}");
+        queryBuilder.Add("high", $"{query.MaxOccupants}");
+        queryBuilder.Add("supports_audience", "0");
+        queryBuilder.Add("plus_filter", $"{query.HasPlusProducts}");
+        
+        switch (query.RequiresAccessPass) {
+            case true when query.Rating is ContentRating.AccessPass:
+                queryBuilder.Add("ap", "1");
+                queryBuilder.Add("rating", "ap");
+                queryBuilder.Add("has_access_pass", "1");
                 break;
-            case false when rating is ContentRating.GeneralAudience:
-                stringBuilder.Append("ap=0&rating=ga&ga_only=1");
+            case false when query.Rating is ContentRating.GeneralAudience:
+                queryBuilder.Add("ap", "0");
+                queryBuilder.Add("rating", "ga");
+                queryBuilder.Add("ga_only", "1");
                 break;
         }
         
-        stringBuilder.Append(
-            $"filter_text={keywords}&name_filter={avatarName}&partial_avatar_name={avatarName}&keywords={keywords}");
+        queryBuilder.Add("filter_text", query.Keywords);
+        queryBuilder.Add("name_filter", query.AvatarName);
+        queryBuilder.Add("partial_avatar_name", query.AvatarName);
+        queryBuilder.Add("keywords", query.Keywords);
         
-        using var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"{stringBuilder}")
-            .AddLoginCookie();
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Get,
+                $"https://api.imvu.com/user/user-371456359/filtered_rooms?{queryBuilder}")
+            .AddLoginCookie(sauce);
         
         var responseMessage = await httpClient.SendAsync(requestMessage);
         if (!responseMessage.IsSuccessStatusCode) {
@@ -76,6 +114,11 @@ public class RoomHandler(
             .ToArray()!;
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
     public async ValueTask<VURoomModel> GetPublicRoomsForUserAsync(long userId) {
         // https://client-dynamic.imvu.com/api/find_locations.php?cids={userIds}
         return default;
