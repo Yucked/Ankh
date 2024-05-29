@@ -9,15 +9,27 @@ namespace Ankh.Api.Handlers;
 public sealed class UserHandler(
     ILogger<UserHandler> logger,
     HttpClient httpClient) {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="Username"></param>
+    /// <param name="Password"></param>
+    /// <param name="SecurityCode"></param>
     private readonly record struct LoginPayload(
         [property: JsonPropertyName("username")]
         string Username,
         [property: JsonPropertyName("password")]
         string Password,
         [property: JsonPropertyName("2fa_code"),
-                   JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault | JsonIgnoreCondition.WhenWritingNull)]
+                   JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         string? SecurityCode);
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
     public ValueTask<UserModel> GetUserByIdAsync(long userId) {
         if (userId <= 0) {
             throw new ArgumentException("Can't be less than or equal to 0.", nameof(userId));
@@ -32,10 +44,20 @@ public sealed class UserHandler(
         }
     }
     
-    // TODO: Requires Cookies or make individual requests
-    public async ValueTask<IReadOnlyList<UserModel>> GetUsersByIdAsync(params int[] userIds) {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sauce"></param>
+    /// <param name="userIds"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public async ValueTask<IReadOnlyList<UserModel>> GetUsersByIdAsync(string sauce, params int[] userIds) {
+        if (string.IsNullOrWhiteSpace(sauce)) {
+            throw new Exception($"Please use {nameof(LoginAsync)} before calling this method.");
+        }
+        
         if (userIds.Length == 0) {
-            throw new Exception("");
+            throw new Exception($"{nameof(userIds)} can't be null or empty.");
         }
         
         try {
@@ -45,7 +67,7 @@ public sealed class UserHandler(
             
             using var requestMessage = new HttpRequestMessage(HttpMethod.Get,
                     $"https://api.imvu.com/user?id={string.Join(',', userIdUrls)}")
-                .AddLoginCookie();
+                .AddLoginCookie(sauce);
             
             var responseMessage = await httpClient.SendAsync(requestMessage);
             if (!responseMessage.IsSuccessStatusCode) {
@@ -69,6 +91,11 @@ public sealed class UserHandler(
         }
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="username"></param>
+    /// <returns></returns>
     public async Task<long> GetIdFromUsernameAsync(string username) {
         using var data = new StringContent(
             $"""
@@ -97,6 +124,13 @@ public sealed class UserHandler(
         return int.Parse(Encoding.UTF8.GetString(slice.Span));
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="username"></param>
+    /// <param name="password"></param>
+    /// <param name="mfaCode"></param>
+    /// <returns></returns>
     public async Task<string?> LoginAsync(string username, string password, string mfaCode = "") {
         using var responseMessage = await httpClient.PostAsync("https://api.imvu.com/login",
             new StringContent(JsonSerializer.Serialize(
@@ -108,10 +142,6 @@ public sealed class UserHandler(
                 Encoding.UTF8,
                 "application/json"
             ));
-        
-        if (!responseMessage.IsSuccessStatusCode) {
-            logger.LogError("{ReasonPhrase}", responseMessage.ReasonPhrase);
-        }
         
         using var document = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
         if (!document.RootElement.TryGetProperty("error", out var errorElement)) {
@@ -125,7 +155,9 @@ public sealed class UserHandler(
         }
         
         var errorCode = errorElement.GetString();
-        var errorMessage = document.RootElement.GetProperty("message").GetString();
+        var errorMessage = errorCode == "LOGIN-017"
+            ? $"Call {nameof(LoginAsync)} again with 2FA code."
+            : document.RootElement.GetProperty("message").GetString();
         
         logger.LogError("{errorCode}: {errorMessage}", errorCode, errorMessage);
         return null;
