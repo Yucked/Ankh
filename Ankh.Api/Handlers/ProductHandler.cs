@@ -23,9 +23,11 @@ public sealed class ProductHandler(
         var sceneItems = queryParams
             .AllKeys
             .Select(x =>
-                (x!.Replace("avatar", string.Empty), queryParams[x]!.Split(';'))
+                (x!.Replace("avatar", string.Empty), queryParams[x]!
+                     .Split(';')
+                     .Select(id => id.Contains('x') ? id[..id.IndexOf('x')] : id))
             )
-            .ToDictionary(x => x.Item1, y => y.Item2);
+            .ToDictionary(x => x.Item1, y => y.Item2.ToArray());
         return ValueTask.FromResult<IDictionary<string, string[]>>(sceneItems);
     }
     
