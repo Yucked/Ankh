@@ -44,6 +44,12 @@ public sealed class UserHandler(
         }
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
     public ValueTask<RestProfileModel> GetUserProfileAsync(long userId) {
         if (userId <= 0) {
             throw new ArgumentException("Can't be less than or equal to 0.", nameof(userId));
