@@ -21,7 +21,8 @@ public class RestModelConverter : JsonConverter<IRestModel> {
             _ when id.Contains("user/user-")       => data.Deserialize<RestUserModel>(),
             _ when id.Contains("room/room-")       => data.Deserialize<RestRoomModel>(),
             _ when id.Contains("profile/profile")  => data.Deserialize<RestProfileModel>(),
-            _ when id.Contains("account/account")  => data.Deserialize<RestAccountModel>()
+            _ when id.Contains("account/account")  => data.Deserialize<RestAccountModel>(),
+            _ when id.Contains("outfit/outfit")    => data.Deserialize<RestOutfitModel>()
         };
         
         return result;
