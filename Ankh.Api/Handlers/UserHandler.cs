@@ -194,4 +194,29 @@ public sealed class UserHandler(
         logger.LogError("{errorCode}: {errorMessage}", errorCode, errorMessage);
         return default;
     }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="userSauce"></param>
+    /// <returns></returns>
+    public async Task<RestOutfitModel?[]> GetUserOutfitsAsync(UserSauce userSauce) {
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Get,
+                $"https://api.imvu.com/user/user-{userSauce.UserId}/outfits?sort=purchased&sort_order=desc")
+            .WithCookieSauce(userSauce.Auth);
+        
+        var responseMessage = await httpClient.SendAsync(requestMessage);
+        await using var stream = await responseMessage.Content.ReadAsStreamAsync();
+        using var document = await JsonDocument.ParseAsync(stream);
+        
+        Extensions.IsRequestSuccessful(responseMessage.StatusCode, document.RootElement);
+        
+        return document
+            .RootElement
+            .GetProperty("denormalized")
+            .EnumerateObject()
+            .Where(x => x.Name.Contains("api.imvu.com/outfit/outfit"))
+            .Select(x => x.Value.GetProperty("data").Deserialize<RestOutfitModel>())
+            .ToArray();
+    }
 }
