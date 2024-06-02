@@ -55,14 +55,13 @@ public class RoomHandler(
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="sauce"></param>
+    /// <param name="userSauce"></param>
     /// <param name="searchQuery"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public async ValueTask<IReadOnlyList<RestRoomModel>> SearchRoomsAsync(string sauce, Action<SearchQuery> searchQuery) {
-        if (string.IsNullOrWhiteSpace(sauce)) {
-            throw new Exception($"Please use {nameof(UserHandler.LoginAsync)} before calling this method.");
-        }
+    public async ValueTask<IReadOnlyList<RestRoomModel>> SearchRoomsAsync(
+        UserSauce userSauce, Action<SearchQuery> searchQuery) {
+        userSauce.VerifyLogin();
         
         var query = new SearchQuery();
         searchQuery.Invoke(query);
@@ -93,19 +92,14 @@ public class RoomHandler(
         queryBuilder.Add("keywords", query.Keywords);
         
         using var requestMessage = new HttpRequestMessage(HttpMethod.Get,
-                $"https://api.imvu.com/user/user-371456359/filtered_rooms?{queryBuilder}")
-            .AddLoginCookie(sauce);
+                $"https://api.imvu.com/user/user-{userSauce.UserId}/filtered_rooms?{queryBuilder}")
+            .WithCookieSauce(userSauce.Auth);
         
         var responseMessage = await httpClient.SendAsync(requestMessage);
-        if (!responseMessage.IsSuccessStatusCode) {
-            throw new Exception($"Failed to fetch because of {responseMessage.ReasonPhrase}");
-        }
-        
         await using var stream = await responseMessage.Content.ReadAsStreamAsync();
         using var document = await JsonDocument.ParseAsync(stream);
         
-        // TODO: status returns success even if child items return 403 need to work on this.
-        var status = document.RootElement.GetProperty("status").GetString();
+        Extensions.IsRequestSuccessful(responseMessage.StatusCode, document.RootElement);
         
         var denorm = document.RootElement.GetProperty("denormalized");
         return denorm
