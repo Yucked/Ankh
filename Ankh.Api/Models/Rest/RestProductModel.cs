@@ -7,7 +7,7 @@ using Ankh.Api.Models.Rest;
 
 namespace Ankh.Api.Models;
 
-public record ProductModel(
+public record RestProductModel(
     [property: JsonPropertyName("product_id")]
     long ProductId,
     [property: JsonPropertyName("product_name")]

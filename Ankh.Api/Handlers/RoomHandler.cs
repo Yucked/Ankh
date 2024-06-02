@@ -38,13 +38,13 @@ public class RoomHandler(
     /// <param name="roomId"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public ValueTask<RoomModel> GetRoomByIdAsync(long userId, int roomId) {
+    public ValueTask<RestRoomModel> GetRoomByIdAsync(long userId, int roomId) {
         if (userId <= 0 || roomId <= 0) {
             throw new ArgumentException("Can't be less than or equal to 0.", nameof(userId));
         }
         
         try {
-            return httpClient.GetRestModelAsync<RoomModel>($"https://api.imvu.com/room/room-{userId}-{roomId}");
+            return httpClient.GetRestModelAsync<RestRoomModel>($"https://api.imvu.com/room/room-{userId}-{roomId}");
         }
         catch (Exception exception) {
             logger.LogError(exception, "Something went wrong.");
@@ -59,7 +59,7 @@ public class RoomHandler(
     /// <param name="searchQuery"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public async ValueTask<IReadOnlyList<RoomModel>> SearchRoomsAsync(string sauce, Action<SearchQuery> searchQuery) {
+    public async ValueTask<IReadOnlyList<RestRoomModel>> SearchRoomsAsync(string sauce, Action<SearchQuery> searchQuery) {
         if (string.IsNullOrWhiteSpace(sauce)) {
             throw new Exception($"Please use {nameof(UserHandler.LoginAsync)} before calling this method.");
         }
@@ -110,7 +110,7 @@ public class RoomHandler(
         var denorm = document.RootElement.GetProperty("denormalized");
         return denorm
             .EnumerateObject()
-            .Select(x => denorm.GetProperty(x.Name).GetProperty("data").Deserialize<RoomModel>())
+            .Select(x => denorm.GetProperty(x.Name).GetProperty("data").Deserialize<RestRoomModel>())
             .ToArray()!;
     }
     

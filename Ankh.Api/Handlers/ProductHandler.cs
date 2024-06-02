@@ -33,7 +33,7 @@ public sealed class ProductHandler(
     /// Fetches product information from API
     /// </summary>
     /// <param name="productId"></param>
-    public async ValueTask<ProductModel> GetProductByIdAsync(int productId) {
+    public async ValueTask<RestProductModel> GetProductByIdAsync(int productId) {
         if (productId <= 0) {
             throw new ArgumentException("Can't be less than or equal to 0.", nameof(productId));
         }
@@ -50,6 +50,6 @@ public sealed class ProductHandler(
             throw new Exception("");
         }
         
-        return (ProductModel)restModel.Data;
+        return (RestProductModel)restModel.Data;
     }
 }
