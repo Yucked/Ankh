@@ -18,4 +18,7 @@ public static class Globals {
     
     public static RoomHandler RoomHandler
         => Provider.GetRequiredService<RoomHandler>();
+    
+    public static ProductHandler ProductHandler
+        => Provider.GetRequiredService<ProductHandler>();
 }
