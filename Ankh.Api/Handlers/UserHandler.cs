@@ -30,13 +30,13 @@ public sealed class UserHandler(
     /// <param name="userId"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public ValueTask<UserModel> GetUserByIdAsync(long userId) {
+    public ValueTask<RestUserModel> GetUserByIdAsync(long userId) {
         if (userId <= 0) {
             throw new ArgumentException("Can't be less than or equal to 0.", nameof(userId));
         }
         
         try {
-            return httpClient.GetRestModelAsync<UserModel>($"https://api.imvu.com/user/user-{userId}");
+            return httpClient.GetRestModelAsync<RestUserModel>($"https://api.imvu.com/user/user-{userId}");
         }
         catch (Exception exception) {
             logger.LogError(exception, "Something went wrong.");
@@ -44,13 +44,13 @@ public sealed class UserHandler(
         }
     }
     
-    public ValueTask<UserProfileModel> GetUserProfileAsync(long userId) {
+    public ValueTask<RestProfileModel> GetUserProfileAsync(long userId) {
         if (userId <= 0) {
             throw new ArgumentException("Can't be less than or equal to 0.", nameof(userId));
         }
         
         try {
-            return httpClient.GetRestModelAsync<UserProfileModel>(
+            return httpClient.GetRestModelAsync<RestProfileModel>(
                 $"https://api.imvu.com/profile/profile-user-{userId}");
         }
         catch (Exception exception) {
@@ -62,12 +62,12 @@ public sealed class UserHandler(
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="sauce"></param>
+    /// <param name="userSauce"></param>
     /// <param name="userIds"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public async ValueTask<IReadOnlyList<UserModel>> GetUsersByIdAsync(string sauce, params int[] userIds) {
-        if (string.IsNullOrWhiteSpace(sauce)) {
+    public async ValueTask<IReadOnlyList<RestUserModel>> GetUsersByIdAsync(UserSauce userSauce, params int[] userIds) {
+        if (userSauce == default || string.IsNullOrWhiteSpace(userSauce.Auth)) {
             throw new Exception($"Please use {nameof(LoginAsync)} before calling this method.");
         }
         
@@ -82,26 +82,21 @@ public sealed class UserHandler(
             
             using var requestMessage = new HttpRequestMessage(HttpMethod.Get,
                     $"https://api.imvu.com/user?id={string.Join(',', userIdUrls)}")
-                .AddLoginCookie(sauce);
+                .WithCookieSauce(userSauce.Auth);
             
             var responseMessage = await httpClient.SendAsync(requestMessage);
-            if (!responseMessage.IsSuccessStatusCode) {
-                throw new Exception($"Failed to fetch because of {responseMessage.ReasonPhrase}");
-            }
-            
             await using var stream = await responseMessage.Content.ReadAsStreamAsync();
             using var document = await JsonDocument.ParseAsync(stream);
             
-            // TODO: Find actually errors in JSON
-            var status = document.RootElement.GetProperty("status").GetString();
+            Extensions.IsRequestSuccessful(responseMessage.StatusCode, document.RootElement);
             
             var denormalized = document.RootElement.GetProperty("denormalized");
             return userIdUrls
-                .Select(x => denormalized.GetProperty(x).GetProperty("data").Deserialize<UserModel>())
+                .Select(x => denormalized.GetProperty(x).GetProperty("data").Deserialize<RestUserModel>())
                 .ToList()!;
         }
         catch (Exception exception) {
-            logger.LogError(exception, "Something went wrong.");
+            logger.LogError("{exception.Message}", exception.Message);
             throw;
         }
     }
@@ -146,7 +141,7 @@ public sealed class UserHandler(
     /// <param name="password"></param>
     /// <param name="mfaCode"></param>
     /// <returns></returns>
-    public async Task<string?> LoginAsync(string username, string password, string mfaCode = "") {
+    public async Task<UserSauce> LoginAsync(string username, string password, string mfaCode = "") {
         using var responseMessage = await httpClient.PostAsync("https://api.imvu.com/login",
             new StringContent(JsonSerializer.Serialize(
                     new LoginPayload {
@@ -160,13 +155,29 @@ public sealed class UserHandler(
         
         using var document = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
         if (!document.RootElement.TryGetProperty("error", out var errorElement)) {
-            return document
+            var data = document
                 .RootElement
                 .GetProperty("denormalized")
                 .GetProperty(document.RootElement.GetProperty("id").GetString()!)
-                .GetProperty("data")
+                .GetProperty("data");
+            
+            var loginId = document
+                .RootElement
+                .GetProperty("id")
+                .GetString()!
+                .Split('/')[^1];
+            
+            var sauce = data
                 .GetProperty("sauce")
                 .GetString()!;
+            
+            var userId = data
+                .GetProperty("user")
+                .GetProperty("id")
+                .GetString()!
+                .Split('/')[^1];
+            
+            return new UserSauce(username, userId, sauce, loginId);
         }
         
         var errorCode = errorElement.GetString();
@@ -175,6 +186,6 @@ public sealed class UserHandler(
             : document.RootElement.GetProperty("message").GetString();
         
         logger.LogError("{errorCode}: {errorMessage}", errorCode, errorMessage);
-        return null;
+        return default;
     }
 }
