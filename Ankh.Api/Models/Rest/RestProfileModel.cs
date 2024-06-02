@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Ankh.Api.Models.Rest;
 
-public record UserProfileModel(
+public record RestProfileModel(
     [property: JsonPropertyName("image")]
     string Image,
     [property: JsonPropertyName("title")]

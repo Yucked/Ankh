@@ -4,7 +4,7 @@ using Ankh.Api.Models.Enums;
 
 namespace Ankh.Api.Models.Rest;
 
-public record UserModel(
+public record RestUserModel(
     [property: JsonPropertyName("created")]
     DateTimeOffset Created,
     [property: JsonPropertyName("registered")]

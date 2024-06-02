@@ -4,7 +4,7 @@ using Ankh.Api.Models.Enums;
 
 namespace Ankh.Api.Models.Rest;
 
-public record UserAccountModel(
+public record RestAccountModel(
     [property: JsonPropertyName("show_age")]
     bool ShowAge,
     [property: JsonPropertyName("age")]

@@ -17,11 +17,11 @@ public class RestModelConverter : JsonConverter<IRestModel> {
             .GetProperty(id)
             .GetProperty("data");
         IRestModel result = id switch {
-            _ when id.Contains("product/product-") => data.Deserialize<ProductModel>(),
-            _ when id.Contains("user/user-")       => data.Deserialize<UserModel>(),
-            _ when id.Contains("room/room-")       => data.Deserialize<RoomModel>(),
-            _ when id.Contains("profile/profile")  => data.Deserialize<UserProfileModel>(),
-            _ when id.Contains("account/account")  => data.Deserialize<UserAccountModel>()
+            _ when id.Contains("product/product-") => data.Deserialize<RestProductModel>(),
+            _ when id.Contains("user/user-")       => data.Deserialize<RestUserModel>(),
+            _ when id.Contains("room/room-")       => data.Deserialize<RestRoomModel>(),
+            _ when id.Contains("profile/profile")  => data.Deserialize<RestProfileModel>(),
+            _ when id.Contains("account/account")  => data.Deserialize<RestAccountModel>()
         };
         
         return result;

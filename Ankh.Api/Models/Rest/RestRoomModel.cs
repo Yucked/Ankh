@@ -4,7 +4,7 @@ using Ankh.Api.Models.Enums;
 
 namespace Ankh.Api.Models.Rest;
 
-public record RoomModel(
+public record RestRoomModel(
     [property: JsonPropertyName("name")]
     string Name,
     [property: JsonPropertyName("description")]
