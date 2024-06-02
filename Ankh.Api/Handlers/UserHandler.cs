@@ -44,6 +44,21 @@ public sealed class UserHandler(
         }
     }
     
+    public ValueTask<UserProfileModel> GetUserProfileAsync(long userId) {
+        if (userId <= 0) {
+            throw new ArgumentException("Can't be less than or equal to 0.", nameof(userId));
+        }
+        
+        try {
+            return httpClient.GetRestModelAsync<UserProfileModel>(
+                $"https://api.imvu.com/profile/profile-user-{userId}");
+        }
+        catch (Exception exception) {
+            logger.LogError(exception, "Something went wrong.");
+            throw;
+        }
+    }
+    
     /// <summary>
     /// 
     /// </summary>
