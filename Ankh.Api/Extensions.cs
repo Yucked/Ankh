@@ -76,19 +76,17 @@ public static class Extensions {
         };
         
         if (statusCode is HttpStatusCode.Forbidden or HttpStatusCode.Unauthorized) {
-            throw new Exception("");
+            throw new Exception($"Please use {nameof(UserHandler.LoginAsync)} before calling this method.");
         }
         
         if (rootElement.TryGetProperty("status", out var statusElement) &&
             statusElement.GetString()!.Equals("failure")) {
-            throw new Exception("");
+            throw new Exception(rootElement.GetProperty("message").GetString());
         }
         
-        if (!rootElement.TryGetProperty("http", out var httpElement) &&
-            !errors.Any(x => httpElement.GetRawText().Contains(x))) {
-            return;
+        if (rootElement.TryGetProperty("http", out var httpElement) &&
+            errors.Any(x => httpElement.GetRawText().Contains(x))) {
+            throw new Exception($"Please use {nameof(UserHandler.LoginAsync)} before calling this method.");
         }
-        
-        throw new Exception("");
     }
 }
