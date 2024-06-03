@@ -13,23 +13,47 @@ public class RoomHandler(
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="Keywords"></param>
-    /// <param name="Language"></param>
-    /// <param name="AvatarName"></param>
-    /// <param name="MinOccpuants"></param>
-    /// <param name="MaxOccupants"></param>
-    /// <param name="HasPlusProducts"></param>
-    /// <param name="RequiresAccessPass"></param>
-    /// <param name="Rating"></param>
-    public record struct SearchQuery(
-        string Keywords,
-        string Language = "en",
-        string AvatarName = "",
-        int MinOccpuants = 1,
-        int MaxOccupants = 10,
-        bool HasPlusProducts = false,
-        bool RequiresAccessPass = false,
-        ContentRating Rating = ContentRating.GeneralAudience);
+    public sealed record SearchQuery {
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Keywords { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Language { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Username { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public int? MinOccupants { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public int? MaxOccupants { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool? HasPlusProducts { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool? RequiresAccessPass { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public ContentRating? Rating { get; set; }
+    }
     
     /// <summary>
     /// 
@@ -67,11 +91,22 @@ public class RoomHandler(
         searchQuery.Invoke(query);
         
         var queryBuilder = HttpUtility.ParseQueryString(string.Empty);
-        queryBuilder.Add("language", query.Language);
-        queryBuilder.Add("low", $"{query.MinOccpuants}");
-        queryBuilder.Add("high", $"{query.MaxOccupants}");
+        if (!string.IsNullOrWhiteSpace(query.Language)) {
+            queryBuilder.Add("language", query.Language);
+        }
+        
+        if (query.MinOccupants != null) {
+            queryBuilder.Add("low", $"{query.MinOccupants}");
+        }
+        
+        if (query.MaxOccupants != null) {
+            queryBuilder.Add("high", $"{query.MaxOccupants}");
+        }
+        
         queryBuilder.Add("supports_audience", "0");
-        queryBuilder.Add("plus_filter", $"{query.HasPlusProducts}");
+        if (query.HasPlusProducts != null) {
+            queryBuilder.Add("plus_filter", $"{query.HasPlusProducts}");
+        }
         
         switch (query.RequiresAccessPass) {
             case true when query.Rating is ContentRating.AccessPass:
@@ -86,10 +121,21 @@ public class RoomHandler(
                 break;
         }
         
-        queryBuilder.Add("filter_text", query.Keywords);
-        queryBuilder.Add("name_filter", query.AvatarName);
-        queryBuilder.Add("partial_avatar_name", query.AvatarName);
-        queryBuilder.Add("keywords", query.Keywords);
+        if (!string.IsNullOrWhiteSpace(query.Keywords)) {
+            queryBuilder.Add("filter_text", query.Keywords);
+        }
+        
+        if (!string.IsNullOrWhiteSpace(query.Username)) {
+            queryBuilder.Add("name_filter", query.Username);
+        }
+        
+        if (!string.IsNullOrWhiteSpace(query.Username)) {
+            queryBuilder.Add("partial_avatar_name", query.Username);
+        }
+        
+        if (!string.IsNullOrWhiteSpace(query.Keywords)) {
+            queryBuilder.Add("keywords", query.Keywords);
+        }
         
         using var requestMessage = new HttpRequestMessage(HttpMethod.Get,
                 $"https://api.imvu.com/user/user-{userSauce.UserId}/filtered_rooms?{queryBuilder}")
@@ -101,10 +147,12 @@ public class RoomHandler(
         
         Extensions.IsRequestSuccessful(responseMessage.StatusCode, document.RootElement);
         
-        var denorm = document.RootElement.GetProperty("denormalized");
-        return denorm
+        return document
+            .RootElement
+            .GetProperty("denormalized")
             .EnumerateObject()
-            .Select(x => denorm.GetProperty(x.Name).GetProperty("data").Deserialize<RestRoomModel>())
+            .Select(x => document.RootElement.GetProperty("denormalized").GetProperty(x.Name).GetProperty("data")
+                .Deserialize<RestRoomModel>())
             .ToArray()!;
     }
     
