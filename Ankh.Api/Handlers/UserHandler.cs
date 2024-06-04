@@ -39,7 +39,7 @@ public sealed class UserHandler(
             return httpClient.GetRestModelAsync<RestUserModel>($"https://api.imvu.com/user/user-{userId}");
         }
         catch (Exception exception) {
-            logger.LogError(exception, "Something went wrong.");
+            logger.LogError("{exception.Message}", exception.Message);
             throw;
         }
     }
@@ -60,7 +60,7 @@ public sealed class UserHandler(
                 $"https://api.imvu.com/profile/profile-user-{userId}");
         }
         catch (Exception exception) {
-            logger.LogError(exception, "Something went wrong.");
+            logger.LogError("{exception.Message}", exception.Message);
             throw;
         }
     }
@@ -91,15 +91,16 @@ public sealed class UserHandler(
                 .WithCookieSauce(userSauce.Auth);
             
             var responseMessage = await httpClient.SendAsync(requestMessage);
-            await using var stream = await responseMessage.Content.ReadAsStreamAsync();
-            using var document = await JsonDocument.ParseAsync(stream);
+            using var document = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
             
             Extensions.IsRequestSuccessful(responseMessage.StatusCode, document.RootElement);
             
-            var denormalized = document.RootElement.GetProperty("denormalized");
-            return userIdUrls
-                .Select(x => denormalized.GetProperty(x).GetProperty("data").Deserialize<RestUserModel>())
-                .ToList()!;
+            return document
+                .RootElement
+                .GetProperty("denormalized")
+                .EnumerateObject()
+                .Select(x => x.Value.GetProperty("data").Deserialize<RestUserModel>())
+                .ToArray()!;
         }
         catch (Exception exception) {
             logger.LogError("{exception.Message}", exception.Message);
@@ -206,8 +207,7 @@ public sealed class UserHandler(
             .WithCookieSauce(userSauce.Auth);
         
         var responseMessage = await httpClient.SendAsync(requestMessage);
-        await using var stream = await responseMessage.Content.ReadAsStreamAsync();
-        using var document = await JsonDocument.ParseAsync(stream);
+        using var document = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
         
         Extensions.IsRequestSuccessful(responseMessage.StatusCode, document.RootElement);
         
