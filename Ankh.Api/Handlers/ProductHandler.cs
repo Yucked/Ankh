@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Web;
 using Ankh.Api.Models;
+using Ankh.Api.Models.Rest;
 using Microsoft.Extensions.Logging;
 
 namespace Ankh.Api.Handlers;
@@ -43,7 +44,7 @@ public sealed class ProductHandler(
             return httpClient.GetRestModelAsync<RestProductModel>($"https://api.imvu.com/product/product-{productId}");
         }
         catch (Exception exception) {
-            logger.LogError(exception, "Something went wrong.");
+            logger.LogError("{exception.Message}", exception.Message);
             throw;
         }
     }
@@ -92,6 +93,29 @@ public sealed class ProductHandler(
                         StringComparison.CurrentCultureIgnoreCase))
                 .Select(x => x.Value.GetProperty("data").Deserialize<RestProductModel>())
                 .ToArray()!;
+        }
+        catch (Exception exception) {
+            logger.LogError("{exception.Message}", exception.Message);
+            throw;
+        }
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="userSauce"></param>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public ValueTask<RestCreatorModel> GetCreatorInformationAsync(UserSauce userSauce, int userId) {
+        if (userId <= 0) {
+            throw new ArgumentException("Can't be less than or equal to 0.", nameof(userId));
+        }
+        
+        try {
+            return httpClient.GetRestModelAsync<RestCreatorModel>(
+                $"https://api.imvu.com/creator/creator-{userId}",
+                userSauce.Auth);
         }
         catch (Exception exception) {
             logger.LogError("{exception.Message}", exception.Message);
