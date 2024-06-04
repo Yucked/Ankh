@@ -12,4 +12,39 @@ public class ProductHandlerTests {
         Assert.IsNotNull(products);
         Assert.IsTrue(products.Count > 0);
     }
+    
+    [DataTestMethod]
+    [DataRow(67171225)]
+    [DataRow(67690502)]
+    [DataRow(63927904)]
+    [DataRow(64144044)]
+    [DataRow(67774891)]
+    public async Task Test_GetProductByIdAsync(int productId) {
+        var product = await Globals.ProductHandler.GetProductByIdAsync(productId);
+        Assert.IsNotNull(product);
+        Assert.IsNotNull(product.ProductName);
+    }
+    
+    [DataTestMethod]
+    [DataRow("ACUR", 60)]
+    [DataRow("ACUV", 0)]
+    [DataRow("Tomie", 18)]
+    [DataRow("Temia", 45)]
+    public async Task Test_GetProductsByCreatorAsync(string username, int count) {
+        var products = await Globals.ProductHandler.GetProductsByCreatorAsync(username);
+        Assert.IsNotNull(products);
+        Assert.IsTrue(products.Count == count);
+    }
+    
+    [DataTestMethod]
+    [DataRow(137287334)]
+    [DataRow(254243330)]
+    [DataRow(357444795)]
+    [DataRow(142712680)]
+    [DataRow(364103319)]
+    public async Task Test_GetCreatorInformationAsync(int userId) {
+        var creator = await Globals.ProductHandler.GetCreatorInformationAsync(default, userId);
+        Assert.IsNotNull(creator);
+        Assert.IsNotNull(creator.CreatorTier);
+    }
 }
