@@ -159,10 +159,29 @@ public class RoomHandler(
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="userId"></param>
+    /// <param name="userIds"></param>
     /// <returns></returns>
-    public async ValueTask<VURoomModel> GetPublicRoomsForUserAsync(long userId) {
-        // https://client-dynamic.imvu.com/api/find_locations.php?cids={userIds}
-        return default;
+    public async ValueTask<IDictionary<long, VURoomModel[]>> GetPublicRoomsForUsersAsync(params long[] userIds) {
+        var responseMessage =
+            await httpClient.GetAsync($"https://client-dynamic.imvu.com/api/find_locations.php?cids={userIds}");
+        if (!responseMessage.IsSuccessStatusCode) {
+            return default;
+        }
+        
+        using var document = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
+        var result = document
+            .RootElement
+            .GetProperty("result")
+            .EnumerateObject()
+            .Select(x => {
+                var rooms = x.Value
+                    .EnumerateArray()
+                    .Select(y => y.Deserialize<VURoomModel>())
+                    .ToArray();
+                return (long.Parse(x.Name), rooms);
+            })
+            .ToDictionary(x => x.Item1, y => y.rooms);
+        
+        return result;
     }
 }
