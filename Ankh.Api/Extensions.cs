@@ -34,12 +34,19 @@ public static class Extensions {
     /// </summary>
     /// <param name="httpClient"></param>
     /// <param name="requestUrl"></param>
+    /// <param name="cookie"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public static async ValueTask<T> GetRestModelAsync<T>(this HttpClient httpClient, string requestUrl)
+    public static async ValueTask<T> GetRestModelAsync<T>(this HttpClient httpClient,
+                                                          string requestUrl,
+                                                          string cookie = "")
         where T : IRestModel {
-        using var responseMessage = await httpClient.GetAsync(requestUrl);
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+        
+        using var responseMessage = await httpClient.SendAsync(string.IsNullOrWhiteSpace(cookie)
+            ? requestMessage.WithCookieSauce(cookie)
+            : requestMessage);
         if (!responseMessage.IsSuccessStatusCode) {
             throw new Exception($"Failed to fetch {requestUrl} because of {responseMessage.ReasonPhrase}");
         }
