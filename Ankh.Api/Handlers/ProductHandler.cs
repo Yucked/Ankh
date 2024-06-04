@@ -1,8 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Net.Http.Json;
+using System.Text.Json;
 using System.Web;
 using Ankh.Api.Models;
-using Ankh.Api.Models.Rest;
 using Microsoft.Extensions.Logging;
 
 namespace Ankh.Api.Handlers;
@@ -35,23 +34,68 @@ public sealed class ProductHandler(
     /// Fetches product information from API
     /// </summary>
     /// <param name="productId"></param>
-    public async ValueTask<RestProductModel> GetProductByIdAsync(int productId) {
+    public ValueTask<RestProductModel> GetProductByIdAsync(int productId) {
         if (productId <= 0) {
             throw new ArgumentException("Can't be less than or equal to 0.", nameof(productId));
         }
         
-        var apiUrl = $"https://api.imvu.com/product/product-{productId}";
-        using var responseMessage = await httpClient.GetAsync(apiUrl);
-        if (!responseMessage.IsSuccessStatusCode) {
-            logger.LogError("Failed product fetch {}", productId);
-            throw new Exception("");
+        try {
+            return httpClient.GetRestModelAsync<RestProductModel>($"https://api.imvu.com/product/product-{productId}");
         }
-        
-        var restModel = await responseMessage.Content.ReadFromJsonAsync<RestModel>();
-        if (restModel!.Status != "success") {
-            throw new Exception("");
+        catch (Exception exception) {
+            logger.LogError(exception, "Something went wrong.");
+            throw;
         }
+    }
+    
+    /// <summary>
+    /// Fetches all products from creator's shop.
+    /// </summary>
+    /// <param name="username"></param>
+    /// <param name="userSauce"></param>
+    /// <returns></returns>
+    public async ValueTask<IReadOnlyCollection<RestProductModel>> GetProductsByCreatorAsync(
+        string username,
+        UserSauce userSauce = default) {
+        ArgumentException.ThrowIfNullOrWhiteSpace(username);
         
-        return (RestProductModel)restModel.Data;
+        var requestMessage = new HttpRequestMessage(HttpMethod.Get,
+            $"https://api.imvu.com/product?creator={username}&limit=1");
+        
+        try {
+            var responseMessage = await httpClient.SendAsync(userSauce != default
+                ? requestMessage.WithCookieSauce(userSauce.Auth)
+                : requestMessage);
+            var document = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
+            var totalCount = document
+                .RootElement
+                .GetProperty("denormalized")
+                .GetProperty(document.RootElement.GetProperty("id").GetString()!)
+                .GetProperty("data")
+                .GetProperty("total_count")
+                .GetInt32();
+            
+            requestMessage = new HttpRequestMessage(HttpMethod.Get,
+                $"https://api.imvu.com/product?creator={username}&limit={totalCount}");
+            
+            responseMessage =
+                await httpClient.SendAsync(userSauce != default
+                    ? requestMessage.WithCookieSauce(userSauce.Auth)
+                    : requestMessage);
+            document = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
+            return document
+                .RootElement
+                .GetProperty("denormalized")
+                .EnumerateObject()
+                .Where(x =>
+                    !x.Name.Equals($"{responseMessage.RequestMessage!.RequestUri}",
+                        StringComparison.CurrentCultureIgnoreCase))
+                .Select(x => x.Value.GetProperty("data").Deserialize<RestProductModel>())
+                .ToArray()!;
+        }
+        catch (Exception exception) {
+            logger.LogError("{exception.Message}", exception.Message);
+            throw;
+        }
     }
 }
