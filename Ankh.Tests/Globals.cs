@@ -1,4 +1,4 @@
-using Ankh.Api.Handlers;
+using Ankh.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Ankh.Tests;
