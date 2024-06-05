@@ -1,5 +1,3 @@
-using Ankh.Api;
-
 namespace Ankh.Tests;
 
 [TestClass]
