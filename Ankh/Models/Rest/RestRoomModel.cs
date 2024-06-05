@@ -1,0 +1,74 @@
+﻿using System.Text.Json.Serialization;
+using Ankh.Converters;
+using Ankh.Models.Enums;
+
+namespace Ankh.Models.Rest;
+
+public record RestRoomModel(
+    [property: JsonPropertyName("name")]
+    string Name,
+    [property: JsonPropertyName("description")]
+    string Description,
+    [property: JsonPropertyName("type")]
+    string Type,
+    [property: JsonPropertyName("privacy")]
+    string Privacy,
+    [property: JsonPropertyName("auto_boot_when_owner_leaves")]
+    bool AutoBootWhenOwnerLeaves,
+    [property: JsonPropertyName("auto_boot_timeout")]
+    int AutoBootTimeout,
+    [property: JsonPropertyName("image_url")]
+    string ImageUrl,
+    [property: JsonPropertyName("themed_image_url")]
+    string ThemedImageUrl,
+    [property: JsonPropertyName("occupancy")]
+    int Occupancy,
+    [property: JsonPropertyName("capacity")]
+    int Capacity,
+    [property: JsonPropertyName("language")]
+    string Language,
+    [property: JsonPropertyName("language_code")]
+    string LanguageCode,
+    [property: JsonPropertyName("rating")]
+    float Rating,
+    [property: JsonPropertyName("content_rating"),
+               JsonConverter(typeof(ContentRatingConverter))]
+    ContentRating ContentRating,
+    [property: JsonPropertyName("owner_avatarname")]
+    string OwnerAvatarname,
+    [property: JsonPropertyName("vip_only"),
+               JsonConverter(typeof(IntToBoolConverter))]
+    bool IsVipOnly,
+    [property: JsonPropertyName("is_ap")]
+    bool IsAp,
+    [property: JsonPropertyName("is_vip")]
+    bool IsVip,
+    [property: JsonPropertyName("is_age_verified")]
+    bool IsAgeVerified,
+    [property: JsonPropertyName("is_friends_only")]
+    bool IsFriendsOnly,
+    [property: JsonPropertyName("is_non_guest_only")]
+    bool IsNonGuestOnly,
+    [property: JsonPropertyName("has_plus_badge")]
+    bool HasPlusBadge,
+    [property: JsonPropertyName("is_plus_badge_compatible")]
+    bool IsPlusBadgeCompatible,
+    [property: JsonPropertyName("has_audio")]
+    bool HasAudio,
+    [property: JsonPropertyName("supports_youtube")]
+    bool SupportsYoutube,
+    [property: JsonPropertyName("supports_audience")]
+    bool SupportsAudience,
+    [property: JsonPropertyName("mimic_chat_room")]
+    bool MimicChatRoom,
+    [property: JsonPropertyName("rendered_image")]
+    Uri RenderedImage,
+    [property: JsonPropertyName("join_room_url")]
+    Uri JoinRoomUrl,
+    [property: JsonPropertyName("customers_id")]
+    long CustomersId,
+    [property: JsonPropertyName("customers_room_id")]
+    long CustomersRoomId,
+    [property: JsonPropertyName("is_expired")]
+    bool IsExpired
+) : IRestModel;
