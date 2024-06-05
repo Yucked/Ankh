@@ -1,0 +1,6 @@
+@Ankh.Backend_HostAddress = http://localhost:5199
+
+GET {{Ankh.Backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
