@@ -10,6 +10,6 @@ public sealed class ContentRatingConverter : JsonConverter<ContentRating> {
     }
     
     public override void Write(Utf8JsonWriter writer, ContentRating value, JsonSerializerOptions options) {
-        throw new NotImplementedException();
+        writer.WriteStringValue($"{value}");
     }
 }
