@@ -18,6 +18,6 @@ public sealed class NullIntConverter : JsonConverter<int> {
     }
     
     public override void Write(Utf8JsonWriter writer, int value, JsonSerializerOptions options) {
-        throw new NotImplementedException();
+        writer.WriteNumberValue(value);
     }
 }

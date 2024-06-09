@@ -13,6 +13,6 @@ public class AvailabilityConverter : JsonConverter<Availability> {
     }
     
     public override void Write(Utf8JsonWriter writer, Availability value, JsonSerializerOptions options) {
-        throw new NotImplementedException();
+        writer.WriteStringValue($"{value}");
     }
 }
