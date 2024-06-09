@@ -5,10 +5,6 @@ using Ankh.Models.Enums;
 namespace Ankh.Models.Rest;
 
 public record RestRoomModel(
-    [property: JsonPropertyName("name")]
-    string Name,
-    [property: JsonPropertyName("description")]
-    string Description,
     [property: JsonPropertyName("type")]
     string Type,
     [property: JsonPropertyName("privacy")]
