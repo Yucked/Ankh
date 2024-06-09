@@ -8,5 +8,6 @@
 	
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1"/>
+		<PackageReference Include="Microsoft.Playwright" Version="1.44.0" />
 	</ItemGroup>
 </Project>

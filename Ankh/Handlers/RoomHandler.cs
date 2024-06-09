@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Ankh.Handlers;
 
-public class RoomHandler(
+public sealed class RoomHandler(
     ILogger<RoomHandler> logger,
     HttpClient httpClient) {
     /// <summary>
