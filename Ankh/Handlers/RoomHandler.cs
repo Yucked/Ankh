@@ -93,21 +93,13 @@ public sealed class RoomHandler(
             queryBuilder.Add("keywords", query.Keywords);
         }
         
-        using var requestMessage = new HttpRequestMessage(HttpMethod.Get,
-                $"https://api.imvu.com/user/user-{userSauce.UserId}/filtered_rooms?{queryBuilder}")
-            .WithCookieSauce(userSauce.Auth);
-        
-        var responseMessage = await httpClient.SendAsync(requestMessage);
-        await using var stream = await responseMessage.Content.ReadAsStreamAsync();
-        using var document = await JsonDocument.ParseAsync(stream);
-        
-        Extensions.IsRequestSuccessful(responseMessage.StatusCode, document.RootElement);
-        
-        return document
-            .RootElement
+        var jsonElement = await httpClient
+            .GetJsonAsync($"https://api.imvu.com/user/user-{userSauce.UserId}/filtered_rooms?{queryBuilder}",
+                userSauce.Auth);
+        return jsonElement
             .GetProperty("denormalized")
             .EnumerateObject()
-            .Select(x => document.RootElement.GetProperty("denormalized").GetProperty(x.Name).GetProperty("data")
+            .Select(x => jsonElement.GetProperty("denormalized").GetProperty(x.Name).GetProperty("data")
                 .Deserialize<RestRoomModel>())
             .ToArray()!;
     }
@@ -118,19 +110,10 @@ public sealed class RoomHandler(
     /// <param name="userIds"></param>
     /// <returns></returns>
     public async ValueTask<IDictionary<long, VURoomModel[]>> GetPublicRoomsForUsersAsync(params long[] userIds) {
-        var responseMessage =
-            await httpClient.GetAsync($"https://client-dynamic.imvu.com/api/find_locations.php?cids={userIds}");
+        var jsonElement =
+            await httpClient.GetJsonAsync($"https://client-dynamic.imvu.com/api/find_locations.php?cids={userIds}");
         
-        if (!responseMessage.IsSuccessStatusCode) {
-            logger.LogError("{responseMessage.StatusCode}: {responseMessage.ReasonPhrase}",
-                responseMessage.StatusCode,
-                responseMessage.ReasonPhrase);
-            throw new Exception(responseMessage.ReasonPhrase);
-        }
-        
-        using var document = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
-        return document
-            .RootElement
+        return jsonElement
             .GetProperty("result")
             .EnumerateObject()
             .Select(x => {
