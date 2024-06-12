@@ -15,6 +15,16 @@ public static class Extensions {
         11417,     //IMVU Badger
     ];
     
+    private static readonly string[] Errors = [
+        """
+        "status": 401
+        """,
+        
+        """
+        "status": 404
+        """
+    ];
+    
     /// <summary>
     /// 
     /// </summary>
@@ -62,6 +72,35 @@ public static class Extensions {
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="httpClient"></param>
+    /// <param name="requestUrl"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public static async ValueTask<JsonElement> GetJsonAsync(this HttpClient httpClient, string requestUrl) {
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+        using var responseMessage = await httpClient.SendAsync(requestMessage);
+        
+        if (responseMessage.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.Unauthorized) {
+            throw new Exception($"Please use {nameof(UserHandler.LoginAsync)} before calling this method.");
+        }
+        
+        var document = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
+        if (document.RootElement.TryGetProperty("status", out var statusElement) &&
+            statusElement.GetString()!.Equals("failure")) {
+            throw new Exception(document.RootElement.GetProperty("message").GetString());
+        }
+        
+        if (document.RootElement.TryGetProperty("http", out var httpElement) &&
+            Errors.Any(x => httpElement.GetRawText().Contains(x))) {
+            throw new Exception($"Please use {nameof(UserHandler.LoginAsync)} before calling this method.");
+        }
+        
+        return document.RootElement;
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
     /// <param name="requestMessage"></param>
     /// <param name="cookie"></param>
     /// <returns></returns>
@@ -72,16 +111,6 @@ public static class Extensions {
     }
     
     public static void IsRequestSuccessful(HttpStatusCode statusCode, JsonElement rootElement) {
-        var errors = new[] {
-            """
-            "status": 401
-            """,
-            
-            """
-            "status": 404
-            """
-        };
-        
         if (statusCode is HttpStatusCode.Forbidden or HttpStatusCode.Unauthorized) {
             throw new Exception($"Please use {nameof(UserHandler.LoginAsync)} before calling this method.");
         }
@@ -92,7 +121,7 @@ public static class Extensions {
         }
         
         if (rootElement.TryGetProperty("http", out var httpElement) &&
-            errors.Any(x => httpElement.GetRawText().Contains(x))) {
+            Errors.Any(x => httpElement.GetRawText().Contains(x))) {
             throw new Exception($"Please use {nameof(UserHandler.LoginAsync)} before calling this method.");
         }
     }
