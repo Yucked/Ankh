@@ -74,10 +74,17 @@ public static class Extensions {
     /// </summary>
     /// <param name="httpClient"></param>
     /// <param name="requestUrl"></param>
+    /// <param name="authentication"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public static async ValueTask<JsonElement> GetJsonAsync(this HttpClient httpClient, string requestUrl) {
+    public static async ValueTask<JsonElement> GetJsonAsync(this HttpClient httpClient,
+                                                            string requestUrl,
+                                                            string authentication = "") {
         using var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+        if (!string.IsNullOrWhiteSpace(authentication)) {
+            requestMessage.WithCookieSauce(authentication);
+        }
+        
         using var responseMessage = await httpClient.SendAsync(requestMessage);
         
         if (responseMessage.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.Unauthorized) {
