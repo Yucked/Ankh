@@ -1,4 +1,6 @@
-﻿namespace Ankh.Models.Queries;
+﻿using Ankh.Models.Enums;
+
+namespace Ankh.Models.Queries;
 
 /// <summary>
 /// https://api.imvu.com/product?
@@ -18,7 +20,7 @@ public sealed record ProductSearchQuery {
     /// <summary>
     /// 
     /// </summary>
-    public int? ProductRating { get; set; }
+    public ContentRating ProductRating { get; set; }
     
     /// <summary>
     /// 
@@ -53,20 +55,30 @@ public sealed record ProductSearchQuery {
     /// <summary>
     /// 
     /// </summary>
+    public char? GenderRestriction { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
     public int[]? ExlcudedCategories { get; set; }
     
     /// <summary>
     /// 
     /// </summary>
-    public int? MinimumVCoinPrice { get; set; }
+    public int MinimumVCoinPrice { get; set; } = 1;
     
     /// <summary>
     /// 
     /// </summary>
-    public int MinimumPrice { get; set; }
+    public int MinimumPrice { get; set; } = 1;
     
     /// <summary>
     /// 
     /// </summary>
     public bool IncludeHistogram { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    public int Limit { get; set; } = 10;
 }
