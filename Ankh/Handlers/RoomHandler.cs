@@ -2,6 +2,7 @@
 using System.Web;
 using Ankh.Models.Enums;
 using Ankh.Models.Interfaces;
+using Ankh.Models.Queries;
 using Ankh.Models.Rest;
 using Microsoft.Extensions.Logging;
 
@@ -10,51 +11,6 @@ namespace Ankh.Handlers;
 public sealed class RoomHandler(
     ILogger<RoomHandler> logger,
     HttpClient httpClient) {
-    /// <summary>
-    /// 
-    /// </summary>
-    public sealed record SearchQuery {
-        /// <summary>
-        /// 
-        /// </summary>
-        public string Keywords { get; set; }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        public string Language { get; set; }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        public string Username { get; set; }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        public int? MinOccupants { get; set; }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        public int? MaxOccupants { get; set; }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        public bool? HasPlusProducts { get; set; }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        public bool? RequiresAccessPass { get; set; }
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        public ContentRating? Rating { get; set; }
-    }
-    
     /// <summary>
     /// 
     /// </summary>
@@ -84,10 +40,10 @@ public sealed class RoomHandler(
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
     public async ValueTask<IReadOnlyList<RestRoomModel>> SearchRoomsAsync(
-        UserSauce userSauce, Action<SearchQuery> searchQuery) {
+        UserSauce userSauce, Action<RoomSearchQuery> searchQuery) {
         userSauce.VerifyLogin();
         
-        var query = new SearchQuery();
+        var query = new RoomSearchQuery();
         searchQuery.Invoke(query);
         
         var queryBuilder = HttpUtility.ParseQueryString(string.Empty);

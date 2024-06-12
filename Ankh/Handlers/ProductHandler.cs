@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Web;
 using Ankh.Api.Models;
+using Ankh.Models.Queries;
 using Ankh.Models.Rest;
 using Microsoft.Extensions.Logging;
 
@@ -123,8 +124,46 @@ public sealed class ProductHandler(
         }
     }
     
-    public async ValueTask SearchProductsAsync() {
-        var url =
-            "https://api.imvu.com/product?product_rating=0&filter_text=wig&name_filter=wig&partial_avatar_name=wig&keywords=wig&cat=40%2C41&gender_restriction=male_compatible&no_cat=316%2C324&vcoin_price_min=0&price_min=1&include_histogram=true";
+    public async ValueTask SearchProductsAsync(Action<ProductSearchQuery> productAction) {
+        var searchQuery = new ProductSearchQuery();
+        productAction.Invoke(searchQuery);
+        
+        var queryBuilder = HttpUtility.ParseQueryString(string.Empty);
+        if (searchQuery.ProductRating != null) {
+            queryBuilder.Add("product_rating", $"{searchQuery.ProductRating}");
+        }
+        
+        if (!string.IsNullOrWhiteSpace(searchQuery.FilterText)) {
+            queryBuilder.Add("filter_text", searchQuery.FilterText);
+        }
+        
+        if (!string.IsNullOrWhiteSpace(searchQuery.FilterName)) {
+            queryBuilder.Add("name_filter", searchQuery.FilterName);
+        }
+        
+        if (!string.IsNullOrWhiteSpace(searchQuery.PartialAvatarName)) {
+            queryBuilder.Add("partial_avatar_name", searchQuery.PartialAvatarName);
+        }
+        
+        if (!string.IsNullOrWhiteSpace(searchQuery.Keywords)) {
+            queryBuilder.Add("keywords", searchQuery.Keywords);
+        }
+        
+        if (searchQuery.Gender != null) {
+            queryBuilder.Add("gender_restriction", searchQuery.Gender == 'M' ? "male_compatible" : "female_compatible");
+        }
+        
+        queryBuilder.Add("vcoin_price_min", $"{searchQuery.MinimumVCoinPrice}");
+        queryBuilder.Add("price_min", $"{searchQuery.MinimumPrice}");
+        queryBuilder.Add("include_histogram", $"{searchQuery.IncludeHistogram}");
+        
+        using var requestMessage =
+            new HttpRequestMessage(HttpMethod.Get, $"https://api.imvu.com/product??{queryBuilder}");
+        
+        var responseMessage = await httpClient.SendAsync(requestMessage);
+        await using var stream = await responseMessage.Content.ReadAsStreamAsync();
+        using var document = await JsonDocument.ParseAsync(stream);
+        
+        Extensions.IsRequestSuccessful(responseMessage.StatusCode, document.RootElement);
     }
 }
