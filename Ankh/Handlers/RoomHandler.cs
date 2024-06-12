@@ -14,17 +14,14 @@ public sealed class RoomHandler(
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="userId"></param>
     /// <param name="roomId"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public ValueTask<RestRoomModel> GetRoomByIdAsync(long userId, int roomId) {
-        if (userId <= 0 || roomId <= 0) {
-            throw new ArgumentException("Can't be less than or equal to 0.", nameof(userId));
-        }
+    public ValueTask<RestRoomModel> GetRoomByIdAsync(string roomId) {
+        ArgumentException.ThrowIfNullOrWhiteSpace(roomId);
         
         try {
-            return httpClient.GetRestModelAsync<RestRoomModel>($"https://api.imvu.com/room/room-{userId}-{roomId}");
+            return httpClient.GetRestModelAsync<RestRoomModel>($"https://api.imvu.com/room/room-{roomId}");
         }
         catch (Exception exception) {
             logger.LogError(exception, "Something went wrong.");
