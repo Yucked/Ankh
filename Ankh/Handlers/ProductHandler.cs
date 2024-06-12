@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Web;
 using Ankh.Api.Models;
+using Ankh.Models.Enums;
 using Ankh.Models.Queries;
 using Ankh.Models.Rest;
 using Microsoft.Extensions.Logging;
@@ -124,14 +125,17 @@ public sealed class ProductHandler(
         }
     }
     
-    public async ValueTask SearchProductsAsync(Action<ProductSearchQuery> productAction) {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="productAction"></param>
+    public async ValueTask<IReadOnlyCollection<RestProductModel>> SearchProductsAsync(
+        Action<ProductSearchQuery> productAction) {
         var searchQuery = new ProductSearchQuery();
         productAction.Invoke(searchQuery);
         
         var queryBuilder = HttpUtility.ParseQueryString(string.Empty);
-        if (searchQuery.ProductRating != null) {
-            queryBuilder.Add("product_rating", $"{searchQuery.ProductRating}");
-        }
+        queryBuilder.Add("product_rating", searchQuery.ProductRating == ContentRating.GeneralAudience ? "0" : "1");
         
         if (!string.IsNullOrWhiteSpace(searchQuery.FilterText)) {
             queryBuilder.Add("filter_text", searchQuery.FilterText);
@@ -157,13 +161,26 @@ public sealed class ProductHandler(
         queryBuilder.Add("price_min", $"{searchQuery.MinimumPrice}");
         queryBuilder.Add("include_histogram", $"{searchQuery.IncludeHistogram}");
         
-        using var requestMessage =
-            new HttpRequestMessage(HttpMethod.Get, $"https://api.imvu.com/product??{queryBuilder}");
-        
-        var responseMessage = await httpClient.SendAsync(requestMessage);
-        await using var stream = await responseMessage.Content.ReadAsStreamAsync();
-        using var document = await JsonDocument.ParseAsync(stream);
-        
-        Extensions.IsRequestSuccessful(responseMessage.StatusCode, document.RootElement);
+        var jsonElement = await httpClient.GetJsonAsync($"https://api.imvu.com/product??{queryBuilder}");
+        return jsonElement
+            .GetProperty("denormalized")
+            .EnumerateObject()
+            .Select(x => x.Value.GetProperty("data").Deserialize<RestProductModel>())
+            .ToArray()!;
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="searchQuery"></param>
+    /// <returns></returns>
+    public ValueTask<IReadOnlyCollection<RestProductModel>> SearchProductsAsync(ProductSearchQuery searchQuery) {
+        return SearchProductsAsync(x => {
+            x.Keywords = searchQuery.Keywords;
+            x.Gender = searchQuery.Gender;
+            x.FilterName = searchQuery.FilterName;
+            x.FilterText = searchQuery.FilterText;
+            x.ProductRating = searchQuery.ProductRating;
+        });
     }
 }
