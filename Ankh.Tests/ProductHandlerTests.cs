@@ -1,3 +1,5 @@
+using Ankh.Models.Queries;
+
 namespace Ankh.Tests;
 
 [TestClass]
@@ -46,5 +48,42 @@ public class ProductHandlerTests {
         var creator = await Globals.ProductHandler.GetCreatorInformationAsync(default, userId);
         Assert.IsNotNull(creator);
         Assert.IsNotNull(creator.CreatorTier);
+    }
+    
+    [TestMethod]
+    [DynamicData(nameof(_dummyProductSearchQueries), DynamicDataSourceType.Method)]
+    public async Task Test_SearchProductsAsync(ProductSearchQuery searchQuery) {
+        await Globals.ProductHandler.SearchProductsAsync(searchQuery);
+    }
+    
+    public static IEnumerable<object[]> _dummyProductSearchQueries() {
+        yield return [
+            new ProductSearchQuery {
+                PartialAvatarName = "Anya",
+                Keywords = "Goth",
+                FilterText = "Flare Pants"
+            }
+        ];
+        yield return [
+            new ProductSearchQuery {
+                MinimumPrice = 500
+            }
+        ];
+        yield return [
+            new ProductSearchQuery {
+                FilterName = "RNX"
+            }
+        ];
+        yield return [
+            new ProductSearchQuery {
+                Keywords = "H! Oisticu .Billie"
+            }
+        ];
+        
+        yield return [
+            new ProductSearchQuery {
+                Gender = 'F'
+            }
+        ];
     }
 }
