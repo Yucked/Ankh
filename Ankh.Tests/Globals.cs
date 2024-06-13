@@ -21,4 +21,9 @@ public static class Globals {
     
     public static ProductHandler ProductHandler
         => Provider.GetRequiredService<ProductHandler>();
+    
+    public record Login(string Username, string Password);
+    
+    public static Login DummyLogin
+        => new("foo", "bar");
 }
