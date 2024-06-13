@@ -92,7 +92,8 @@ public record RestUserModel(
     bool HasNft,
     [property: JsonPropertyName("vip_tier")]
     int VipTier,
-    [property: JsonPropertyName("vip_platform")]
+    [property: JsonPropertyName("vip_platform"),
+               JsonConverter(typeof(NullIntConverter))]
     int VipPlatform,
     [property: JsonPropertyName("has_legacy_vip")]
     bool HasLegacyVip
