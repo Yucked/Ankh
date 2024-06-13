@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Ankh.Handlers;
@@ -25,65 +26,30 @@ public static class Extensions {
         """
     ];
     
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public static long GetRandomUserId() {
-        return StaffUserIds[Random.Shared.Next(StaffUserIds.Length - 1)];
-    }
+    private static readonly string[] UserAgents = [
+        "Mozilla/5.0 (Win10; x64) Chrome/91.0.4472.124 Safari/537.36",
+        "Mozilla/5.0 (Mac OS X 10_15_7) AppleWebKit/605.1.15 Safari/605.1.15",
+        "Mozilla/5.0 (Linux x86_64) Chrome/91.0.4472.114 Safari/537.36",
+        "Mozilla/5.0 (iPhone; CPU iOS 14_4_2) AppleWebKit/605.1.15 Mobile/15E148",
+        "Mozilla/5.0 (Win10; rv:89.0) Gecko/20100101 Firefox/89.0"
+    ];
     
-    public static void VerifyLogin(this UserSauce userSauce) {
-        if (userSauce == default || string.IsNullOrWhiteSpace(userSauce.Auth)) {
-            throw new Exception($"Please use {nameof(UserHandler.LoginAsync)} before calling this method.");
-        }
-    }
-    
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="httpClient"></param>
-    /// <param name="requestUrl"></param>
-    /// <param name="cookie"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
-    public static async ValueTask<T> GetRestModelAsync<T>(this HttpClient httpClient,
-                                                          string requestUrl,
-                                                          string cookie = "")
-        where T : IRestModel {
-        using var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUrl);
-        
-        using var responseMessage = await httpClient.SendAsync(string.IsNullOrWhiteSpace(cookie)
-            ? requestMessage.WithCookieSauce(cookie)
-            : requestMessage);
-        if (!responseMessage.IsSuccessStatusCode) {
-            throw new Exception($"Failed to fetch {requestUrl} because of {responseMessage.ReasonPhrase}");
-        }
-        
-        var restModel = await responseMessage.Content.ReadFromJsonAsync<RestModel>();
-        if (restModel!.Status != "success") {
-            throw new Exception($"API returned following status: {restModel.Status}");
-        }
-        
-        return (T)restModel.Data;
+    public static Uri AsUri(this string str) {
+        return new Uri(str);
     }
     
     /// <summary>
     /// 
     /// </summary>
     /// <param name="httpClient"></param>
-    /// <param name="requestUrl"></param>
-    /// <param name="authentication"></param>
+    /// <param name="requestAction"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
     public static async ValueTask<JsonElement> GetJsonAsync(this HttpClient httpClient,
-                                                            string requestUrl,
-                                                            string authentication = "") {
-        using var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUrl);
-        if (!string.IsNullOrWhiteSpace(authentication)) {
-            requestMessage.WithCookieSauce(authentication);
-        }
+                                                            Action<HttpRequestMessage> requestAction) {
+        using var requestMessage = new HttpRequestMessage();
+        requestAction.Invoke(requestMessage);
+        requestMessage.Headers.Add("User-Agent", UserAgents[Random.Shared.Next(UserAgents.Length - 1)]);
         
         using var responseMessage = await httpClient.SendAsync(requestMessage);
         
@@ -105,18 +71,6 @@ public static class Extensions {
         return document.RootElement;
     }
     
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="requestMessage"></param>
-    /// <param name="cookie"></param>
-    /// <returns></returns>
-    public static HttpRequestMessage WithCookieSauce(this HttpRequestMessage requestMessage, string cookie) {
-        // osCsid is session id - server sided can't spoof.
-        requestMessage.Headers.Add("Cookie", $"osCsid={cookie}");
-        return requestMessage;
-    }
-    
     public static void IsRequestSuccessful(HttpStatusCode statusCode, JsonElement rootElement) {
         if (statusCode is HttpStatusCode.Forbidden or HttpStatusCode.Unauthorized) {
             throw new Exception($"Please use {nameof(UserHandler.LoginAsync)} before calling this method.");
@@ -131,5 +85,19 @@ public static class Extensions {
             Errors.Any(x => httpElement.GetRawText().Contains(x))) {
             throw new Exception($"Please use {nameof(UserHandler.LoginAsync)} before calling this method.");
         }
+    }
+    
+    internal static void WithAuthentication(this HttpRequestHeaders requestHeaders, UserSauce userSauce) {
+        requestHeaders.Add("Cookie", $"osCsid={userSauce.Auth}");
+    }
+    
+    internal static T GetDernormalizedData<T>(this JsonElement jsonElement) {
+        return jsonElement
+            .GetProperty("denormalized")
+            .EnumerateObject()
+            .First()
+            .Value
+            .GetProperty("data")
+            .Deserialize<T>()!;
     }
 }
