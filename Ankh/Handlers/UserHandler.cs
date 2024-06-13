@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Ankh.Models.Rest;
@@ -30,13 +31,17 @@ public sealed class UserHandler(
     /// <param name="userId"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public ValueTask<RestUserModel> GetUserByIdAsync(long userId) {
+    public async ValueTask<RestUserModel> GetUserByIdAsync(long userId) {
         if (userId <= 0) {
             throw new ArgumentException("Can't be less than or equal to 0.", nameof(userId));
         }
         
         try {
-            return httpClient.GetRestModelAsync<RestUserModel>($"https://api.imvu.com/user/user-{userId}");
+            var jsonElement = await httpClient.GetJsonAsync(x => {
+                x.RequestUri = $"https://api.imvu.com/user/user-{userId}".AsUri();
+            });
+            
+            return jsonElement.GetDernormalizedData<RestUserModel>();
         }
         catch (Exception exception) {
             logger.LogError("{exception.Message}", exception.Message);
@@ -50,14 +55,17 @@ public sealed class UserHandler(
     /// <param name="userId"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public ValueTask<RestProfileModel> GetUserProfileAsync(long userId) {
+    public async ValueTask<RestProfileModel> GetUserProfileAsync(long userId) {
         if (userId <= 0) {
             throw new ArgumentException("Can't be less than or equal to 0.", nameof(userId));
         }
         
         try {
-            return httpClient.GetRestModelAsync<RestProfileModel>(
-                $"https://api.imvu.com/profile/profile-user-{userId}");
+            var jsonElement = await httpClient.GetJsonAsync(x => {
+                x.RequestUri = $"https://api.imvu.com/profile/profile-user-{userId}".AsUri();
+            });
+            
+            return jsonElement.GetDernormalizedData<RestProfileModel>();
         }
         catch (Exception exception) {
             logger.LogError("{exception.Message}", exception.Message);
@@ -86,17 +94,12 @@ public sealed class UserHandler(
                 .Select(x => $"https://api.imvu.com/user/user-{x}")
                 .ToArray();
             
-            using var requestMessage = new HttpRequestMessage(HttpMethod.Get,
-                    $"https://api.imvu.com/user?id={string.Join(',', userIdUrls)}")
-                .WithCookieSauce(userSauce.Auth);
+            var jsonElement = await httpClient.GetJsonAsync(x => {
+                x.Headers.WithAuthentication(userSauce);
+                x.RequestUri = $"https://api.imvu.com/user?id={string.Join(',', userIdUrls)}".AsUri();
+            });
             
-            var responseMessage = await httpClient.SendAsync(requestMessage);
-            using var document = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
-            
-            Extensions.IsRequestSuccessful(responseMessage.StatusCode, document.RootElement);
-            
-            return document
-                .RootElement
+            return jsonElement
                 .GetProperty("denormalized")
                 .EnumerateObject()
                 .Select(x => x.Value.GetProperty("data").Deserialize<RestUserModel>())
@@ -150,15 +153,11 @@ public sealed class UserHandler(
     /// <returns></returns>
     public async Task<UserSauce> LoginAsync(string username, string password, string mfaCode = "") {
         using var responseMessage = await httpClient.PostAsync("https://api.imvu.com/login",
-            new StringContent(JsonSerializer.Serialize(
-                    new LoginPayload {
-                        Username = username,
-                        Password = password,
-                        SecurityCode = string.IsNullOrWhiteSpace(mfaCode) ? null : mfaCode
-                    }),
-                Encoding.UTF8,
-                "application/json"
-            ));
+            JsonContent.Create(new LoginPayload {
+                Username = username,
+                Password = password,
+                SecurityCode = string.IsNullOrWhiteSpace(mfaCode) ? null : mfaCode
+            }));
         
         using var document = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
         if (!document.RootElement.TryGetProperty("error", out var errorElement)) {
@@ -202,17 +201,13 @@ public sealed class UserHandler(
     /// <param name="userSauce"></param>
     /// <returns></returns>
     public async Task<RestOutfitModel?[]> GetUserOutfitsAsync(UserSauce userSauce) {
-        using var requestMessage = new HttpRequestMessage(HttpMethod.Get,
-                $"https://api.imvu.com/user/user-{userSauce.UserId}/outfits?sort=purchased&sort_order=desc")
-            .WithCookieSauce(userSauce.Auth);
+        var jsonElement = await httpClient.GetJsonAsync(x => {
+            x.Headers.WithAuthentication(userSauce);
+            x.RequestUri = $"https://api.imvu.com/user/user-{userSauce.UserId}/outfits?sort=purchased&sort_order=desc"
+                .AsUri();
+        });
         
-        var responseMessage = await httpClient.SendAsync(requestMessage);
-        using var document = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
-        
-        Extensions.IsRequestSuccessful(responseMessage.StatusCode, document.RootElement);
-        
-        return document
-            .RootElement
+        return jsonElement
             .GetProperty("denormalized")
             .EnumerateObject()
             .Where(x => x.Name.Contains("api.imvu.com/outfit/outfit"))

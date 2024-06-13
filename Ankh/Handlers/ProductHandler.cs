@@ -37,13 +37,17 @@ public sealed class ProductHandler(
     /// Fetches product information from API
     /// </summary>
     /// <param name="productId"></param>
-    public ValueTask<RestProductModel> GetProductByIdAsync(int productId) {
+    public async ValueTask<RestProductModel> GetProductByIdAsync(int productId) {
         if (productId <= 0) {
             throw new ArgumentException("Can't be less than or equal to 0.", nameof(productId));
         }
         
         try {
-            return httpClient.GetRestModelAsync<RestProductModel>($"https://api.imvu.com/product/product-{productId}");
+            var jsonElement = await httpClient.GetJsonAsync(x => {
+                x.RequestUri = $"https://api.imvu.com/product/product-{productId}".AsUri();
+            });
+            
+            return jsonElement.GetDernormalizedData<RestProductModel>();
         }
         catch (Exception exception) {
             logger.LogError("{exception.Message}", exception.Message);
@@ -66,32 +70,28 @@ public sealed class ProductHandler(
             $"https://api.imvu.com/product?creator={username}&limit=1");
         
         try {
-            var responseMessage = await httpClient.SendAsync(userSauce != default
-                ? requestMessage.WithCookieSauce(userSauce.Auth)
-                : requestMessage);
-            var document = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
-            var totalCount = document
-                .RootElement
+            var jsonElement = await httpClient.GetJsonAsync(x => {
+                x.RequestUri = $"https://api.imvu.com/product?creator={username}&limit=1".AsUri();
+                x.Headers.WithAuthentication(userSauce);
+            });
+            
+            var totalCount = jsonElement
                 .GetProperty("denormalized")
-                .GetProperty(document.RootElement.GetProperty("id").GetString()!)
+                .GetProperty(jsonElement.GetProperty("id").GetString()!)
                 .GetProperty("data")
                 .GetProperty("total_count")
                 .GetInt32();
             
-            requestMessage = new HttpRequestMessage(HttpMethod.Get,
-                $"https://api.imvu.com/product?creator={username}&limit={totalCount}");
+            jsonElement = await httpClient.GetJsonAsync(x => {
+                x.RequestUri = $"https://api.imvu.com/product?creator={username}&limit={totalCount}".AsUri();
+                x.Headers.WithAuthentication(userSauce);
+            });
             
-            responseMessage =
-                await httpClient.SendAsync(userSauce != default
-                    ? requestMessage.WithCookieSauce(userSauce.Auth)
-                    : requestMessage);
-            document = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
-            return document
-                .RootElement
+            return jsonElement
                 .GetProperty("denormalized")
                 .EnumerateObject()
                 .Where(x =>
-                    !x.Name.Equals($"{responseMessage.RequestMessage!.RequestUri}",
+                    !x.Name.Equals(jsonElement.GetProperty("id").GetString(),
                         StringComparison.CurrentCultureIgnoreCase))
                 .Select(x => x.Value.GetProperty("data").Deserialize<RestProductModel>())
                 .ToArray()!;
@@ -109,15 +109,18 @@ public sealed class ProductHandler(
     /// <param name="userId"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public ValueTask<RestCreatorModel> GetCreatorInformationAsync(UserSauce userSauce, int userId) {
+    public async ValueTask<RestCreatorModel> GetCreatorInformationAsync(UserSauce userSauce, int userId) {
         if (userId <= 0) {
             throw new ArgumentException("Can't be less than or equal to 0.", nameof(userId));
         }
         
         try {
-            return httpClient.GetRestModelAsync<RestCreatorModel>(
-                $"https://api.imvu.com/creator/creator-{userId}",
-                userSauce.Auth);
+            var jsonElement = await httpClient.GetJsonAsync(x => {
+                x.RequestUri = $"https://api.imvu.com/creator/creator-{userId}".AsUri();
+                x.Headers.WithAuthentication(userSauce);
+            });
+            
+            return jsonElement.GetDernormalizedData<RestCreatorModel>()!;
         }
         catch (Exception exception) {
             logger.LogError("{exception.Message}", exception.Message);
@@ -161,7 +164,8 @@ public sealed class ProductHandler(
         queryBuilder.Add("price_min", $"{searchQuery.MinimumPrice}");
         queryBuilder.Add("include_histogram", $"{searchQuery.IncludeHistogram}");
         
-        var jsonElement = await httpClient.GetJsonAsync($"https://api.imvu.com/product??{queryBuilder}");
+        var jsonElement = await httpClient.GetJsonAsync(x =>
+            x.RequestUri = $"https://api.imvu.com/product??{queryBuilder}".AsUri());
         return jsonElement
             .GetProperty("denormalized")
             .EnumerateObject()
