@@ -1,11 +1,9 @@
 using Ankh.Backend;
+using Ankh.Backend.Workers;
 using Ankh.Handlers;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Playwright;
 using Raven.Client.Documents;
-using Raven.Client.Documents.Operations.Revisions;
-using Raven.Client.ServerWide;
-using Raven.Client.ServerWide.Operations;
 
 var exitCode = Microsoft.Playwright.Program.Main(["install", "--with-deps", "chromium"]);
 if (exitCode != 0) {
@@ -35,7 +33,7 @@ builder.Services
         });
     })
     .AddSingleton<IDocumentStore>(x => new DocumentStore {
-        Urls = x.GetService<IConfiguration>()!.GetValue<string[]>("RavenNodes"),
+        Urls = x.GetService<IConfiguration>()!.GetSection("RavenNodes").Get<string[]>(),
         Conventions = {
             CreateHttpClient = f => x.GetService<IHttpClientFactory>()!.CreateClient("RavenDB"),
             UseOptimisticConcurrency = true,
@@ -44,6 +42,9 @@ builder.Services
         },
         Database = nameof(Ankh)
     }.Initialize())
+    .AddHostedService<StartupWorker>()
+    .AddHostedService<RoomCacheWorker>()
+    .AddHostedService<ShopCacheWorker>()
     .AddHealthChecks();
 
 var app = builder.Build();
@@ -51,22 +52,4 @@ app.UseHttpsRedirection();
 app.MapControllers();
 app.UseHealthChecks("/health");
 
-await await app
-    .RunAsync()
-    .ContinueWith(_ => EnableRavenFeaturesAsync());
-return;
-
-async Task EnableRavenFeaturesAsync() {
-    var store = app.Services.GetRequiredService<IDocumentStore>();
-    try {
-        await store.Maintenance.Server.SendAsync(new CreateDatabaseOperation(new DatabaseRecord(nameof(Ankh))));
-        await store.Maintenance.SendAsync(new ConfigureRevisionsOperation(new RevisionsConfiguration {
-            Default = new RevisionsCollectionConfiguration {
-                Disabled = false
-            }
-        }));
-    }
-    catch {
-        app.Services.GetService<ILogger<Program>>()!.LogWarning("Raven operations already in place.");
-    }
-}
+await app.RunAsync();
