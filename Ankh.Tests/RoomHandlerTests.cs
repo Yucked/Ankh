@@ -1,22 +1,23 @@
 namespace Ankh.Tests;
- 
+
 [TestClass]
 public sealed class RoomHandlerTests {
     [DataTestMethod]
-    [DataRow()]
-    public async Task Test_GetRoomByIdAsync(int userId, int roomId) {
-        //Globals.RoomHandler.GetRoomByIdAsync(userId, roomId);
+    [DataRow("116678358-646")]
+    [DataRow("263636495-130")]
+    [DataRow("347951586-161")]
+    public async Task Test_GetRoomByIdAsync(string roomId) {
+        var room = await Globals.RoomHandler.GetRoomByIdAsync(roomId);
+        Assert.IsNotNull(room.Name);
     }
     
     [DataTestMethod]
-    [DataRow("Foo", "Bar", "Query")]
-    public async Task Test_SearchRoomsAsync(string u, string p, string kw) {
-        var userSauce = await Globals.UserHandler.LoginAsync(u, p);
+    [DataRow("Query")]
+    public async Task Test_SearchRoomsAsync(string kw) {
+        var userSauce = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
         Assert.IsNotNull(userSauce);
         Assert.IsNotNull(userSauce.Auth);
         
-        await Globals.RoomHandler.SearchRoomsAsync(userSauce, q => {
-            q.Keywords = kw;
-        });
+        await Globals.RoomHandler.SearchRoomsAsync(userSauce, q => { q.Keywords = kw; });
     }
 }
