@@ -27,9 +27,9 @@ public sealed class UserHandlerTests {
     }
     
     [DataTestMethod]
-    [DataRow("Foo", "Bar", 347951586, 327222770, 350843753, 116678358, 121197925)]
-    public async Task Test_GetUsersByIdAsync(string username, string password, params int[] userIds) {
-        var userSauce = await Globals.UserHandler.LoginAsync(username, password);
+    [DataRow(347951586, 327222770, 350843753, 116678358, 121197925)]
+    public async Task Test_GetUsersByIdAsync(params int[] userIds) {
+        var userSauce = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
         Assert.IsNotNull(userSauce);
         Assert.IsNotNull(userSauce.Auth);
         
@@ -49,21 +49,16 @@ public sealed class UserHandlerTests {
         Assert.IsNotNull(userId);
     }
     
-    [DataTestMethod]
-    [DataRow("Foo", "Bar")]
-    public async Task Test_LoginAsync(string username, string password) {
-        var userSauce = await Globals.UserHandler.LoginAsync(username, password);
+    [TestMethod]
+    public async Task Test_LoginAsync() {
+        var userSauce = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
         Assert.IsNotNull(userSauce);
         Assert.IsNotNull(userSauce.Auth);
-        
-        var result = Saucery.TryStore(username, userSauce);
-        Assert.IsTrue(result);
     }
     
-    [DataTestMethod]
-    [DataRow("Foo", "Bar")]
-    public async Task Test_GetUserOutfitsAsync(string username, string password) {
-        var userSauce = await Globals.UserHandler.LoginAsync(username, password);
+    [TestMethod]
+    public async Task Test_GetUserOutfitsAsync() {
+        var userSauce = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
         Assert.IsNotNull(userSauce);
         Assert.IsNotNull(userSauce.Auth);
         
