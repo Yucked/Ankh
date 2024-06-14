@@ -5,6 +5,7 @@ using Ankh.Api.Models;
 using Ankh.Models.Enums;
 using Ankh.Models.Queries;
 using Ankh.Models.Rest;
+using Ankh.Models.Rework;
 using Microsoft.Extensions.Logging;
 
 namespace Ankh.Handlers;
@@ -59,20 +60,17 @@ public sealed class ProductHandler(
     /// Fetches all products from creator's shop.
     /// </summary>
     /// <param name="username"></param>
-    /// <param name="userSauce"></param>
+    /// <param name="userLogin"></param>
     /// <returns></returns>
     public async ValueTask<IReadOnlyCollection<RestProductModel>> GetProductsByCreatorAsync(
         string username,
-        UserSauce userSauce = default) {
+        UserLogin userLogin) {
         ArgumentException.ThrowIfNullOrWhiteSpace(username);
-        
-        var requestMessage = new HttpRequestMessage(HttpMethod.Get,
-            $"https://api.imvu.com/product?creator={username}&limit=1");
         
         try {
             var jsonElement = await httpClient.GetJsonAsync(x => {
                 x.RequestUri = $"https://api.imvu.com/product?creator={username}&limit=1".AsUri();
-                x.Headers.WithAuthentication(userSauce);
+                x.Headers.WithAuthentication(userLogin);
             });
             
             var totalCount = jsonElement
@@ -84,7 +82,7 @@ public sealed class ProductHandler(
             
             jsonElement = await httpClient.GetJsonAsync(x => {
                 x.RequestUri = $"https://api.imvu.com/product?creator={username}&limit={totalCount}".AsUri();
-                x.Headers.WithAuthentication(userSauce);
+                x.Headers.WithAuthentication(userLogin);
             });
             
             return jsonElement
@@ -105,11 +103,11 @@ public sealed class ProductHandler(
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="userSauce"></param>
+    /// <param name="userLogin"></param>
     /// <param name="userId"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public async ValueTask<RestCreatorModel> GetCreatorInformationAsync(UserSauce userSauce, int userId) {
+    public async ValueTask<RestCreatorModel> GetCreatorInformationAsync(UserLogin userLogin, int userId) {
         if (userId <= 0) {
             throw new ArgumentException("Can't be less than or equal to 0.", nameof(userId));
         }
@@ -117,10 +115,10 @@ public sealed class ProductHandler(
         try {
             var jsonElement = await httpClient.GetJsonAsync(x => {
                 x.RequestUri = $"https://api.imvu.com/creator/creator-{userId}".AsUri();
-                x.Headers.WithAuthentication(userSauce);
+                x.Headers.WithAuthentication(userLogin);
             });
             
-            return jsonElement.GetDernormalizedData<RestCreatorModel>()!;
+            return jsonElement.GetDernormalizedData<RestCreatorModel>();
         }
         catch (Exception exception) {
             logger.LogError("{exception.Message}", exception.Message);
@@ -186,5 +184,7 @@ public sealed class ProductHandler(
             x.FilterText = searchQuery.FilterText;
             x.ProductRating = searchQuery.ProductRating;
         });
+        
+        // TODO: Complete Mapping
     }
 }
