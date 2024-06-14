@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using Ankh.Handlers;
+using Ankh.Models.Rework;
 
 namespace Ankh;
 
@@ -41,7 +42,16 @@ public static class Extensions {
             { "customers_id", "ownerId" },
             { "room_pid", "id" },
             { "room_instance_id", "id" },
-            { "is_age_verified_only", "is_age_verified" }
+            { "is_age_verified_only", "is_age_verified" },
+            { "customers_id", "id" },
+            { "avatar_name", "username" },
+            { "avname", "username" },
+            { "avatar_download_size", "size" },
+            { "avpic", "profileImage" },
+            { "legacy_cid", "id" },
+            { "cid", "id" },
+            { "avatar_image", "profileImage" },
+            { "avpic_url", "profileImage" },
         };
     
     internal static Uri AsUri(this string str) {
@@ -86,8 +96,8 @@ public static class Extensions {
         return document.RootElement;
     }
     
-    internal static void WithAuthentication(this HttpRequestHeaders requestHeaders, UserSauce userSauce) {
-        requestHeaders.Add("Cookie", $"osCsid={userSauce.Auth}");
+    internal static void WithAuthentication(this HttpRequestHeaders requestHeaders, UserLogin userLogin) {
+        requestHeaders.Add("Cookie", $"osCsid={userLogin.SessionId}");
     }
     
     internal static JsonElement GetDernormalizedData(this JsonElement jsonElement) {
