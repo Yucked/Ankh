@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Ankh.Converters;
 
-public sealed class IntToBoolConverter : JsonConverter<bool> {
+public sealed class ValueToBoolConverter : JsonConverter<bool> {
     public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
         return reader.TokenType switch {
             JsonTokenType.True  => true,
