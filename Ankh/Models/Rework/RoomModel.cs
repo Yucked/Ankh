@@ -1,9 +1,10 @@
 ﻿using System.Text.Json.Serialization;
+using Ankh.Converters;
 
 namespace Ankh.Models.Rework;
 
 // Minimal information returned from API endpoint find_locations PHP
-public partial record BaseRoomModel {
+public record RoomModelMinimal {
     [JsonPropertyName("id")]
     public string Id { get; init; }
     
@@ -18,7 +19,7 @@ public partial record BaseRoomModel {
 }
 
 // Common properties between PHP and Rest
-public partial record BaseRoomModel {
+public record RoomModelCommon : RoomModelMinimal {
     [JsonPropertyName("description")]
     public string Description { get; init; }
     
@@ -46,22 +47,16 @@ public partial record BaseRoomModel {
     [JsonPropertyName("is_friends_only")]
     public bool IsFriendsOnly { get; set; }
     
+    // rest is_age_verified, php is_age_verified_only
+    [JsonPropertyName("is_age_verified")]
+    public bool IsAgeVerified { get; set; }
+    
     [JsonPropertyName("is_non_guest_only")]
     public bool IsNonGuestOnly { get; set; }
-    
-    [JsonIgnore]
-    internal static readonly IDictionary<string, string> KeyReplacements
-        = new Dictionary<string, string> {
-            { "owner_avatarname", "ownerUsername" },
-            { "customers_avatar_name", "ownerUsername" },
-            { "max_users", "capacity" },
-            { "customers_id", "ownerId" },
-            { "room_pid", "id" }
-        };
 }
 
 // Rest API 
-public partial record BaseRoomModel {
+public record RoomModel : RoomModelCommon {
     [JsonPropertyName("type")]
     public string Type { get; set; }
     
@@ -85,9 +80,6 @@ public partial record BaseRoomModel {
     
     [JsonPropertyName("content_rating")]
     public string ContentRating { get; set; }
-    
-    [JsonPropertyName("is_age_verified")]
-    public bool IsAgeVerified { get; set; }
     
     [JsonPropertyName("has_plus_badge")]
     public bool HasPlusBadge { get; set; }
@@ -118,10 +110,9 @@ public partial record BaseRoomModel {
     
     [JsonPropertyName("is_expired")]
     public bool IsExpired { get; set; }
-}
-
-// Php API
-public partial record BaseRoomModel {
+    
+    // PHP API 
+    
     [JsonPropertyName("permissions")]
     public int Permissions { get; set; }
     
@@ -130,9 +121,6 @@ public partial record BaseRoomModel {
     
     [JsonPropertyName("visitor_count")]
     public int VisitorCount { get; set; }
-    
-    [JsonPropertyName("is_age_verified_only")]
-    public bool IsAgeVerifiedOnly { get; set; }
     
     [JsonPropertyName("is_qa")]
     public bool IsQa { get; set; }
@@ -182,11 +170,11 @@ public partial record BaseRoomModel {
     [JsonPropertyName("is_greylisted")]
     public bool IsGreylisted { get; set; }
     
-    [JsonPropertyName("last_modified")]
-    public DateTimeOffset LastModified { get; set; }
+    [JsonPropertyName("last_modified"), JsonConverter(typeof(DateTimeConverter))]
+    public DateTime LastModified { get; set; }
     
     [JsonPropertyName("participants")]
-    public object[] Participants { get; set; }
+    public UserModelMinimal[] Participants { get; set; }
     
     [JsonPropertyName("room_download_size")]
     public long RoomDownloadSize { get; set; }
