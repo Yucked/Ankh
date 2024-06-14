@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Ankh.Models.Rest;
+using Ankh.Models.Rework;
 using Microsoft.Extensions.Logging;
 
 namespace Ankh.Handlers;
@@ -76,15 +77,11 @@ public sealed class UserHandler(
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="userSauce"></param>
+    /// <param name="userLogin"></param>
     /// <param name="userIds"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public async ValueTask<IReadOnlyList<RestUserModel>> GetUsersByIdAsync(UserSauce userSauce, params int[] userIds) {
-        if (userSauce == default || string.IsNullOrWhiteSpace(userSauce.Auth)) {
-            throw new Exception($"Please use {nameof(LoginAsync)} before calling this method.");
-        }
-        
+    public async ValueTask<IReadOnlyList<RestUserModel>> GetUsersByIdAsync(UserLogin userLogin, params int[] userIds) {
         if (userIds.Length == 0) {
             throw new Exception($"{nameof(userIds)} can't be null or empty.");
         }
@@ -95,7 +92,7 @@ public sealed class UserHandler(
                 .ToArray();
             
             var jsonElement = await httpClient.GetJsonAsync(x => {
-                x.Headers.WithAuthentication(userSauce);
+                x.Headers.WithAuthentication(userLogin);
                 x.RequestUri = $"https://api.imvu.com/user?id={string.Join(',', userIdUrls)}".AsUri();
             });
             
@@ -151,7 +148,7 @@ public sealed class UserHandler(
     /// <param name="password"></param>
     /// <param name="mfaCode"></param>
     /// <returns></returns>
-    public async Task<UserSauce> LoginAsync(string username, string password, string mfaCode = "") {
+    public async Task<UserLogin> LoginAsync(string username, string password, string mfaCode = "") {
         using var responseMessage = await httpClient.PostAsync("https://api.imvu.com/login",
             JsonContent.Create(new LoginPayload {
                 Username = username,
@@ -183,7 +180,13 @@ public sealed class UserHandler(
                 .GetString()!
                 .Split('/')[^1];
             
-            return new UserSauce(username, userId, sauce, loginId);
+            return new UserLogin {
+                Username = username,
+                Password = password,
+                Sauce = sauce,
+                UserId = int.Parse(userId),
+                SessionId = loginId
+            };
         }
         
         var errorCode = errorElement.GetString();
@@ -192,18 +195,18 @@ public sealed class UserHandler(
             : document.RootElement.GetProperty("message").GetString();
         
         logger.LogError("{errorCode}: {errorMessage}", errorCode, errorMessage);
-        return default;
+        return default!;
     }
     
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="userSauce"></param>
+    /// <param name="userLogin"></param>
     /// <returns></returns>
-    public async Task<RestOutfitModel?[]> GetUserOutfitsAsync(UserSauce userSauce) {
+    public async Task<RestOutfitModel?[]> GetUserOutfitsAsync(UserLogin userLogin) {
         var jsonElement = await httpClient.GetJsonAsync(x => {
-            x.Headers.WithAuthentication(userSauce);
-            x.RequestUri = $"https://api.imvu.com/user/user-{userSauce.UserId}/outfits?sort=purchased&sort_order=desc"
+            x.Headers.WithAuthentication(userLogin);
+            x.RequestUri = $"https://api.imvu.com/user/user-{userLogin.UserId}/outfits?sort=purchased&sort_order=desc"
                 .AsUri();
         });
         

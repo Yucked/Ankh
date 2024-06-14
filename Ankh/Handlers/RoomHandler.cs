@@ -14,10 +14,10 @@ public sealed class RoomHandler(
     /// 
     /// </summary>
     /// <param name="roomId"></param>
-    /// <param name="userSauce"></param>
+    /// <param name="userLogin"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public async ValueTask<RoomModel> GetRoomByIdAsync(string roomId, UserSauce userSauce) {
+    public async ValueTask<RoomModel> GetRoomByIdAsync(string roomId, UserLogin userLogin) {
         ArgumentException.ThrowIfNullOrWhiteSpace(roomId);
         
         try {
@@ -27,7 +27,7 @@ public sealed class RoomHandler(
             
             var phpJson = await httpClient.GetJsonAsync(x => {
                 x.RequestUri = $"https://client-dynamic.imvu.com/api/rooms/room_info.php?room_id={roomId}".AsUri();
-                x.Headers.WithAuthentication(userSauce);
+                x.Headers.WithAuthentication(userLogin);
             });
             
             return Extensions
@@ -43,11 +43,11 @@ public sealed class RoomHandler(
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="userSauce"></param>
+    /// <param name="userLogin"></param>
     /// <param name="searchQuery"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public async ValueTask<IReadOnlyList<RoomModel>> SearchRoomsAsync(UserSauce userSauce,
+    public async ValueTask<IReadOnlyList<RoomModel>> SearchRoomsAsync(UserLogin userLogin,
                                                                       Action<RoomSearchQuery> searchQuery) {
         var query = new RoomSearchQuery();
         searchQuery.Invoke(query);
@@ -101,9 +101,9 @@ public sealed class RoomHandler(
         
         var jsonElement = await httpClient
             .GetJsonAsync(x => {
-                x.RequestUri = $"https://api.imvu.com/user/user-{userSauce.UserId}/filtered_rooms?{queryBuilder}"
+                x.RequestUri = $"https://api.imvu.com/user/user-{userLogin.UserId}/filtered_rooms?{queryBuilder}"
                     .AsUri();
-                x.Headers.WithAuthentication(userSauce);
+                x.Headers.WithAuthentication(userLogin);
             });
         
         return jsonElement
@@ -117,17 +117,17 @@ public sealed class RoomHandler(
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="userSauce"></param>
+    /// <param name="userLogin"></param>
     /// <param name="userIds"></param>
     /// <returns></returns>
     public async ValueTask<IDictionary<long, RoomModelMinimal[]>> GetPublicRoomsForUsersAsync(
-        UserSauce userSauce,
+        UserLogin userLogin,
         params long[] userIds) {
         var jsonElement =
             await httpClient.GetJsonAsync(x => {
                 x.RequestUri =
                     $"https://client-dynamic.imvu.com/api/find_locations.php?cids={string.Join(',', userIds)}".AsUri();
-                x.Headers.WithAuthentication(userSauce);
+                x.Headers.WithAuthentication(userLogin);
             });
         
         var results = jsonElement.GetProperty("result");
