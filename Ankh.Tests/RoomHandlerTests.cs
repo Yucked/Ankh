@@ -20,4 +20,12 @@ public sealed class RoomHandlerTests {
         
         await Globals.RoomHandler.SearchRoomsAsync(userSauce, q => { q.Keywords = kw; });
     }
+    
+    [DataTestMethod]
+    [DataRow(347951586)]
+    public async Task Test_GetPublicRoomsForUsersAsync(long userId) {
+        var userSauce = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
+        var rooms = await Globals.RoomHandler.GetPublicRoomsForUsersAsync(userSauce, userId);
+        Assert.IsNotNull(rooms);
+    }
 }
