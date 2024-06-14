@@ -1,9 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text.Json;
 using Ankh.Handlers;
-using Ankh.Models.Rest;
 
 namespace Ankh;
 
@@ -34,6 +32,16 @@ public static class Extensions {
         "Mozilla/5.0 (Win10; rv:89.0) Gecko/20100101 Firefox/89.0"
     ];
     
+    internal static readonly IDictionary<string, string> JsonKeyReplacements
+        = new Dictionary<string, string> {
+            { "owner_avatarname", "ownerUsername" },
+            { "customers_avatar_name", "ownerUsername" },
+            { "max_users", "capacity" },
+            { "customers_id", "ownerId" },
+            { "room_pid", "id" },
+            { "room_instance_id", "id" }
+        };
+    
     public static Uri AsUri(this string str) {
         return new Uri(str);
     }
@@ -57,7 +65,12 @@ public static class Extensions {
             throw new Exception($"Please use {nameof(UserHandler.LoginAsync)} before calling this method.");
         }
         
-        var document = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
+        var jsonContent = await responseMessage.Content.ReadAsStringAsync();
+        foreach (var (key, value) in JsonKeyReplacements) {
+            jsonContent = jsonContent.Replace(key, value);
+        }
+        
+        var document = JsonDocument.Parse(jsonContent);
         if (document.RootElement.TryGetProperty("status", out var statusElement) &&
             statusElement.GetString()!.Equals("failure")) {
             throw new Exception(document.RootElement.GetProperty("message").GetString());
@@ -69,22 +82,6 @@ public static class Extensions {
         }
         
         return document.RootElement;
-    }
-    
-    public static void IsRequestSuccessful(HttpStatusCode statusCode, JsonElement rootElement) {
-        if (statusCode is HttpStatusCode.Forbidden or HttpStatusCode.Unauthorized) {
-            throw new Exception($"Please use {nameof(UserHandler.LoginAsync)} before calling this method.");
-        }
-        
-        if (rootElement.TryGetProperty("status", out var statusElement) &&
-            statusElement.GetString()!.Equals("failure")) {
-            throw new Exception(rootElement.GetProperty("message").GetString());
-        }
-        
-        if (rootElement.TryGetProperty("http", out var httpElement) &&
-            Errors.Any(x => httpElement.GetRawText().Contains(x))) {
-            throw new Exception($"Please use {nameof(UserHandler.LoginAsync)} before calling this method.");
-        }
     }
     
     internal static void WithAuthentication(this HttpRequestHeaders requestHeaders, UserSauce userSauce) {
