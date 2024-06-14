@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Ankh.Converters;
 
-public sealed class NullIntConverter : JsonConverter<int> {
+public sealed class NullToIntConverter : JsonConverter<int> {
     public override bool HandleNull
         => true;
     
