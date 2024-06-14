@@ -12,10 +12,10 @@ public record RoomModelMinimal {
     public string Name { get; init; }
     
     [JsonPropertyName("isAP")]
-    public bool IsAP { get; init; }
+    public bool IsAp { get; init; }
     
     [JsonPropertyName("isVIP")]
-    public bool IsVIP { get; init; }
+    public bool IsVip { get; init; }
 }
 
 // Common properties between PHP and Rest
