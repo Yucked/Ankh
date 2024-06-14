@@ -3,7 +3,7 @@ using Ankh.Converters;
 
 namespace Ankh.Models.PHP;
 
-public record PHPBadgeModel(
+public record PhpBadgeModel(
     [property: JsonPropertyName("creator_id")]
     long CreatorId,
     [property: JsonPropertyName("creator_badge_index")]
@@ -19,7 +19,7 @@ public record PHPBadgeModel(
     [property: JsonPropertyName("description")]
     string Description,
     [property: JsonPropertyName("allow_autogrant"),
-               JsonConverter(typeof(StringToBoolConverter))]
+               JsonConverter(typeof(ValueToBoolConverter))]
     bool AllowAutogrant,
     [property: JsonPropertyName("badge_type"),
                JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]

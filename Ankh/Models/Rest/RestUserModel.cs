@@ -16,7 +16,7 @@ public record RestUserModel(
     [property: JsonPropertyName("gender")]
     string Gender,
     [property: JsonPropertyName("age"),
-               JsonConverter(typeof(NullIntConverter))]
+               JsonConverter(typeof(NullToIntConverter))]
     int Age,
     [property: JsonPropertyName("relationship_status"),
                JsonConverter(typeof(JsonNumberEnumConverter<RelationshipStatus>))]
@@ -72,7 +72,7 @@ public record RestUserModel(
     [property: JsonPropertyName("thumbnail_url")]
     Uri ThumbnailUrl,
     [property: JsonPropertyName("is_host"),
-               JsonConverter(typeof(IntToBoolConverter))]
+               JsonConverter(typeof(ValueToBoolConverter))]
     bool IsHost,
     [property: JsonPropertyName("is_current_user")]
     bool IsCurrentUser,
@@ -87,13 +87,13 @@ public record RestUserModel(
     [property: JsonPropertyName("last_password_change")]
     DateTimeOffset LastPasswordChange,
     [property: JsonPropertyName("is_2fa_required")]
-    object Is2FARequired,
+    object Is2FaRequired,
     [property: JsonPropertyName("has_nft")]
     bool HasNft,
     [property: JsonPropertyName("vip_tier")]
     int VipTier,
     [property: JsonPropertyName("vip_platform"),
-               JsonConverter(typeof(NullIntConverter))]
+               JsonConverter(typeof(NullToIntConverter))]
     int VipPlatform,
     [property: JsonPropertyName("has_legacy_vip")]
     bool HasLegacyVip

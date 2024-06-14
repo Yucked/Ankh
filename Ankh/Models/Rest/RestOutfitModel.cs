@@ -12,7 +12,7 @@ public sealed record RestOutfitModel(
     [property: JsonPropertyName("outfit_name")]
     string Name,
     [property: JsonPropertyName("dirty"),
-               JsonConverter(typeof(IntToBoolConverter))]
+               JsonConverter(typeof(ValueToBoolConverter))]
     bool IsDirty,
     [property: JsonPropertyName("full_image")]
     string FullImage,
