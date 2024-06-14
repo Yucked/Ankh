@@ -1,9 +1,7 @@
 ﻿using System.Text.Json;
 using System.Web;
 using Ankh.Models.Enums;
-using Ankh.Models.Interfaces;
 using Ankh.Models.Queries;
-using Ankh.Models.Rest;
 using Ankh.Models.Rework;
 using Microsoft.Extensions.Logging;
 
@@ -16,17 +14,25 @@ public sealed class RoomHandler(
     /// 
     /// </summary>
     /// <param name="roomId"></param>
+    /// <param name="userSauce"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public async ValueTask<BaseRoomModel> GetRoomByIdAsync(string roomId) {
+    public async ValueTask<RoomModel> GetRoomByIdAsync(string roomId, UserSauce userSauce) {
         ArgumentException.ThrowIfNullOrWhiteSpace(roomId);
         
         try {
-            var jsonElement = await httpClient.GetJsonAsync(x => {
+            var restJson = await httpClient.GetJsonAsync(x => {
                 x.RequestUri = $"https://api.imvu.com/room/room-{roomId}".AsUri();
             });
             
-            return jsonElement.GetDernormalizedData<BaseRoomModel>();
+            var phpJson = await httpClient.GetJsonAsync(x => {
+                x.RequestUri = $"https://client-dynamic.imvu.com/api/rooms/room_info.php?room_id={roomId}".AsUri();
+                x.Headers.WithAuthentication(userSauce);
+            });
+            
+            return Extensions
+                .MergeJson(restJson, phpJson)
+                .Deserialize<RoomModel>()!;
         }
         catch (Exception exception) {
             logger.LogError(exception, "Something went wrong.");
@@ -41,8 +47,8 @@ public sealed class RoomHandler(
     /// <param name="searchQuery"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public async ValueTask<IReadOnlyList<RestRoomModel>> SearchRoomsAsync(UserSauce userSauce,
-                                                                          Action<RoomSearchQuery> searchQuery) {
+    public async ValueTask<IReadOnlyList<RoomModel>> SearchRoomsAsync(UserSauce userSauce,
+                                                                      Action<RoomSearchQuery> searchQuery) {
         var query = new RoomSearchQuery();
         searchQuery.Invoke(query);
         
@@ -104,7 +110,7 @@ public sealed class RoomHandler(
             .GetProperty("denormalized")
             .EnumerateObject()
             .Select(x => jsonElement.GetProperty("denormalized").GetProperty(x.Name).GetProperty("data")
-                .Deserialize<RestRoomModel>())
+                .Deserialize<RoomModel>())
             .ToArray()!;
     }
     
@@ -114,7 +120,7 @@ public sealed class RoomHandler(
     /// <param name="userSauce"></param>
     /// <param name="userIds"></param>
     /// <returns></returns>
-    public async ValueTask<IDictionary<long, BaseRoomModel[]>> GetPublicRoomsForUsersAsync(
+    public async ValueTask<IDictionary<long, RoomModelMinimal[]>> GetPublicRoomsForUsersAsync(
         UserSauce userSauce,
         params long[] userIds) {
         var jsonElement =
@@ -132,7 +138,7 @@ public sealed class RoomHandler(
                 .Select(x => {
                     var rooms = x.Value
                         .EnumerateArray()
-                        .Select(y => y.Deserialize<BaseRoomModel>())
+                        .Select(y => y.Deserialize<RoomModelMinimal>())
                         .ToArray();
                     return (long.Parse(x.Name), rooms);
                 })
