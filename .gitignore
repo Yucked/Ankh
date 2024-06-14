@@ -453,9 +453,5 @@ $RECYCLE.BIN/
 !.vscode/launch.json
 !.vscode/extensions.json
 
-
-node_modules
-
-**/.cache
-**/build
-.env
+Ankh.Frontend/
+Ankh.Media/
