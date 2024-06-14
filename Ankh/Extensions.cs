@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Buffers;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using Ankh.Handlers;
@@ -39,10 +40,11 @@ public static class Extensions {
             { "max_users", "capacity" },
             { "customers_id", "ownerId" },
             { "room_pid", "id" },
-            { "room_instance_id", "id" }
+            { "room_instance_id", "id" },
+            { "is_age_verified_only", "is_age_verified" }
         };
     
-    public static Uri AsUri(this string str) {
+    internal static Uri AsUri(this string str) {
         return new Uri(str);
     }
     
@@ -88,13 +90,38 @@ public static class Extensions {
         requestHeaders.Add("Cookie", $"osCsid={userSauce.Auth}");
     }
     
-    internal static T GetDernormalizedData<T>(this JsonElement jsonElement) {
+    internal static JsonElement GetDernormalizedData(this JsonElement jsonElement) {
         return jsonElement
             .GetProperty("denormalized")
             .EnumerateObject()
             .First()
             .Value
-            .GetProperty("data")
-            .Deserialize<T>()!;
+            .GetProperty("data");
+    }
+    
+    internal static T GetDernormalizedData<T>(this JsonElement jsonElement) {
+        return GetDernormalizedData(jsonElement).Deserialize<T>()!;
+    }
+    
+    internal static JsonElement MergeJson(JsonElement restJson, JsonElement phpJson) {
+        restJson = GetDernormalizedData(restJson);
+        
+        var outputBuffer = new ArrayBufferWriter<byte>();
+        using var writer = new Utf8JsonWriter(outputBuffer);
+        writer.WriteStartObject();
+        
+        // .Where(p => !phpJson.TryGetProperty(p.Name, out _))
+        foreach (var p in restJson.EnumerateObject()) {
+            p.WriteTo(writer);
+        }
+        
+        foreach (var p in phpJson.EnumerateObject()) {
+            p.WriteTo(writer);
+        }
+        
+        writer.WriteEndObject();
+        writer.Flush();
+        
+        return JsonDocument.Parse(outputBuffer.WrittenMemory).RootElement;
     }
 }
