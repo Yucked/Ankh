@@ -33,4 +33,4 @@ public sealed record RestOutfitModel(
     int[] ProductIds,
     [property: JsonPropertyName("privacy")]
     string Privacy // TODO: Figure out Privacy
-) : IRestModel;
+) ;

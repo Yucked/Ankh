@@ -97,4 +97,4 @@ public record RestUserModel(
     int VipPlatform,
     [property: JsonPropertyName("has_legacy_vip")]
     bool HasLegacyVip
-) : IRestModel;
+);

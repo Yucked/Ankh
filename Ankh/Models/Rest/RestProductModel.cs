@@ -85,7 +85,7 @@ public record RestProductModel(
     [property: JsonPropertyName("allow_derived_nft_minting"),
                JsonConverter(typeof(IntToBoolConverter))]
     bool AllowDerivedNftMinting
-) : IRestModel;
+);
 
 public record CategoryPath(
     [property: JsonPropertyName("id")]

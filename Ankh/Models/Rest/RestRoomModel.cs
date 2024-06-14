@@ -67,4 +67,4 @@ public record RestRoomModel(
     long CustomersRoomId,
     [property: JsonPropertyName("is_expired")]
     bool IsExpired
-) : IRestModel;
+);

@@ -19,4 +19,4 @@ public sealed record RestCreatorModel(
     bool IsMediaMaven,
     [property: JsonPropertyName("is_media_master")]
     bool IsMediaMaster
-) : IRestModel;
+) ;

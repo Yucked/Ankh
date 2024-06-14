@@ -40,4 +40,4 @@ public record RestAccountModel(
     string Email,
     [property: JsonPropertyName("last_password_change")]
     string LastPasswordChange
-) : IRestModel;
+);
