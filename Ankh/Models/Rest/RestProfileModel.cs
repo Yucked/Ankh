@@ -20,4 +20,4 @@ public record RestProfileModel(
     [property: JsonPropertyName("approx_follower_count")]
     int Followers,
     [property: JsonPropertyName("approx_following_count")]
-    int Following) : IRestModel;
+    int Following) ;
