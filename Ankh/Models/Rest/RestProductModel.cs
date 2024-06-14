@@ -1,7 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using Ankh.Converters;
 using Ankh.Models.Enums;
-using Ankh.Models.Rest;
 
 // ReSharper disable All
 
@@ -34,10 +33,10 @@ public record RestProductModel(
     [property: JsonPropertyName("derivation_profit")]
     long DerivationProfit,
     [property: JsonPropertyName("allows_derivation"),
-               JsonConverter(typeof(IntToBoolConverter))]
+               JsonConverter(typeof(ValueToBoolConverter))]
     bool AllowsDerivation,
     [property: JsonPropertyName("allow_third_party_bundle"),
-               JsonConverter(typeof(IntToBoolConverter))]
+               JsonConverter(typeof(ValueToBoolConverter))]
     bool AllowThirdPartyBundle,
     [property: JsonPropertyName("product_image")]
     string Image,
@@ -60,7 +59,7 @@ public record RestProductModel(
     [property: JsonPropertyName("gender_restriction")]
     string GenderRestriction,
     [property: JsonPropertyName("is_bundable"),
-               JsonConverter(typeof(IntToBoolConverter))]
+               JsonConverter(typeof(ValueToBoolConverter))]
     bool IsBundable,
     [property: JsonPropertyName("is_visible")]
     bool IsVisible,
@@ -83,7 +82,7 @@ public record RestProductModel(
     [property: JsonPropertyName("preview_image")]
     Uri PreviewImage,
     [property: JsonPropertyName("allow_derived_nft_minting"),
-               JsonConverter(typeof(IntToBoolConverter))]
+               JsonConverter(typeof(ValueToBoolConverter))]
     bool AllowDerivedNftMinting
 );
 
