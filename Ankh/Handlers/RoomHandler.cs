@@ -111,24 +111,31 @@ public sealed class RoomHandler(
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="userSauce"></param>
     /// <param name="userIds"></param>
     /// <returns></returns>
-    public async ValueTask<IDictionary<long, VURoomModel[]>> GetPublicRoomsForUsersAsync(params long[] userIds) {
+    public async ValueTask<IDictionary<long, BaseRoomModel[]>> GetPublicRoomsForUsersAsync(
+        UserSauce userSauce,
+        params long[] userIds) {
         var jsonElement =
             await httpClient.GetJsonAsync(x => {
-                x.RequestUri = $"https://client-dynamic.imvu.com/api/find_locations.php?cids={userIds}".AsUri();
+                x.RequestUri =
+                    $"https://client-dynamic.imvu.com/api/find_locations.php?cids={string.Join(',', userIds)}".AsUri();
+                x.Headers.WithAuthentication(userSauce);
             });
         
-        return jsonElement
-            .GetProperty("result")
-            .EnumerateObject()
-            .Select(x => {
-                var rooms = x.Value
-                    .EnumerateArray()
-                    .Select(y => y.Deserialize<VURoomModel>())
-                    .ToArray();
-                return (long.Parse(x.Name), rooms);
-            })
-            .ToDictionary(x => x.Item1, y => y.rooms)!;
+        var results = jsonElement.GetProperty("result");
+        return (results.ValueKind == JsonValueKind.Array
+            ? null
+            : results
+                .EnumerateObject()
+                .Select(x => {
+                    var rooms = x.Value
+                        .EnumerateArray()
+                        .Select(y => y.Deserialize<BaseRoomModel>())
+                        .ToArray();
+                    return (long.Parse(x.Name), rooms);
+                })
+                .ToDictionary(x => x.Item1, y => y.rooms))!;
     }
 }
