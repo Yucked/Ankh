@@ -29,11 +29,11 @@ public sealed class UserHandlerTests {
     [DataTestMethod]
     [DataRow(347951586, 327222770, 350843753, 116678358, 121197925)]
     public async Task Test_GetUsersByIdAsync(params int[] userIds) {
-        var userSauce = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
-        Assert.IsNotNull(userSauce);
-        Assert.IsNotNull(userSauce.Auth);
+        var userLogin = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
+        Assert.IsNotNull(userLogin);
+        Assert.IsNotNull(userLogin.SessionId);
         
-        var users = await Globals.UserHandler.GetUsersByIdAsync(userSauce, userIds);
+        var users = await Globals.UserHandler.GetUsersByIdAsync(userLogin, userIds);
         Assert.IsNotNull(users);
         Assert.IsTrue(users.Count > 0);
     }
@@ -51,18 +51,18 @@ public sealed class UserHandlerTests {
     
     [TestMethod]
     public async Task Test_LoginAsync() {
-        var userSauce = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
-        Assert.IsNotNull(userSauce);
-        Assert.IsNotNull(userSauce.Auth);
+        var userLogin = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
+        Assert.IsNotNull(userLogin);
+        Assert.IsNotNull(userLogin.SessionId);
     }
     
     [TestMethod]
     public async Task Test_GetUserOutfitsAsync() {
-        var userSauce = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
-        Assert.IsNotNull(userSauce);
-        Assert.IsNotNull(userSauce.Auth);
+        var userLogin = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
+        Assert.IsNotNull(userLogin);
+        Assert.IsNotNull(userLogin.SessionId);
         
-        var outfits = await Globals.UserHandler.GetUserOutfitsAsync(userSauce);
+        var outfits = await Globals.UserHandler.GetUserOutfitsAsync(userLogin);
         Assert.IsNotNull(outfits);
         Assert.IsTrue(outfits.Length > 0);
     }
