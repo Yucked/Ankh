@@ -10,7 +10,10 @@ public sealed class Database(
     RoomHandler roomHandler,
     ProductHandler productHandler,
     IConfiguration configuration) {
-    public static IReadOnlyCollection<UserLogin> Logins;
+    public static IReadOnlyList<UserLogin> Logins;
+    
+    public static UserLogin RandomLogin
+        => Logins[Random.Shared.Next(Logins.Count - 1)];
     
     public async ValueTask GetOrUpdateLoggedInUsersAsync() {
         using var session = documentStore.OpenAsyncSession();
