@@ -84,4 +84,19 @@ public sealed class VUController(
         await database.SaveAsync(room);
         return Ok(room);
     }
+    
+    [HttpPost("history-username")]
+    public ValueTask<IActionResult> GetUsernameHistoryAsync(Response response) {
+        return ValueTask.FromResult<IActionResult>(Ok());
+    }
+    
+    [HttpPost("history-user-rooms")]
+    public ValueTask<IActionResult> GetUserRoomHistoryAsync(Response response) {
+        return ValueTask.FromResult<IActionResult>(Ok());
+    }
+    
+    [HttpGet("rip-product")]
+    public ValueTask<IActionResult> RipProductAsync(Response response) {
+        return ValueTask.FromResult<IActionResult>(Ok());
+    }
 }
