@@ -33,7 +33,8 @@ public class ProductHandlerTests {
     [DataRow("Tomie")]
     [DataRow("Temia")]
     public async Task Test_GetProductsByCreatorAsync(string username) {
-        var products = await Globals.ProductHandler.GetProductsByCreatorAsync(username);
+        var userLogin = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
+        var products = await Globals.ProductHandler.GetProductsByCreatorAsync(username, userLogin);
         Assert.IsNotNull(products);
     }
     
@@ -44,8 +45,8 @@ public class ProductHandlerTests {
     [DataRow(142712680)]
     [DataRow(364103319)]
     public async Task Test_GetCreatorInformationAsync(int userId) {
-        var userSauce = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
-        var creator = await Globals.ProductHandler.GetCreatorInformationAsync(userSauce, userId);
+        var userLogin = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
+        var creator = await Globals.ProductHandler.GetCreatorInformationAsync(userLogin, userId);
         Assert.IsNotNull(creator);
         Assert.IsNotNull(creator.CreatorTier);
     }

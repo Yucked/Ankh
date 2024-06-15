@@ -7,25 +7,26 @@ public sealed class RoomHandlerTests {
     [DataRow("263636495-130")]
     [DataRow("347951586-161")]
     public async Task Test_GetRoomByIdAsync(string roomId) {
-        var room = await Globals.RoomHandler.GetRoomByIdAsync(roomId);
+        var userLogin = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
+        var room = await Globals.RoomHandler.GetRoomByIdAsync(roomId, userLogin);
         Assert.IsNotNull(room.Name);
     }
     
     [DataTestMethod]
     [DataRow("Query")]
     public async Task Test_SearchRoomsAsync(string kw) {
-        var userSauce = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
-        Assert.IsNotNull(userSauce);
-        Assert.IsNotNull(userSauce.Auth);
+        var userLogin = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
+        Assert.IsNotNull(userLogin);
+        Assert.IsNotNull(userLogin.SessionId);
         
-        await Globals.RoomHandler.SearchRoomsAsync(userSauce, q => { q.Keywords = kw; });
+        await Globals.RoomHandler.SearchRoomsAsync(userLogin, q => { q.Keywords = kw; });
     }
     
     [DataTestMethod]
     [DataRow(347951586)]
     public async Task Test_GetPublicRoomsForUsersAsync(long userId) {
-        var userSauce = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
-        var rooms = await Globals.RoomHandler.GetPublicRoomsForUsersAsync(userSauce, userId);
+        var userLogin = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
+        var rooms = await Globals.RoomHandler.GetPublicRoomsForUsersAsync(userLogin, userId);
         Assert.IsNotNull(rooms);
     }
 }
