@@ -7,7 +7,8 @@ namespace Ankh.Backend.Workers;
 
 public sealed class StartupWorker(
     IDocumentStore documentStore,
-    ILogger<StartupWorker> logger) : BackgroundService {
+    ILogger<StartupWorker> logger,
+    Database database) : BackgroundService {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
         try {
             await documentStore
@@ -22,6 +23,8 @@ public sealed class StartupWorker(
                         Disabled = false
                     }
                 }), stoppingToken);
+            
+            await database.GetOrUpdateLoggedInUsersAsync();
         }
         catch {
             logger.LogWarning("Raven operations already in place.");
