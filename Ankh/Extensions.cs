@@ -31,7 +31,8 @@ public static class Extensions {
         "Mozilla/5.0 (Mac OS X 10_15_7) AppleWebKit/605.1.15 Safari/605.1.15",
         "Mozilla/5.0 (Linux x86_64) Chrome/91.0.4472.114 Safari/537.36",
         "Mozilla/5.0 (iPhone; CPU iOS 14_4_2) AppleWebKit/605.1.15 Mobile/15E148",
-        "Mozilla/5.0 (Win10; rv:89.0) Gecko/20100101 Firefox/89.0"
+        "Mozilla/5.0 (Win10; rv:89.0) Gecko/20100101 Firefox/89.0",
+        $"IMVU Client/{Random.Shared.Next(500, 550)}.0 Python-urllib/2.7"
     ];
     
     internal static readonly IDictionary<string, string> JsonKeyReplacements
