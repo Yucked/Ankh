@@ -1,0 +1,29 @@
+services:
+    raven_n01:
+        image: ravendb/ravendb:ubuntu-latest
+        container_name: raven_n01
+        restart: unless-stopped
+        ports:
+            - "9000:8080"
+            - "9001:38888"
+        networks:
+            - net-grim
+        environment:
+            - RAVEN_Setup_Mode=None
+            - RAVEN_License_Eula_Accepted=true
+
+    raven_n02:
+        image: ravendb/ravendb:ubuntu-latest
+        container_name: raven_n02
+        restart: unless-stopped
+        ports:
+            - "9002:8080"
+            - "9003:38888"
+        networks:
+            - net-grim
+        environment:
+            - RAVEN_Setup_Mode=None
+            - RAVEN_License_Eula_Accepted=true
+
+networks:
+    net-grim:
