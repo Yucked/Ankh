@@ -56,7 +56,7 @@ public sealed class Database(
         await session.SaveChangesAsync();
     }
     
-    public async ValueTask<IReadOnlyCollection<T>> RevisionsAsync<T>(string id) {
+    public async ValueTask<IReadOnlyCollection<T>> GetRevisionsAsync<T>(string id) {
         using var session = documentStore.OpenAsyncSession();
         return await session.Advanced.Revisions.GetForAsync<T>(id);
     }
