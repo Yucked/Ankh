@@ -7,8 +7,6 @@ namespace Ankh.Backend;
 public sealed class Database(
     IDocumentStore documentStore,
     UserHandler userHandler,
-    RoomHandler roomHandler,
-    ProductHandler productHandler,
     IConfiguration configuration) {
     public static IReadOnlyList<UserLogin> Logins;
     
@@ -25,14 +23,14 @@ public sealed class Database(
         }
         
         var tasks = configuration
-            .GetSection("VUAccounts")
+            .GetSection("Accounts")
             .Get<string[]>()!
             .Select(x => userHandler.LoginAsync(x.Split(';')[0], x.Split(';')[1]));
         
         Logins = await Task.WhenAll(tasks);
         foreach (var account in Logins) {
             await session.StoreAsync(account);
-            var userLogin = await session.LoadAsync<UserLogin>($"{account.UserId}");
+            var userLogin = await session.LoadAsync<UserLogin>(account.Id);
             var metadata = session.Advanced.GetMetadataFor(userLogin);
             metadata.Add("LAST_UPDATE", $"{DateTimeOffset.Now}");
         }
