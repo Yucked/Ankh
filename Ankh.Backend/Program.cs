@@ -1,6 +1,6 @@
+using Ankh;
 using Ankh.Backend;
 using Ankh.Backend.Workers;
-using Ankh.Handlers;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Playwright;
 using Raven.Client.Documents;
@@ -17,10 +17,8 @@ var builder = WebApplication.CreateSlimBuilder();
 builder.Services.AddControllers();
 builder.Services
     .AddSingleton<Database>()
-    .AddSingleton<UserHandler>()
-    .AddSingleton<RoomHandler>()
-    .AddSingleton<ProductHandler>()
     .AddSingleton(browser)
+    .AddAnkh()
     .AddHttpClient()
     .AddLogging(x => {
         x.ClearProviders();
@@ -35,7 +33,7 @@ builder.Services
     .AddSingleton<IDocumentStore>(x => new DocumentStore {
         Urls = x.GetService<IConfiguration>()!.GetSection("RavenNodes").Get<string[]>(),
         Conventions = {
-            CreateHttpClient = f => x.GetService<IHttpClientFactory>()!.CreateClient("RavenDB"),
+            CreateHttpClient = _ => x.GetService<IHttpClientFactory>()!.CreateClient("RavenDB"),
             UseOptimisticConcurrency = true,
             MaxNumberOfRequestsPerSession = 30,
             RequestTimeout = TimeSpan.FromSeconds(2)

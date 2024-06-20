@@ -37,7 +37,7 @@ public sealed class InfoController(
             return Ok(room);
         }
         
-        room = await roomHandler.GetRoomByIdAsync(roomId, Database.RandomLogin);
+        room = await roomHandler.GetRoomByIdAsync(Database.RandomLogin, roomId);
         await database.SaveAsync(room);
         return Ok(room);
     }
