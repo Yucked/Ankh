@@ -1,7 +1,6 @@
 ﻿using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Ankh.Models.Rest;
 using Ankh.Models.Rework;
 using Microsoft.Extensions.Logging;
@@ -11,21 +10,6 @@ namespace Ankh.Handlers;
 public sealed class UserHandler(
     ILogger<UserHandler> logger,
     HttpClient httpClient) {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="Username"></param>
-    /// <param name="Password"></param>
-    /// <param name="SecurityCode"></param>
-    private readonly record struct LoginPayload(
-        [property: JsonPropertyName("username")]
-        string Username,
-        [property: JsonPropertyName("password")]
-        string Password,
-        [property: JsonPropertyName("2fa_code"),
-                   JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        string? SecurityCode);
-    
     /// <summary>
     /// 
     /// </summary>
@@ -149,13 +133,16 @@ public sealed class UserHandler(
     /// <param name="mfaCode"></param>
     /// <returns></returns>
     public async Task<UserLogin> LoginAsync(string username, string password, string mfaCode = "") {
-        using var responseMessage = await httpClient.PostAsync("https://api.imvu.com/login",
-            JsonContent.Create(new LoginPayload {
-                Username = username,
-                Password = password,
-                SecurityCode = string.IsNullOrWhiteSpace(mfaCode) ? null : mfaCode
-            }));
+        var dict = new Dictionary<string, string>() {
+            { "username", username },
+            { "password", password }
+        };
         
+        if (!string.IsNullOrWhiteSpace(mfaCode)) {
+            dict.Add("2fa_code", mfaCode);
+        }
+        
+        using var responseMessage = await httpClient.PostAsync("https://api.imvu.com/login", JsonContent.Create(dict));
         using var document = await JsonDocument.ParseAsync(await responseMessage.Content.ReadAsStreamAsync());
         if (!document.RootElement.TryGetProperty("error", out var errorElement)) {
             var data = document
@@ -184,7 +171,7 @@ public sealed class UserHandler(
                 Username = username,
                 Password = password,
                 Sauce = sauce,
-                UserId = int.Parse(userId),
+                Id = userId,
                 SessionId = loginId
             };
         }
@@ -206,7 +193,7 @@ public sealed class UserHandler(
     public async Task<RestOutfitModel?[]> GetUserOutfitsAsync(UserLogin userLogin) {
         var jsonElement = await httpClient.GetJsonAsync(x => {
             x.Headers.WithAuthentication(userLogin);
-            x.RequestUri = $"https://api.imvu.com/user/user-{userLogin.UserId}/outfits?sort=purchased&sort_order=desc"
+            x.RequestUri = $"https://api.imvu.com/user/user-{userLogin.Id}/outfits?sort=purchased&sort_order=desc"
                 .AsUri();
         });
         

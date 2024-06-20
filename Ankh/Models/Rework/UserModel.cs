@@ -3,7 +3,8 @@
 namespace Ankh.Models.Rework;
 
 public record UserModelEssential {
-    public int UserId { get; init; }
+    [JsonPropertyName("id")]
+    public string Id { get; init; }
     public string Username { get; init; }
 }
 
@@ -13,7 +14,9 @@ public record UserLogin : UserModelEssential {
     public string SessionId { get; init; }
 }
 
-public record UserModelMinimal : UserModelEssential { }
+public record UserModelMinimal : UserModelEssential {
+    
+}
 
 public record UserModelCommon : UserModelMinimal {
     public string ProfileImage { get; init; }
@@ -28,4 +31,4 @@ public record UserModelCommon : UserModelMinimal {
     public int Age { get; init; }
 }
 
-public record UserModel { }
+public record UserModel : UserModelCommon { }

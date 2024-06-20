@@ -8,7 +8,7 @@ public sealed class RoomHandlerTests {
     [DataRow("347951586-161")]
     public async Task Test_GetRoomByIdAsync(string roomId) {
         var userLogin = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
-        var room = await Globals.RoomHandler.GetRoomByIdAsync(roomId, userLogin);
+        var room = await Globals.RoomHandler.GetRoomByIdAsync(userLogin, roomId);
         Assert.IsNotNull(room.Name);
     }
     

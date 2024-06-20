@@ -17,7 +17,7 @@ public sealed class RoomHandler(
     /// <param name="userLogin"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public async ValueTask<RoomModel> GetRoomByIdAsync(string roomId, UserLogin userLogin) {
+    public async ValueTask<RoomModel> GetRoomByIdAsync(UserLogin userLogin, string roomId ) {
         ArgumentException.ThrowIfNullOrWhiteSpace(roomId);
         
         try {
@@ -101,7 +101,7 @@ public sealed class RoomHandler(
         
         var jsonElement = await httpClient
             .GetJsonAsync(x => {
-                x.RequestUri = $"https://api.imvu.com/user/user-{userLogin.UserId}/filtered_rooms?{queryBuilder}"
+                x.RequestUri = $"https://api.imvu.com/user/user-{userLogin.Id}/filtered_rooms?{queryBuilder}"
                     .AsUri();
                 x.Headers.WithAuthentication(userLogin);
             });

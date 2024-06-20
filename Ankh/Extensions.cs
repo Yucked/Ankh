@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using Ankh.Handlers;
 using Ankh.Models.Rework;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Ankh;
 
@@ -57,6 +58,19 @@ public static class Extensions {
     
     internal static Uri AsUri(this string str) {
         return new Uri(str);
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="serviceCollection"></param>
+    /// <returns></returns>
+    public static IServiceCollection AddAnkh(this IServiceCollection serviceCollection) {
+        return serviceCollection
+            .AddSingleton<UserHandler>()
+            .AddSingleton<RoomModel>()
+            .AddSingleton<ProductHandler>()
+            .AddSingleton<Spyder>();
     }
     
     /// <summary>
