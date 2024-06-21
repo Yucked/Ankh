@@ -19,7 +19,8 @@ public sealed class Spyder(
         "googletagmanager",
         "googlesyndication",
         "disqus",
-        "ads"
+        "ads",
+        "analytic"
     ];
     
     public async Task<IPage?> RequestPageAsync(string url) {
@@ -28,7 +29,7 @@ public sealed class Spyder(
         
         await page.RouteAsync("**/*", async route => {
             if (BlockedResources.Any(y => route.Request.Url.Contains(y))) {
-                logger.LogWarning("Route matched with blocked resources, aborted: {}", route.Request.Url);
+                logger.LogDebug("Route matched with blocked resources, aborted: {}", route.Request.Url);
                 await route.AbortAsync();
                 return;
             }
@@ -36,10 +37,7 @@ public sealed class Spyder(
             await route.ContinueAsync();
         });
         
-        var response = await page.GotoAsync(url, new PageGotoOptions {
-            WaitUntil = WaitUntilState.NetworkIdle
-        });
-        
+        var response = await page.GotoAsync(url);
         if (response?.Ok is not true) {
             logger.LogError("Playwright couldn't fetch {}", url);
             return null;
