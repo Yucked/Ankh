@@ -27,7 +27,7 @@ builder.Services
             f.UseUtcTimestamp = true;
             f.IncludeScopes = true;
             f.SingleLine = false;
-            f.TimestampFormat = "yy/MM/dd HH:mm:ss ";
+            f.TimestampFormat = "dd/MM/yy HH:mm:ss ";
         });
     })
     .AddSingleton<IDocumentStore>(x => new DocumentStore {
