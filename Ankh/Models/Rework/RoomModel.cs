@@ -72,7 +72,7 @@ public record RoomModel : RoomModelCommon {
     [JsonPropertyName("themed_image_url")]
     public string ThemedImageUrl { get; set; }
     
-    [JsonPropertyName("occupancy")]
+    [JsonPropertyName("occupancy"), JsonConverter(typeof(NullToIntConverter))]
     public int Occupancy { get; set; }
     
     [JsonPropertyName("language_code")]
@@ -173,8 +173,8 @@ public record RoomModel : RoomModelCommon {
     [JsonPropertyName("last_modified"), JsonConverter(typeof(DateTimeConverter))]
     public DateTime LastModified { get; set; }
     
-    [JsonPropertyName("participants")]
-    public UserModelMinimal[] Participants { get; set; }
+    [JsonPropertyName("participants"), JsonConverter(typeof(ParticipantsConverter))]
+    public IDictionary<string, DateTime> Participants { get; set; }
     
     [JsonPropertyName("room_download_size")]
     public long RoomDownloadSize { get; set; }
