@@ -15,7 +15,12 @@ public sealed class StartupWorker(
                 .Maintenance
                 .Server
                 .SendAsync(new CreateDatabaseOperation(new DatabaseRecord(nameof(Ankh))), stoppingToken);
-            
+        }
+        catch {
+            logger.LogWarning("Database already exists.");
+        }
+        
+        try {
             await documentStore
                 .Maintenance
                 .SendAsync(new ConfigureRevisionsOperation(new RevisionsConfiguration {
@@ -23,11 +28,11 @@ public sealed class StartupWorker(
                         Disabled = false
                     }
                 }), stoppingToken);
-            
-            await database.GetOrUpdateLoggedInUsersAsync();
         }
         catch {
-            logger.LogWarning("Raven operations already in place.");
+            logger.LogWarning("Revisions already enabled.");
         }
+        
+        await database.GetOrUpdateLoggedInUsersAsync();
     }
 }
