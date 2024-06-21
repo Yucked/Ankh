@@ -9,7 +9,8 @@ public sealed class RoomCacheWorker(
     Database database,
     ILogger<RoomCacheWorker> logger) : BackgroundService {
     private const string ROOMS_URL = "https://www.imvu.com/rooms";
-    private readonly HashSet<string> _roomIds = new();
+    private readonly HashSet<string> _failedUrls = new();
+    private readonly SemaphoreSlim _semaphoreSlim = new(2, 5);
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
         var letterTracker = string.Empty;
@@ -28,10 +29,7 @@ public sealed class RoomCacheWorker(
                     stoppingToken,
                     HandleLetterAsync);
                 
-                await Parallel.ForEachAsync(_roomIds, stoppingToken, async (x, _) => {
-                    var roomModel = await roomHandler.GetRoomByIdAsync(Database.RandomLogin, x);
-                    await database.SaveAsync(roomModel);
-                });
+                await GetRoomsInformationAsync(_failedUrls, stoppingToken);
             }
             catch (Exception exception) {
                 logger.LogError("{exception}", exception);
@@ -44,35 +42,38 @@ public sealed class RoomCacheWorker(
             return;
         }
         
+        await _semaphoreSlim.LockAsync(stoppingToken);
+        var requestUrl = string.Empty;
         try {
-            bool goToNext;
-            var requestUrl = $"{ROOMS_URL}/{href}";
-            
-            do {
+            foreach (var i in Enumerable.Range(0, 150)) {
+                requestUrl = $"{ROOMS_URL}/{href}&page={i}";
                 var page = (await spyder.RequestPageAsync(requestUrl))!;
                 
-                // Get next page
-                var nextPage = (await page.QuerySelectorAllAsync("div[align] > a")).LastOrDefault();
-                if (nextPage == null) {
-                    logger.LogError("Unable to find next page element for {}", page.Url);
-                    return;
+                var roomDirectoryElement = await page.QuerySelectorAllAsync("a.roomdirectory-link");
+                if (!roomDirectoryElement.Any()) {
+                    logger.LogWarning("No more links to parse on {}. Skipping to next letter.", page.Url);
+                    break;
                 }
                 
-                goToNext = await nextPage.TextContentAsync() == "Previous";
-                requestUrl = $"{ROOMS_URL}{await nextPage.GetAttributeAsync("href")}";
-                
-                // Parse links on current page
-                var roomDirectoryElement = await page.QuerySelectorAllAsync("a.roomdirectory-link");
                 var roomHrefElement = await roomDirectoryElement
                     .Select(x => x.GetAttributeAsync("href"))
                     .WhenAll();
                 
                 var roomIds = roomHrefElement.Select(x => x![(x.IndexOf('=') + 1)..]);
-                _roomIds.UnionWith(roomIds);
-            } while (goToNext);
+                await GetRoomsInformationAsync(roomIds, stoppingToken);
+            }
         }
-        catch (Exception exception) {
-            logger.LogError("{exception}", exception);
+        catch (Exception e) {
+            logger.LogError("{e}", e);
+            _failedUrls.Add(requestUrl);
         }
+    }
+    
+    private async ValueTask GetRoomsInformationAsync(IEnumerable<string> roomIds, CancellationToken stoppingToken) {
+        await _semaphoreSlim.LockAsync(stoppingToken);
+        await Parallel.ForEachAsync(roomIds, stoppingToken, async (x, _) => {
+            var roomModel = await roomHandler.GetRoomByIdAsync(Database.RandomLogin, x);
+            await database.SaveAsync(roomModel);
+        });
     }
 }
