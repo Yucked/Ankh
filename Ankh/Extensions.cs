@@ -1,6 +1,7 @@
 ﻿using System.Buffers;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using Ankh.Handlers;
 using Ankh.Models.Rework;
@@ -45,7 +46,9 @@ public static class Extensions {
             { "room_pid", "id" },
             { "room_instance_id", "id" },
             { "is_age_verified_only", "is_age_verified" },
-            { "customers_id", "id" },
+            // WHAT IS THSI FOR? { "customers_id", "id" },
+            
+            // User Object
             { "avatar_name", "username" },
             { "avname", "username" },
             { "avatar_download_size", "size" },
@@ -53,7 +56,7 @@ public static class Extensions {
             { "legacy_cid", "id" },
             { "cid", "id" },
             { "avatar_image", "profileImage" },
-            { "avpic_url", "profileImage" },
+            { "avpic_url", "profileImage" }
         };
     
     internal static Uri AsUri(this string str) {
@@ -68,7 +71,7 @@ public static class Extensions {
     public static IServiceCollection AddAnkh(this IServiceCollection serviceCollection) {
         return serviceCollection
             .AddSingleton<UserHandler>()
-            .AddSingleton<RoomModel>()
+            .AddSingleton<RoomHandler>()
             .AddSingleton<ProductHandler>()
             .AddSingleton<Spyder>();
     }
@@ -111,6 +114,15 @@ public static class Extensions {
         return document.RootElement;
     }
     
+    public static async ValueTask GetXMLAsync(this HttpClient httpClient,
+                                              string requestUrl,
+                                              string content) {
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+        requestMessage.Content = new StringContent(content, Encoding.UTF8, "application/xml");
+        using var responseMessage = await httpClient.SendAsync(requestMessage);
+        var responseContent = await responseMessage.Content.ReadAsStringAsync();
+    }
+    
     internal static void WithAuthentication(this HttpRequestHeaders requestHeaders, UserLogin userLogin) {
         requestHeaders.Add("Cookie", $"osCsid={userLogin.SessionId}");
     }
@@ -135,7 +147,6 @@ public static class Extensions {
         using var writer = new Utf8JsonWriter(outputBuffer);
         writer.WriteStartObject();
         
-        // .Where(p => !phpJson.TryGetProperty(p.Name, out _))
         foreach (var p in restJson.EnumerateObject()) {
             p.WriteTo(writer);
         }
