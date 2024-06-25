@@ -16,17 +16,21 @@ public sealed class UserHandler(
     /// <param name="userId"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public async ValueTask<RestUserModel> GetUserByIdAsync(long userId) {
-        if (userId <= 0) {
-            throw new ArgumentException("Can't be less than or equal to 0.", nameof(userId));
-        }
+    public async ValueTask<UserModel> GetUserByIdAsync(string userId) {
+        ArgumentException.ThrowIfNullOrWhiteSpace(userId);
         
         try {
-            var jsonElement = await httpClient.GetJsonAsync(x => {
+            var restJson = await httpClient.GetJsonAsync(x => {
                 x.RequestUri = $"https://api.imvu.com/user/user-{userId}".AsUri();
             });
             
-            return jsonElement.GetDernormalizedData<RestUserModel>();
+            var phpJson = await httpClient.GetJsonAsync(x => {
+                x.RequestUri = $"https://client-dynamic.imvu.com/api/avatarcard.php?cid={userId}".AsUri();
+            });
+            
+            return Extensions
+                .MergeJson(restJson, phpJson)
+                .Deserialize<UserModel>()!;
         }
         catch (Exception exception) {
             logger.LogError("{exception.Message}", exception.Message);
@@ -61,30 +65,16 @@ public sealed class UserHandler(
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="userLogin"></param>
     /// <param name="userIds"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public async ValueTask<IReadOnlyList<RestUserModel>> GetUsersByIdAsync(UserLogin userLogin, params int[] userIds) {
+    public async ValueTask<IReadOnlyList<UserModel>> GetUsersByIdAsync(params string[] userIds) {
         if (userIds.Length == 0) {
             throw new Exception($"{nameof(userIds)} can't be null or empty.");
         }
         
         try {
-            var userIdUrls = userIds
-                .Select(x => $"https://api.imvu.com/user/user-{x}")
-                .ToArray();
-            
-            var jsonElement = await httpClient.GetJsonAsync(x => {
-                x.Headers.WithAuthentication(userLogin);
-                x.RequestUri = $"https://api.imvu.com/user?id={string.Join(',', userIdUrls)}".AsUri();
-            });
-            
-            return jsonElement
-                .GetProperty("denormalized")
-                .EnumerateObject()
-                .Select(x => x.Value.GetProperty("data").Deserialize<RestUserModel>())
-                .ToArray()!;
+            return await Task.WhenAll(userIds.Select(GetUserByIdAsync).Select(x => x.AsTask()));
         }
         catch (Exception exception) {
             logger.LogError("{exception.Message}", exception.Message);
@@ -97,7 +87,7 @@ public sealed class UserHandler(
     /// </summary>
     /// <param name="username"></param>
     /// <returns></returns>
-    public async Task<long> GetIdFromUsernameAsync(string username) {
+    public async Task<string> GetIdFromUsernameAsync(string username) {
         using var data = new StringContent(
             $"""
                          <methodCall>
@@ -114,15 +104,15 @@ public sealed class UserHandler(
             Encoding.UTF8, "application/xml");
         
         using var responseMessage =
-            await httpClient.PostAsync("https://secure.imvu.com//catalog/skudb/gateway.php", data);
+            await httpClient.PostAsync("https://secure.imvu.com/catalog/skudb/gateway.php", data);
         if (!responseMessage.IsSuccessStatusCode) {
             logger.LogError("{ReasonPhrase}", responseMessage.ReasonPhrase);
-            return default;
+            return string.Empty;
         }
         
         ReadOnlyMemory<byte> byteData = await responseMessage.Content.ReadAsByteArrayAsync();
         var slice = byteData[106..byteData.Span.IndexOf("</int>"u8)];
-        return int.Parse(Encoding.UTF8.GetString(slice.Span));
+        return Encoding.UTF8.GetString(slice.Span);
     }
     
     /// <summary>
