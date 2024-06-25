@@ -1,5 +1,4 @@
 using Ankh.Handlers;
-using Ankh.Models.Rest;
 using Ankh.Models.Rework;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,12 +15,12 @@ public sealed class InfoController(
             return BadRequest($"Missing {nameof(userId)} in request.");
         }
         
-        var user = await database.GetByIdAsync<RestUserModel>(userId);
+        var user = await database.GetByIdAsync<UserModel>(userId);
         if (!string.IsNullOrWhiteSpace(user.Username)) {
             return Ok(user);
         }
         
-        user = await userHandler.GetUserByIdAsync(int.Parse(userId));
+        user = await userHandler.GetUserByIdAsync(userId);
         await database.SaveAsync(user);
         return Ok(user);
     }
