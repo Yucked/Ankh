@@ -9,7 +9,7 @@ public sealed class UserHandlerTests {
     [DataRow(116678358)]
     [DataRow(121197925)]
     public async Task Test_GetUserByIdAsync(int userId) {
-        var user = await Globals.UserHandler.GetUserByIdAsync(userId);
+        var user = await Globals.UserHandler.GetUserByIdAsync($"{userId}");
         Assert.IsNotNull(user);
         Assert.IsNotNull(user.Username);
     }
@@ -33,7 +33,7 @@ public sealed class UserHandlerTests {
         Assert.IsNotNull(userLogin);
         Assert.IsNotNull(userLogin.SessionId);
         
-        var users = await Globals.UserHandler.GetUsersByIdAsync(userLogin, userIds);
+        var users = await Globals.UserHandler.GetUsersByIdAsync(userLogin, userIds.Select(x => $"{x}").ToArray());
         Assert.IsNotNull(users);
         Assert.IsTrue(users.Count > 0);
     }
