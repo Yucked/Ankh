@@ -171,10 +171,10 @@ public record RoomModel : RoomModelCommon {
     public bool IsGreylisted { get; set; }
     
     [JsonPropertyName("last_modified"), JsonConverter(typeof(DateTimeConverter))]
-    public DateTime LastModified { get; set; }
+    public DateTimeOffset LastModified { get; set; }
     
     [JsonPropertyName("participants"), JsonConverter(typeof(ParticipantsConverter))]
-    public IDictionary<string, DateTime> Participants { get; set; }
+    public IDictionary<string, DateTimeOffset> Participants { get; set; }
     
     [JsonPropertyName("room_download_size")]
     public long RoomDownloadSize { get; set; }

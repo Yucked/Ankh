@@ -44,7 +44,7 @@ public record BadgeModel {
     
     [JsonPropertyName("flag_time"),
      JsonConverter(typeof(DateTimeConverter))]
-    public DateTime FlaggedOn { get; init; }
+    public DateTimeOffset FlaggedOn { get; init; }
 }
 
 public record BadgeModelProfile : BadgeModel {
