@@ -5,43 +5,98 @@ using Ankh.Models.Enums;
 
 namespace Ankh.Models.Rework;
 
-public record UserLogin : UserModelMinimal {
+public record UserLogin : BasicUserModel {
     public string Password { get; init; }
     public string Sauce { get; init; }
     public string SessionId { get; init; }
     public string SecurityKey { get; init; }
 }
 
-public record UserModelMinimal {
+public record BasicUserModel {
+    [JsonPropertyName("id"),
+     JsonConverter(typeof(IntToStringConverter))]
     public string Id { get; init; }
+    
+    [JsonPropertyName("username")]
     public string Username { get; init; }
 }
 
-public record UserModelCommon : UserModelMinimal {
-    [JsonPropertyName("registered"),
-     JsonConverter(typeof(DateTimeConverter))]
-    // TODO: Ignore the property in PHP or don't override
-    public DateTimeOffset RegisteredOn { get; init; }
+// Shares properties from Rest User/User, PHP User Avi Card, Rest Account
+public record MinimalUserModel : BasicUserModel {
+    [JsonPropertyName("age"),
+     JsonConverter(typeof(NullToIntConverter))]
+    public int Age { get; init; }
     
     [JsonPropertyName("gender"),
      JsonConverter(typeof(UserGenderConverter))]
     public string Gender { get; init; }
     
-    [JsonConverter(typeof(NullToIntConverter))]
-    public int Age { get; init; }
+    [JsonPropertyName("is_vip")]
+    public bool IsVip { get; init; }
+    
+    [JsonPropertyName("is_ap")]
+    public bool IsAp { get; init; }
+    
+    [JsonConverter(typeof(AvailabilityConverter))]
+    public Availability Availability { get; init; }
+    
+    [JsonPropertyName("is_ageverified")]
+    public bool IsAgeverified { get; init; }
+    
+    [JsonPropertyName("email")]
+    public string Email { get; init; }
+    
+    [JsonPropertyName("last_password_change")]
+    public DateTimeOffset LastPasswordChange { get; init; }
+}
+
+// Rest User account
+public record UserAccount : MinimalUserModel {
+    [JsonPropertyName("show_age")]
+    public bool IsAgeVisible { get; init; }
+    
+    [JsonPropertyName("show_gender")]
+    public bool IsGenderVisible { get; init; }
+    
+    [JsonPropertyName("show_ap")]
+    public bool IsApVisible { get; init; }
+    
+    [JsonPropertyName("show_vip")]
+    public bool IsVipVisible { get; init; }
+    
+    [JsonPropertyName("vip_expires")]
+    public string VipExpiration { get; init; }
+    
+    [JsonPropertyName("show_ageverified")]
+    public bool ShowAgeVerification { get; init; }
+    
+    [JsonPropertyName("show_location")]
+    public bool ShowLocation { get; init; }
+    
+    [JsonPropertyName("location")]
+    public string Location { get; init; }
+    
+    [JsonPropertyName("show_current_chat_room")]
+    public bool ShowCurrentChatRoom { get; init; }
+}
+
+public record UserModelCommon : BasicUserModel {
+    [JsonPropertyName("registered"),
+     JsonConverter(typeof(DateTimeConverter))]
+    // TODO: Ignore the property in PHP or don't override
+    public DateTime RegisteredOn { get; init; }
     
     [JsonPropertyName("badge_level")]
     public int BadgeLevel { get; init; }
     
+    [JsonPropertyName("tagline")]
     public string Tagline { get; init; }
     
     [JsonPropertyName("online")]
     public bool IsOnline { get; init; }
     
+    [JsonPropertyName("profileImage")]
     public string ProfileImage { get; init; }
-    
-    [JsonConverter(typeof(AvailabilityConverter))]
-    public Availability Availability { get; init; }
     
     [JsonConverter(typeof(UserInterestConverter))]
     public string Interests { get; init; }
@@ -71,20 +126,11 @@ public record UserModel : UserModelCommon {
     [JsonPropertyName("display_name")]
     public string DisplayName { get; init; }
     
-    [JsonPropertyName("is_vip")]
-    public bool IsVip { get; init; }
-    
-    [JsonPropertyName("is_ap")]
-    public bool IsAp { get; init; }
-    
     [JsonPropertyName("is_creator")]
     public bool IsCreator { get; init; }
     
     [JsonPropertyName("is_adult")]
     public bool IsAdult { get; init; }
-    
-    [JsonPropertyName("is_ageverified")]
-    public bool IsAgeverified { get; init; }
     
     [JsonPropertyName("is_staff")]
     public bool IsStaff { get; init; }
@@ -119,14 +165,8 @@ public record UserModel : UserModelCommon {
     [JsonPropertyName("ads_category_p")]
     public bool HasAdsCategory { get; init; }
     
-    [JsonPropertyName("email")]
-    public string Email { get; init; }
-    
     [JsonPropertyName("is_email_verified")]
     public bool IsEmailVerified { get; init; }
-    
-    [JsonPropertyName("last_password_change")]
-    public DateTimeOffset LastPasswordChange { get; init; }
     
     [JsonPropertyName("is_2fa_required")]
     public object Is2FaRequired { get; init; }
@@ -145,13 +185,16 @@ public record UserModel : UserModelCommon {
     public bool HasLegacyVip { get; init; }
     
     // PHP Properties
-    [JsonPropertyName("is_buddy")]
+    [JsonPropertyName("is_buddy"),
+     JsonConverter(typeof(ValueToBoolConverter))]
     public bool IsBuddy { get; init; }
     
-    [JsonPropertyName("is_friend")]
+    [JsonPropertyName("is_friend"),
+     JsonConverter(typeof(ValueToBoolConverter))]
     public bool IsFriend { get; init; }
     
-    [JsonPropertyName("is_qa")]
+    [JsonPropertyName("is_qa"),
+     JsonConverter(typeof(ValueToBoolConverter))]
     public bool IsQa { get; init; }
     
     [JsonPropertyName("last_login"),
