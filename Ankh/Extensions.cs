@@ -51,12 +51,13 @@ public static class Extensions {
             // User Object
             { "avatar_name", "username" },
             { "avname", "username" },
-            { "avatar_download_size", "size" },
+            { "avatar_download_size", "size" }, // Not sure where I got this from?
             { "avpic", "profileImage" },
             { "legacy_cid", "id" },
             { "cid", "id" },
-            { "avatar_image", "profileImage" },
-            { "avpic_url", "profileImage" }
+            //{ "avatar_image", "profileImage" }, Ignore this since avpic_url is better
+            { "avpic_url", "profileImage" },
+            { "location_state", "state" }
         };
     
     internal static Uri AsUri(this string str) {
