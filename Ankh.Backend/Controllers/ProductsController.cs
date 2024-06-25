@@ -1,6 +1,6 @@
 ﻿using Ankh.Api.Models;
 using Ankh.Handlers;
-using Ankh.Models.Rest;
+using Ankh.Models.Rework;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ankh.Backend.Controllers;
@@ -20,14 +20,14 @@ public sealed class ProductsController(
         }
         
         var sceneProducts = await productHandler.GetProductsInSceneAsync($"{response.Query}");
-        var result = new Dictionary<long, object>();
+        var result = new Dictionary<string, object>();
         
         foreach (var (key, value) in sceneProducts) {
-            var user = await database.GetByIdAsync<RestUserModel>(key);
+            var user = await database.GetByIdAsync<UserModel>(key);
             var products = new List<RestProductModel>();
             
             if (!string.IsNullOrWhiteSpace(user.Username)) {
-                user = await userHandler.GetUserByIdAsync(user.UserId);
+                user = await userHandler.GetUserByIdAsync(user.Id);
                 await database.SaveAsync(user);
             }
             
@@ -43,7 +43,7 @@ public sealed class ProductsController(
                 products.Add(product);
             });
             
-            result.Add(user.UserId, new {
+            result.Add(user.Id, new {
                 user,
                 products
             });
