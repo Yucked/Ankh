@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 using Ankh.Models.Enums;
 
-namespace Ankh.Converters;
+namespace Ankh.Converters.UserPropertiesConverters;
 
 public class AvailabilityConverter : JsonConverter<Availability> {
     public override Availability Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
