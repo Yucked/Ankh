@@ -84,7 +84,7 @@ public record UserModelCommon : BasicUserModel {
     [JsonPropertyName("registered"),
      JsonConverter(typeof(DateTimeConverter))]
     // TODO: Ignore the property in PHP or don't override
-    public DateTime RegisteredOn { get; init; }
+    public DateTimeOffset RegisteredOn { get; init; }
     
     [JsonPropertyName("badge_level")]
     public int BadgeLevel { get; init; }
@@ -121,21 +121,25 @@ public record UserModelCommon : BasicUserModel {
 public record UserModel : UserModelCommon {
     [JsonPropertyName("created"),
      JsonConverter(typeof(DateTimeConverter))]
-    public DateTime CreatedOn { get; init; }
+    public DateTimeOffset CreatedOn { get; init; }
     
     [JsonPropertyName("display_name")]
     public string DisplayName { get; init; }
     
-    [JsonPropertyName("is_creator")]
+    [JsonPropertyName("is_creator"),
+     JsonConverter(typeof(ValueToBoolConverter))]
     public bool IsCreator { get; init; }
     
-    [JsonPropertyName("is_adult")]
+    [JsonPropertyName("is_adult"),
+     JsonConverter(typeof(ValueToBoolConverter))]
     public bool IsAdult { get; init; }
     
-    [JsonPropertyName("is_staff")]
+    [JsonPropertyName("is_staff"),
+     JsonConverter(typeof(ValueToBoolConverter))]
     public bool IsStaff { get; init; }
     
-    [JsonPropertyName("is_greeter")]
+    [JsonPropertyName("is_greeter"),
+     JsonConverter(typeof(ValueToBoolConverter))]
     public bool IsGreeter { get; init; }
     
     [JsonPropertyName("greeter_score")]
@@ -199,7 +203,7 @@ public record UserModel : UserModelCommon {
     
     [JsonPropertyName("last_login"),
      JsonConverter(typeof(DateTimeConverter))]
-    public DateTime LastLogin { get; init; }
+    public DateTimeOffset LastLogin { get; init; }
     
     [JsonPropertyName("badge_count")]
     public int BadgeCount { get; init; }
