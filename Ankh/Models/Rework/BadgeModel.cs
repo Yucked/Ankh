@@ -39,8 +39,7 @@ public record BadgeModel {
     [JsonPropertyName("image_width")]
     public int Width { get; init; }
     
-    [JsonPropertyName("flagger_id"),
-     JsonNumberHandling(JsonNumberHandling.WriteAsString)]
+    [JsonPropertyName("flagger_id")]
     public string FlaggerId { get; init; }
     
     [JsonPropertyName("flag_time"),
