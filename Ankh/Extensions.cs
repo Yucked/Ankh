@@ -52,7 +52,6 @@ public static class Extensions {
             { "avatar_name", "username" },
             { "avname", "username" },
             { "avatar_download_size", "size" }, // Not sure where I got this from?
-            { "avpic", "profileImage" },
             { "legacy_cid", "id" },
             { "cid", "id" },
             //{ "avatar_image", "profileImage" }, Ignore this since avpic_url is better
@@ -152,7 +151,9 @@ public static class Extensions {
             p.WriteTo(writer);
         }
         
-        foreach (var p in phpJson.EnumerateObject()) {
+        foreach (var p in phpJson
+                     .EnumerateObject()
+                     .Where(x => !restJson.TryGetProperty(x.Name, out _))) {
             p.WriteTo(writer);
         }
         

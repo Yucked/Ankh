@@ -3,8 +3,8 @@ using System.Text.Json.Serialization;
 
 namespace Ankh.Converters;
 
-public sealed class DateTimeConverter : JsonConverter<DateTime> {
-    public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
+public sealed class DateTimeConverter : JsonConverter<DateTimeOffset> {
+    public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {
         try {
             return reader.TokenType == JsonTokenType.Number
                 ? DateTimeOffset.FromUnixTimeSeconds(reader.GetInt32()).DateTime
@@ -15,7 +15,7 @@ public sealed class DateTimeConverter : JsonConverter<DateTime> {
         }
     }
     
-    public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options) {
+    public override void Write(Utf8JsonWriter writer, DateTimeOffset value, JsonSerializerOptions options) {
         writer.WriteStringValue(value);
     }
 }
