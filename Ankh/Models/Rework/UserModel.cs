@@ -245,5 +245,7 @@ public record UserModel : UserModelCommon {
     [JsonPropertyName("visible_albums")]
     public int VisibleAlbums { get; init; }
     
-    public IReadOnlyCollection<BadgeModelProfile> ProfileBadges { get; init; }
+    [JsonPropertyName("badge_layout"),
+     JsonConverter(typeof(BadgesConverter))]
+    public IReadOnlyCollection<BadgeModelProfile> Badges { get; init; }
 }

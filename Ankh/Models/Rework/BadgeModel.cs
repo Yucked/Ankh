@@ -7,7 +7,8 @@ public record BadgeModel {
     [JsonPropertyName("badgeid")]
     public string Id { get; init; }
     
-    [JsonPropertyName("creator_id")]
+    [JsonPropertyName("creator_id"),
+     JsonConverter(typeof(IntToStringConverter))]
     public string UserId { get; init; }
     
     [JsonPropertyName("creator_badge_index")]
