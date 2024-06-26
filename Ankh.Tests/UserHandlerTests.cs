@@ -29,11 +29,7 @@ public sealed class UserHandlerTests {
     [DataTestMethod]
     [DataRow(347951586, 327222770, 350843753, 116678358, 121197925)]
     public async Task Test_GetUsersByIdAsync(params int[] userIds) {
-        var userLogin = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
-        Assert.IsNotNull(userLogin);
-        Assert.IsNotNull(userLogin.SessionId);
-        
-        var users = await Globals.UserHandler.GetUsersByIdAsync(userLogin, userIds.Select(x => $"{x}").ToArray());
+        var users = await Globals.UserHandler.GetUsersByIdAsync(userIds.Select(x => $"{x}").ToArray());
         Assert.IsNotNull(users);
         Assert.IsTrue(users.Count > 0);
     }
