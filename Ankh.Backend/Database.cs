@@ -1,4 +1,4 @@
-﻿using Ankh.Handlers;
+using Ankh.Handlers;
 using Ankh.Models.Rework;
 using Raven.Client.Documents;
 
@@ -23,7 +23,7 @@ public sealed class Database(
         }
         
         var tasks = configuration
-            .GetSection("Accounts")
+            .GetSection("VUAccounts")
             .Get<string[]>()!
             .Select(x => userHandler.LoginAsync(x.Split(';')[0], x.Split(';')[1]));
         

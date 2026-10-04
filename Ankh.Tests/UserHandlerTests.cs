@@ -2,7 +2,7 @@ namespace Ankh.Tests;
 
 [TestClass]
 public sealed class UserHandlerTests {
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(347951586)]
     [DataRow(327222770)]
     [DataRow(350843753)]
@@ -14,7 +14,7 @@ public sealed class UserHandlerTests {
         Assert.IsNotNull(user.Username);
     }
     
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(347951586)]
     [DataRow(327222770)]
     [DataRow(350843753)]
@@ -26,15 +26,15 @@ public sealed class UserHandlerTests {
         Assert.IsNotNull(user.Username);
     }
     
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(347951586, 327222770, 350843753, 116678358, 121197925)]
     public async Task Test_GetUsersByIdAsync(params int[] userIds) {
         var users = await Globals.UserHandler.GetUsersByIdAsync(userIds.Select(x => $"{x}").ToArray());
         Assert.IsNotNull(users);
-        Assert.IsTrue(users.Count > 0);
+        Assert.IsNotEmpty(users);
     }
     
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("Liep")]
     [DataRow("zimm")]
     [DataRow("veza")]
@@ -60,6 +60,6 @@ public sealed class UserHandlerTests {
         
         var outfits = await Globals.UserHandler.GetUserOutfitsAsync(userLogin);
         Assert.IsNotNull(outfits);
-        Assert.IsTrue(outfits.Length > 0);
+        Assert.IsNotEmpty(outfits);
     }
 }

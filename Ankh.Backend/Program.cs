@@ -5,9 +5,18 @@ using Microsoft.Extensions.Logging.Console;
 using Microsoft.Playwright;
 using Raven.Client.Documents;
 
-var exitCode = Microsoft.Playwright.Program.Main(["install", "--with-deps", "chromium"]);
-if (exitCode != 0) {
-    throw new Exception($"Playwright exited with code {exitCode}");
+var browserPath = Path.Combine(Directory.GetCurrentDirectory(), "playwright");
+Environment.SetEnvironmentVariable("PLAYWRIGHT_BROWSERS_PATH", browserPath);
+
+if (!Directory.Exists(Path.Combine(browserPath, "chromium-*"))) {
+    var exitCode = Microsoft.Playwright.Program.Main([
+     "install",
+    "--with-deps",
+    "chromium"]);
+
+    if (exitCode != 0) {
+        throw new Exception($"Playwright exited with code {exitCode}");
+    }
 }
 
 var playwright = await Playwright.CreateAsync();
@@ -49,5 +58,9 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 app.MapControllers();
 app.UseHealthChecks("/health");
+app.Lifetime.ApplicationStopped.Register(async () => {
+    await browser.DisposeAsync();
+    playwright.Dispose();
+});
 
 await app.RunAsync();

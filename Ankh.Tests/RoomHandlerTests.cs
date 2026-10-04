@@ -2,7 +2,7 @@ namespace Ankh.Tests;
 
 [TestClass]
 public sealed class RoomHandlerTests {
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("116678358-646")]
     [DataRow("263636495-130")]
     [DataRow("347951586-161")]
@@ -12,7 +12,7 @@ public sealed class RoomHandlerTests {
         Assert.IsNotNull(room.Name);
     }
     
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("Query")]
     public async Task Test_SearchRoomsAsync(string kw) {
         var userLogin = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
@@ -22,7 +22,7 @@ public sealed class RoomHandlerTests {
         await Globals.RoomHandler.SearchRoomsAsync(userLogin, q => { q.Keywords = kw; });
     }
     
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(347951586)]
     public async Task Test_GetPublicRoomsForUsersAsync(long userId) {
         var userLogin = await Globals.UserHandler.LoginAsync(Globals.DummyLogin.Username, Globals.DummyLogin.Password);
